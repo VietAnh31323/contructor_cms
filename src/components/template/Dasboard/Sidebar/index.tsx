@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   List,
   ListItemButton,
@@ -8,7 +11,6 @@ import {
   Collapse,
   MenuList,
 } from "@mui/material";
-
 import {
   ExpandLess,
   ExpandMore,
@@ -25,24 +27,39 @@ import {
 
 export default function Sidebar() {
   const [openProject, setOpenProject] = useState(false);
+  const pathname = usePathname();
 
   const handleToggleProject = () => setOpenProject(!openProject);
+  const isActive = (path: string) =>
+    pathname === path || pathname.startsWith(path + "/");
 
+  useEffect(() => {
+    if (pathname.startsWith("/projects")) setOpenProject(true);
+  }, [pathname]);
+  console.log("Sidebar render");
   return (
-    <aside className="w-64 bg-white shadow-md h-screen">
+    <aside className="w-60 bg-white shadow-md h-screen overflow-y-auto">
       <MenuList className="p-2">
         {/* --- Trang chủ / Thống kê --- */}
-        <Link href="/Dashboard">
-          <ListItemButton>
-            <ListItemIcon>
-              <HomeOutlined className="text-gray-600" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Thống kê"
-              className="text-gray-700 font-medium"
+        <ListItemButton
+          component={Link}
+          href="/Dashboard"
+          sx={{
+            backgroundColor: isActive("/Dashboard") ? "#f0f4ff" : "transparent",
+            color: isActive("/Dashboard") ? "#002C66" : "#374151",
+            borderLeft: isActive("/Dashboard") ? "7px solid #002C66" : "none",
+            "&:hover": { backgroundColor: "#e5e7eb" },
+          }}
+        >
+          <ListItemIcon>
+            <HomeOutlined
+              className={
+                isActive("/Dashboard") ? "text-[#002C66]" : "text-gray-600"
+              }
             />
-          </ListItemButton>
-        </Link>
+          </ListItemIcon>
+          <ListItemText primary="Thống kê" />
+        </ListItemButton>
 
         {/* --- Dự án (có submenu) --- */}
         <ListItemButton onClick={handleToggleProject}>
@@ -60,97 +77,162 @@ export default function Sidebar() {
           )}
         </ListItemButton>
 
-        <Collapse in={openProject} timeout="auto" unmountOnExit>
+        <Collapse in={openProject} unmountOnExit>
           <List component="div" disablePadding>
-            <Link href="/projects/progress">
-              <ListItemButton sx={{ pl: 6 }}>
-                <ListItemIcon>
-                  <TimelineOutlined
-                    fontSize="small"
-                    className="text-gray-500"
-                  />
-                </ListItemIcon>
-                <ListItemText primary="Danh sách dự án" />
-              </ListItemButton>
-            </Link>
+            <ListItemButton
+              component={Link}
+              href="/projects/progress"
+              sx={{
+                pl: 6,
+                backgroundColor: isActive("/projects/progress")
+                  ? "#f0f4ff"
+                  : "transparent",
+                color: isActive("/projects/progress") ? "#002C66" : "#374151",
+                borderLeft: isActive("/projects/progress")
+                  ? "7px solid #002C66"
+                  : "none",
+              }}
+            >
+              <ListItemText primary="Danh sách" />
+            </ListItemButton>
 
-            <Link href="/projects/staff">
-              <ListItemButton sx={{ pl: 6 }}>
-                <ListItemIcon>
-                  <PeopleAltOutlined
-                    fontSize="small"
-                    className="text-gray-500"
-                  />
-                </ListItemIcon>
-                <ListItemText primary="Hạng mục" />
-              </ListItemButton>
-            </Link>
+            <ListItemButton
+              component={Link}
+              href="/projects/staff"
+              sx={{
+                pl: 6,
+                backgroundColor: isActive("/projects/staff")
+                  ? "#f0f4ff"
+                  : "transparent",
+                color: isActive("/projects/staff") ? "#002C66" : "#374151",
+                borderLeft: isActive("/projects/staff")
+                  ? "7px solid #002C66"
+                  : "none",
+              }}
+            >
+              <ListItemText primary="Hạng mục" />
+            </ListItemButton>
 
-            <Link href="/projects/cost">
-              <ListItemButton sx={{ pl: 6 }}>
-                <ListItemIcon>
-                  <AttachMoneyOutlined
-                    fontSize="small"
-                    className="text-gray-500"
-                  />
-                </ListItemIcon>
-                <ListItemText primary="Thùng rác" />
-              </ListItemButton>
-            </Link>
+            <ListItemButton
+              component={Link}
+              href="/projects/cost"
+              sx={{
+                pl: 6,
+                backgroundColor: isActive("/projects/cost")
+                  ? "#f0f4ff"
+                  : "transparent",
+                color: isActive("/projects/cost") ? "#002C66" : "#374151",
+                borderLeft: isActive("/projects/cost")
+                  ? "7px solid #002C66"
+                  : "none",
+              }}
+            >
+              <ListItemText primary="Thùng rác" />
+            </ListItemButton>
           </List>
         </Collapse>
 
         {/* --- Nhân sự --- */}
-        <Link href="/employees">
-          <ListItemButton>
-            <ListItemIcon>
-              <PersonPinOutlined className="text-gray-600" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Nhân sự"
-              className="text-gray-700 font-medium"
+        <ListItemButton
+          component={Link}
+          href="/Constructor/Employee"
+          sx={{
+            backgroundColor: isActive("/Constructor/Employee")
+              ? "#f0f4ff"
+              : "transparent",
+            color: isActive("/Constructor/Employee") ? "#002C66" : "#374151",
+            borderLeft: isActive("/Constructor/Employee")
+              ? "7px solid #002C66"
+              : "none",
+          }}
+        >
+          <ListItemIcon>
+            <PersonPinOutlined
+              className={
+                isActive("/Employee") ? "text-[#002C66]" : "text-gray-600"
+              }
             />
-          </ListItemButton>
-        </Link>
+          </ListItemIcon>
+          <ListItemText primary="Nhân sự" />
+        </ListItemButton>
 
         {/* --- Thống kê thép --- */}
-        <Link href="/steel-statistics">
-          <ListItemButton>
-            <ListItemIcon>
-              <AutoGraphOutlined className="text-gray-600" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Thống kê thép"
-              className="text-gray-700 font-medium"
+        <ListItemButton
+          component={Link}
+          href="/steel-statistics"
+          sx={{
+            backgroundColor: isActive("/steel-statistics")
+              ? "#f0f4ff"
+              : "transparent",
+            color: isActive("/steel-statistics") ? "#002C66" : "#374151",
+            borderLeft: isActive("/steel-statistics")
+              ? "7px solid #002C66"
+              : "none",
+          }}
+        >
+          <ListItemIcon>
+            <AutoGraphOutlined
+              className={
+                isActive("/steel-statistics")
+                  ? "text-[#002C66]"
+                  : "text-gray-600"
+              }
             />
-          </ListItemButton>
-        </Link>
+          </ListItemIcon>
+          <ListItemText primary="Thống kê thép" />
+        </ListItemButton>
 
         {/* --- Khách hàng --- */}
-        <Link href="/customers">
-          <ListItemButton>
-            <ListItemIcon>
-              <SupportAgentOutlined className="text-gray-600" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Khách hàng"
-              className="text-gray-700 font-medium"
+        <ListItemButton
+          component={Link}
+          href="/Constructor/Customer"
+          sx={{
+            backgroundColor: isActive("/Constructor/Customer")
+              ? "#f0f4ff"
+              : "transparent",
+            color: isActive("/Constructor/Customer") ? "#002C66" : "#374151",
+            borderLeft: isActive("/Constructor/Customer")
+              ? "7px solid #002C66"
+              : "none",
+          }}
+        >
+          <ListItemIcon>
+            <SupportAgentOutlined
+              className={
+                isActive("/Constructor/Customer")
+                  ? "text-[#002C66]"
+                  : "text-gray-600"
+              }
             />
-          </ListItemButton>
-        </Link>
+          </ListItemIcon>
+          <ListItemText primary="Khách hàng" />
+        </ListItemButton>
 
         {/* --- Tiến độ dự án --- */}
-        <Link href="/project-progress">
-          <ListItemButton>
-            <ListItemIcon>
-              <AnalyticsOutlined className="text-gray-600" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Tiến độ dự án"
-              className="text-gray-700 font-medium"
+        <ListItemButton
+          component={Link}
+          href="/project-progress"
+          sx={{
+            backgroundColor: isActive("/project-progress")
+              ? "#f0f4ff"
+              : "transparent",
+            color: isActive("/project-progress") ? "#002C66" : "#374151",
+            borderLeft: isActive("/project-progress")
+              ? "7px solid #002C66"
+              : "none",
+          }}
+        >
+          <ListItemIcon>
+            <AnalyticsOutlined
+              className={
+                isActive("/project-progress")
+                  ? "text-[#002C66]"
+                  : "text-gray-600"
+              }
             />
-          </ListItemButton>
-        </Link>
+          </ListItemIcon>
+          <ListItemText primary="Tiến độ dự án" />
+        </ListItemButton>
       </MenuList>
     </aside>
   );
