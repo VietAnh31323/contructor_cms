@@ -5,10 +5,11 @@ import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
 import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
-import useEmployee from "./useEmployee";
+import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
+import router from "next/router";
 
 export default function Employee() {
-  const [value, handle] = useEmployee();
+  const [value, handle] = useEmployeeList();
 
   const { columns, tableData, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
@@ -55,7 +56,11 @@ export default function Employee() {
           </Grid>
         </form>
         <div className="flex justify-end py-5">
-          <Button variant="contained" onClick={() => {}}>
+          <Button
+            variant="outlined"
+            onClick={() => router.push("/Constructor/Employee/addNew")}
+            sx={{ textTransform: "capitalize" }}
+          >
             Thêm mới
           </Button>
         </div>
