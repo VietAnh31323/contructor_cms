@@ -56,13 +56,9 @@ export default function Employee() {
           </Grid>
         </form>
         <div className="flex justify-end py-5">
-          <Button
-            variant="outlined"
-            onClick={() => router.push("/Constructor/Employee/addNew")}
-            sx={{ textTransform: "capitalize" }}
-          >
-            Thêm mới
-          </Button>
+          <CoreButton onClick={() => {}} theme="submit">
+            {"Thêm mới"}
+          </CoreButton>
         </div>
         <CoreTableCustom
           columns={columns || []}

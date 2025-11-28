@@ -1,6 +1,6 @@
 import { CoreAutoChip } from "@/components/atoms/CoreAutoChip";
-import { getPlaceholder } from "@/helper/getPlaceholder";
-import { TRANSLATE } from "@/routes";
+// import { getPlaceholder } from "@/helper/getPlaceholder";
+// import { TRANSLATE } from "@/routes";
 import {
   Autocomplete,
   AutocompleteProps,
@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { find, get, isObject, join, map } from "lodash";
-import { useTranslation } from "next-i18next";
+// import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import React, { ReactNode, useCallback } from "react";
 import { Controller } from "react-hook-form";
@@ -48,6 +48,7 @@ export interface FormControlAutoCompleteProps<
   errCustom?: boolean;
   variant?: "outlined" | "filled" | "standard";
   isViewProp?: boolean;
+  placeholder?: string;
   onChangeValue?: (val: any) => void;
   onDeleteTag?: (val: any) => void;
 }
@@ -101,7 +102,7 @@ const CoreAutocomplete: <
     ...restProps
   } = props;
 
-  const { t } = useTranslation(TRANSLATE.COMMON);
+  // const { t } = useTranslation(TRANSLATE.COMMON);
 
   const router = useRouter();
 
@@ -183,7 +184,7 @@ const CoreAutocomplete: <
                   />
                 ))
               }
-              noOptionsText={t("form.autocomplete.no_options")}
+              noOptionsText={"Không có lựa chọn"}
               disabled={disabled}
               readOnly={isView || readOnly}
               onChange={(_, value: any) => {
@@ -222,15 +223,7 @@ const CoreAutocomplete: <
                   <TextField
                     {...params}
                     variant={variant}
-                    placeholder={getPlaceholder(
-                      t,
-                      "autocomplete",
-                      placeholder,
-                      label,
-                      isView,
-                      value,
-                      multiple
-                    )}
+                    placeholder={placeholder ?? ""}
                     inputRef={ref}
                     label={label}
                     error={!!(error || errCustom)}

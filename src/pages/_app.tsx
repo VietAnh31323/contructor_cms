@@ -4,6 +4,8 @@ import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import AuthLayout from "@/components/layouts/AuthLayout";
+import { Provider } from "react-redux";
+import { store } from "@/redux/store";
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin", "latin-ext"],
@@ -19,8 +21,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const Layout = isAuthPage ? AuthLayout : AdminLayout;
 
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <Provider store={store}>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </Provider>
   );
 }
