@@ -6,11 +6,14 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
+import { RecoilRoot } from "recoil"; // <- import RecoilRoot
+
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin", "latin-ext"],
   variable: "--font-poppins",
 });
+
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
@@ -22,9 +25,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <Provider store={store}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <RecoilRoot>
+        {" "}
+        {/* <- Thêm RecoilRoot ở đây */}
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </RecoilRoot>
     </Provider>
   );
 }

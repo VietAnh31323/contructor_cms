@@ -7,12 +7,13 @@ import { PRIMARY } from "@/helper/colors";
 import { useFormCustom } from "@/lib/form";
 import { useAppDispatch } from "@/redux/hook";
 import { addOneTableConfig } from "@/redux/reducer/tableReducer";
-import { TRANSLATE } from "@/routes";
+// import { TRANSLATE } from "@/routes";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { Box, Checkbox, IconButton, Typography } from "@mui/material";
-import { useTranslation } from "next-i18next";
+// import { useTranslation } from "next-i18next";
 import React, { ReactNode } from "react";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 import { ColumnProps } from "..";
 
 const defaultValues = {
@@ -32,7 +33,7 @@ export const DialogTable = ({
   }[];
   columnsChecked: (ColumnProps | undefined)[];
 }) => {
-  const { t } = useTranslation(TRANSLATE.COMMON);
+  // const { t } = useTranslation(TRANSLATE.COMMON);
   const { hideDialog } = useDialog();
 
   const { control, watch, getValues, setValue, reset, handleSubmit } =
@@ -226,10 +227,10 @@ export const DialogTable = ({
             hideDialog();
           }}
         >
-          {t("common:btn.cancel")}
+          {"Hủy"}
         </CoreButton>
         <CoreButton theme="submit" onClick={onSubmit}>
-          {t("common:btn.confirm")}
+          {"Xác nhận"}
         </CoreButton>
       </div>
     </CoreDialog>

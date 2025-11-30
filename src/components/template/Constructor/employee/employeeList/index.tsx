@@ -7,12 +7,17 @@ import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
 import router from "next/router";
+import CoreInputCustom from "@/components/atoms/CoreInputCustom";
+import { useForm } from "react-hook-form";
+import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
+import { CoreTable } from "@/components/organism/CoreTable";
 
 export default function Employee() {
   const [value, handle] = useEmployeeList();
 
   const { columns, tableData, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
+  const { control } = useForm();
   return (
     <Grid
       container
@@ -30,25 +35,25 @@ export default function Employee() {
         <form className="flex flex-col py-6 ">
           <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
             <Grid item xs={12} sm={12} md={6} lg={4}>
-              <TextField
-                // error
-                id="standard"
+              <CoreInputCustom
+                control={control}
+                name="search"
                 label="Tìm kiếm"
-                placeholder="Tìm kiếm theo mã khách hàng"
-                variant="standard"
-                focused
-                sx={{ width: "100%", padding: "0" }}
+                placeholder="Tìm kiếm theo mã nhân viên"
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={4}>
-              <TextField
-                // error
-                id="standard"
-                label="Trạng thái"
-                placeholder="Đang tư vấn"
-                variant="standard"
-                focused
-                sx={{ width: "100%", padding: "0" }}
+              <CoreAutocomplete
+                options={[
+                  { label: "Quản trị viên", value: "admin" },
+                  { label: "Quản lý", value: "manager" },
+                  { label: "Nhân viên", value: "staff" },
+                ]}
+                control={control}
+                name="role"
+                label="Chức vụ"
+                placeholder="Chọn chức vụ"
+                valuePath="value"
               />
             </Grid>
 
@@ -56,17 +61,21 @@ export default function Employee() {
           </Grid>
         </form>
         <div className="flex justify-end py-5">
-          <CoreButton onClick={() => {}} theme="submit">
+          <CoreButton
+            onClick={() => {
+              router.push("/Constructor/Employee/addNew");
+            }}
+            theme="submit"
+          >
             {"Thêm mới"}
           </CoreButton>
         </div>
-        <CoreTableCustom
+        <CoreTable
+          tableName="abc"
           columns={columns || []}
-          rows={tableData || []}
+          data={tableData || []}
           page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={setPage}
-          onRowsPerPageChange={setRowsPerPage}
+          isShowColumnStt
         />
       </PageContainer>
     </Grid>

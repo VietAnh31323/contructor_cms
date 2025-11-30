@@ -4,7 +4,7 @@ import { TableRowEmpty } from "@/components/organism/CoreTable/components/TableR
 import { TableRowLoading } from "@/components/organism/CoreTable/components/TableRowLoading";
 import { BACK_GROUND, WHITE } from "@/helper/colors";
 import { useAppSelector } from "@/redux/hook";
-import { TRANSLATE } from "@/routes";
+// import { TRANSLATE } from "@/routes";
 import styled from "@emotion/styled";
 import {
   Table,
@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@mui/material";
 import _ from "lodash";
-import { useTranslation } from "next-i18next";
+// import { useTranslation } from "next-i18next";
 import { ReactElement, ReactNode } from "react";
 import { useRecoilValue } from "recoil";
 import PaginationCustom from "../CoreTablePagination";
@@ -90,14 +90,14 @@ export const CoreTable = ({
   onRowClick,
   isDoubleClick,
 }: CoreTableProps) => {
-  const { t } = useTranslation(TRANSLATE.COMMON);
+  // const { t } = useTranslation(TRANSLATE.COMMON);
 
   const layout = useRecoilValue(layoutType);
 
   const dataColumn = isShowColumnStt
     ? [
         {
-          header: t("table.no") ?? "No",
+          header: "STT",
           fieldName: "index",
         },
         ...columns,
@@ -238,3 +238,6 @@ export const CoreTable = ({
     </div>
   );
 };
+function t(arg0: string) {
+  throw new Error("Function not implemented.");
+}
