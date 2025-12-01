@@ -81,14 +81,14 @@ export default function Sidebar() {
           <List component="div" disablePadding>
             <ListItemButton
               component={Link}
-              href="/projects/progress"
+              href="/Constructor/Project"
               sx={{
                 pl: 6,
-                backgroundColor: isActive("/projects/progress")
+                backgroundColor: isActive("/Constructor/Project")
                   ? "#f0f4ff"
                   : "transparent",
-                color: isActive("/projects/progress") ? "#002C66" : "#374151",
-                borderLeft: isActive("/projects/progress")
+                color: isActive("/Constructor/Project") ? "#002C66" : "#374151",
+                borderLeft: isActive("/Constructor/Project")
                   ? "7px solid #002C66"
                   : "none",
               }}
@@ -98,14 +98,16 @@ export default function Sidebar() {
 
             <ListItemButton
               component={Link}
-              href="/projects/staff"
+              href="/Constructor/Category"
               sx={{
                 pl: 6,
-                backgroundColor: isActive("/projects/staff")
+                backgroundColor: isActive("/Constructor/Category")
                   ? "#f0f4ff"
                   : "transparent",
-                color: isActive("/projects/staff") ? "#002C66" : "#374151",
-                borderLeft: isActive("/projects/staff")
+                color: isActive("/Constructor/Category")
+                  ? "#002C66"
+                  : "#374151",
+                borderLeft: isActive("/Constructor/Category")
                   ? "7px solid #002C66"
                   : "none",
               }}

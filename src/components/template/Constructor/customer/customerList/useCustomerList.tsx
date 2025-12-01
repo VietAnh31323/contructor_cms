@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-const useCustomer = () => {
+const useCustomerList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const columns = useMemo(
@@ -70,4 +70,4 @@ const useCustomer = () => {
   ];
 };
 
-export default useCustomer;
+export default useCustomerList;

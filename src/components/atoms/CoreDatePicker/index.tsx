@@ -173,7 +173,7 @@ export const CoreDatePicker = (props: CoreDatePickerProps) => {
                   },
                   ...params,
                   ...rest,
-                  onBlur: (e) => {
+                  onBlur: (e: any) => {
                     const value = e.target.value;
                     const parsedDate = moment(value, format ?? dateType, true);
                     handleDateChange(
