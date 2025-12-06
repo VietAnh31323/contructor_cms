@@ -11,6 +11,7 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
+import { ROUTES } from "@/routes";
 
 export default function Employee() {
   const [value, handle] = useEmployeeList();
@@ -63,7 +64,7 @@ export default function Employee() {
         <div className="flex justify-end py-5">
           <CoreButton
             onClick={() => {
-              router.push("/Constructor/Employee/addNew");
+              router.push(ROUTES.CUSTOMER + "/addNew");
             }}
             theme="submit"
           >

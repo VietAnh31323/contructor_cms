@@ -18,7 +18,7 @@ export const CoreButton = forwardRef<HTMLButtonElement, Props>(
     {
       height = 32,
       width = 60,
-      fontSize = 12,
+      fontSize = 13,
       fontWeight = 400,
       textTransform = "none",
       theme = "submit",

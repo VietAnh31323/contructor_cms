@@ -1,4 +1,10 @@
-import { Autocomplete, Button, Grid, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Grid,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import Image from "next/image";
 import statistics from "@/assets/svg/statistics.svg";
 import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
@@ -10,7 +16,7 @@ import CoreNavbar from "@/components/organism/CoreNavbar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
-
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
@@ -94,22 +100,34 @@ export default function EmployeeSave() {
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <DatePicker
-                        selected={date}
-                        onChange={(d) => setDate(d)}
-                        placeholderText="Chọn ngày"
-                        customInput={
-                          <TextField
-                            label="Chọn ngày"
-                            variant="standard"
-                            fullWidth
-                            focused
-                            placeholder="Chọn ngày"
-                          />
-                        }
-                        popperPlacement="bottom"
-                        className="w-full "
-                      />
+                      <div style={{ width: "100%" }}>
+                        <DatePicker
+                          selected={date}
+                          onChange={(d) => setDate(d)}
+                          placeholderText="Chọn ngày"
+                          customInput={
+                            <TextField
+                              label="Chọn ngày"
+                              variant="standard"
+                              fullWidth
+                              focused
+                              placeholder="Chọn ngày"
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    <CalendarMonthIcon
+                                      sx={{ cursor: "pointer" }}
+                                    />
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                          }
+                          popperPlacement="bottom"
+                          wrapperClassName="w-full"
+                          className="w-full"
+                        />
+                      </div>
                     </Grid>
 
                     <Grid item xs={12} sm={12} md={6} lg={4}>

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useLoginForm } from "./useLoginForm";
 import { useRouter } from "next/router";
-import { ROUTES } from "@/routes";
+import { MENU_URL, ROUTES } from "@/routes";
 import { useState } from "react";
 
 export default function LoginForm() {
@@ -24,7 +24,7 @@ export default function LoginForm() {
     router.push(ROUTES.RESET_PASSWORD);
   };
   const handleSubmit = (e: React.FormEvent) => {
-    router.push("/dashboard");
+    router.push(ROUTES.DASHBOARD);
   };
   return (
     <Box

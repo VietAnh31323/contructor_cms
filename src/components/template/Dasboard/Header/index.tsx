@@ -1,28 +1,29 @@
 import { ROUTES } from "@/routes";
 import {
-  Cloud,
-  ContentCopy,
-  ContentCut,
-  ContentPaste,
-} from "@mui/icons-material";
-import {
   Avatar,
   Divider,
   ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
-  MenuList,
   Switch,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
-import React from "react";
+
 import Person2Icon from "@mui/icons-material/Person2";
 import PasswordIcon from "@mui/icons-material/Password";
 import LanguageIcon from "@mui/icons-material/Language";
 import LightModeIcon from "@mui/icons-material/LightMode";
-export default function Header() {
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+
+import React from "react";
+
+export default function Header({
+  toggleDark,
+  isDark,
+}: {
+  toggleDark: () => void;
+  isDark: boolean;
+}) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -30,79 +31,85 @@ export default function Header() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClose = () => setAnchorEl(null);
+
   return (
-    <div>
-      <div className="bg-[#0078D4] p-2 text-white flex justify-between">
-        <Typography sx={{ textAlign: "center", margin: "auto 0" }}>
-          Công ty cổ phần kiến trúc, xây dựng ABC
-        </Typography>
+    <div className="bg-[#0078D4] p-2 text-white flex justify-between items-center">
+      <Typography sx={{ fontWeight: 500 }}>
+        Công ty cổ phần kiến trúc, xây dựng ABC
+      </Typography>
 
-        <Avatar onClick={handleClick} className="w-10 h-10 cursor-pointer">
-          H
-        </Avatar>
+      <Avatar onClick={handleClick} className="w-10 h-10 cursor-pointer">
+        H
+      </Avatar>
 
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          // onClick={handleClose}
-          PaperProps={{
-            elevation: 3,
-            sx: {
-              width: 260,
-              borderRadius: 2,
-              mt: 1.5,
-              overflow: "visible",
-            },
+      {/* --- MENU --- */}
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          elevation: 3,
+          sx: {
+            width: 260,
+            borderRadius: 2,
+            mt: 1.5,
+            overflow: "visible",
+          },
+        }}
+      >
+        <MenuItem>
+          <ListItemIcon>
+            <Person2Icon fontSize="medium" />
+          </ListItemIcon>
+          Thông tin cá nhân
+        </MenuItem>
+
+        <MenuItem>
+          <ListItemIcon>
+            <PasswordIcon fontSize="medium" />
+          </ListItemIcon>
+          Đổi mật khẩu
+        </MenuItem>
+
+        <MenuItem>
+          <ListItemIcon>
+            <LanguageIcon fontSize="medium" />
+          </ListItemIcon>
+          Ngôn ngữ
+        </MenuItem>
+
+        {/* ---------- DARK MODE ---------- */}
+        <MenuItem
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          <MenuItem>
+          <div className="flex items-center gap-2">
             <ListItemIcon>
-              <Person2Icon fontSize="medium" />
+              {isDark ? (
+                <DarkModeIcon className="text-[#0078D4]" />
+              ) : (
+                <LightModeIcon />
+              )}
             </ListItemIcon>
-            Thông tin cá nhân
-          </MenuItem>
 
-          <MenuItem>
-            <ListItemIcon>
-              <PasswordIcon fontSize="medium" />
-            </ListItemIcon>
-            Đổi mật khẩu
-          </MenuItem>
+            <span>{isDark ? "Dark Mode" : "Light Mode"}</span>
+          </div>
 
-          <MenuItem>
-            <ListItemIcon>
-              <LanguageIcon fontSize="medium" />
-            </ListItemIcon>
-            Ngôn ngữ
-          </MenuItem>
-          <MenuItem
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div className="flex items-center ">
-              <ListItemIcon>
-                <LightModeIcon fontSize="medium" />
-              </ListItemIcon>
-              Light Mode
-            </div>
+          <Switch edge="end" checked={isDark} onChange={toggleDark} />
+        </MenuItem>
 
-            <Switch size="medium" />
-          </MenuItem>
+        <Divider />
 
-          <Divider />
-
-          <MenuItem sx={{ display: "flex", justifyContent: "center" }}>
-            Đăng xuất
-          </MenuItem>
-        </Menu>
-      </div>
+        <MenuItem
+          sx={{ display: "flex", justifyContent: "center", color: "#0078D4" }}
+        >
+          Đăng xuất
+        </MenuItem>
+      </Menu>
     </div>
   );
 }
