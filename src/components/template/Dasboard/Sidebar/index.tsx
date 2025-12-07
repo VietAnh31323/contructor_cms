@@ -72,14 +72,14 @@ export default function AppSidebar() {
             component={<Link href="/Constructor/Project" />}
             active={isActive("/Constructor/Project")}
           >
-            Danh sách
+            Danh sách dự án
           </MenuItem>
 
           <MenuItem
             component={<Link href="/Constructor/Category" />}
             active={isActive("/Constructor/Category")}
           >
-            Hạng mục
+            Hạng mục dự án
           </MenuItem>
 
           <MenuItem
@@ -91,13 +91,20 @@ export default function AppSidebar() {
         </SubMenu>
 
         {/* --- Nhân sự --- */}
-        <MenuItem
-          icon={<PersonPinOutlined />}
-          component={<Link href="/Constructor/Employee" />}
-          active={isActive("/Constructor/Employee")}
-        >
-          Nhân sự
-        </MenuItem>
+        <SubMenu icon={<PersonPinOutlined />} label="Nhân sự">
+          <MenuItem
+            component={<Link href="/Constructor/Employee" />}
+            active={isActive("/Constructor/Employee")}
+          >
+            Danh sách nhân sự
+          </MenuItem>
+          <MenuItem
+            component={<Link href="/Constructor/Account" />}
+            active={isActive("/Constructor/Account")}
+          >
+            Quản lý tài khoản
+          </MenuItem>
+        </SubMenu>
 
         {/* --- Thống kê thép --- */}
         <MenuItem
@@ -118,13 +125,25 @@ export default function AppSidebar() {
         </MenuItem>
 
         {/* --- Tiến độ dự án --- */}
-        <MenuItem
+        <SubMenu
           icon={<AnalyticsOutlined />}
-          component={<Link href="/project-progress" />}
-          active={isActive("/project-progress")}
+          component={<Link href="/Constructor/Customer" />}
+          active={isActive("/Constructor/Customer")}
+          label="Tiến độ dự án"
         >
-          Tiến độ dự án
-        </MenuItem>
+          <MenuItem
+            component={<Link href="/project-progress" />}
+            active={isActive("/project-progress")}
+          >
+            Danh sách tiến độ dự án
+          </MenuItem>
+          <MenuItem
+            component={<Link href="/project-progress" />}
+            active={isActive("/manager-progress")}
+          >
+            Quản lý tiến trình
+          </MenuItem>
+        </SubMenu>
       </Menu>
     </Sidebar>
   );

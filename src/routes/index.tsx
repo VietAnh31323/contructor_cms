@@ -11,4 +11,5 @@ export const ROUTES = {
   CUSTOMER: "/Constructor/Employee",
   INFORMATION: "/Dashboard/Information",
   FORGOTPASS: "/Dashboard/ForgotPass",
+  ACCOUNT: "/Constructor/Account",
 };
