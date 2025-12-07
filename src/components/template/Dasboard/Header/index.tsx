@@ -107,6 +107,7 @@ export default function Header({
 
         <MenuItem
           sx={{ display: "flex", justifyContent: "center", color: "#0078D4" }}
+          onClick={() => router.push(ROUTES.LOGIN)}
         >
           Đăng xuất
         </MenuItem>
