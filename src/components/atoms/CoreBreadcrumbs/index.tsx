@@ -1,4 +1,4 @@
-import { MENU_URL } from "@/routes";
+import { MENU_URL, ROUTES } from "@/routes";
 import { Dashboard } from "@mui/icons-material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Box, Breadcrumbs, IconButton } from "@mui/material";
@@ -31,9 +31,7 @@ export const CoreBreadcrumbs = (props: CoreBreadcrumbsProps) => {
       }}
     >
       {isShowDashboard && (
-        <IconButton
-          onClick={() => router.push({ pathname: MENU_URL.DASHBOARD })}
-        >
+        <IconButton onClick={() => router.push({ pathname: ROUTES.DASHBOARD })}>
           <Dashboard fontSize="small" />
         </IconButton>
       )}

@@ -16,6 +16,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 import React from "react";
+import router from "next/router";
 
 export default function Header({
   toggleDark,
@@ -58,14 +59,14 @@ export default function Header({
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => router.push(ROUTES.INFORMATION)}>
           <ListItemIcon>
             <Person2Icon fontSize="medium" />
           </ListItemIcon>
           Thông tin cá nhân
         </MenuItem>
 
-        <MenuItem>
+        <MenuItem onClick={() => router.push(ROUTES.FORGOTPASS)}>
           <ListItemIcon>
             <PasswordIcon fontSize="medium" />
           </ListItemIcon>

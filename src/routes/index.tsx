@@ -9,4 +9,6 @@ export const ROUTES = {
   RESET_PASSWORD: "/ressetPass",
   DASHBOARD: "/Dashboard",
   CUSTOMER: "/Constructor/Employee",
+  INFORMATION: "/Dashboard/Information",
+  FORGOTPASS: "/Dashboard/ForgotPass",
 };
