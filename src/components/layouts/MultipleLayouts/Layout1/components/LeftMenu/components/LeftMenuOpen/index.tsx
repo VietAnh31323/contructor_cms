@@ -86,7 +86,7 @@ const LeftMenuOpen = () => {
               }}
             />
             <Typography
-              variant="h6"
+              variant="subtitle1"
               style={{
                 color: PRIMARY,
               }}

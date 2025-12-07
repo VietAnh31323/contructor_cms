@@ -1,47 +1,44 @@
-import { getPlaceholder } from '@/helper/getPlaceholder'
-import { TRANSLATE } from '@/routes'
 import {
   FormHelperText,
   OutlinedTextFieldProps,
   TextField,
-} from '@mui/material'
-import { useTranslation } from 'next-i18next'
-import { useRouter } from 'next/router'
-import React from 'react'
-import { Controller } from 'react-hook-form'
-import NumberFormatCustom from './NumberFormatCustom'
-import { TooltipCode } from './TooltipCode'
+} from "@mui/material";
+import { useRouter } from "next/router";
+import React from "react";
+import { Controller } from "react-hook-form";
+import NumberFormatCustom from "./NumberFormatCustom";
+import { TooltipCode } from "./TooltipCode";
 
 interface Props
-  extends Omit<OutlinedTextFieldProps, 'variant' | 'label' | 'placeholder'> {
-  className?: string
-  control: any
-  name: string
-  label?: any
-  placeholder?: string | null
-  InputLabelProps?: any
-  inputProps?: any
-  InputProps?: any
-  required?: boolean
-  readOnly?: boolean
-  type?: string
-  multiline?: boolean
-  minRows?: number
-  disabled?: boolean
-  hidden?: boolean
-  helperText?: any
-  rules?: any
-  variant?: 'outlined' | 'filled' | 'standard'
-  disableDecimal?: boolean
-  disableNegative?: boolean
-  onKeyPress?: any
-  decimalScale?: number
-  isHasMessageError?: boolean
-  onAfterChangeValue?: any
-  isViewProp?: boolean
-  isAutoGenCode?: boolean
-  transform?: any
-  onChangeValue?: (val: any) => void
+  extends Omit<OutlinedTextFieldProps, "variant" | "label" | "placeholder"> {
+  className?: string;
+  control: any;
+  name: string;
+  label?: any;
+  placeholder?: string | null;
+  InputLabelProps?: any;
+  inputProps?: any;
+  InputProps?: any;
+  required?: boolean;
+  readOnly?: boolean;
+  type?: string;
+  multiline?: boolean;
+  minRows?: number;
+  disabled?: boolean;
+  hidden?: boolean;
+  helperText?: any;
+  rules?: any;
+  variant?: "outlined" | "filled" | "standard";
+  disableDecimal?: boolean;
+  disableNegative?: boolean;
+  onKeyPress?: any;
+  decimalScale?: number;
+  isHasMessageError?: boolean;
+  onAfterChangeValue?: any;
+  isViewProp?: boolean;
+  isAutoGenCode?: boolean;
+  transform?: any;
+  onChangeValue?: (val: any) => void;
 }
 
 const CoreInput = (props: Props) => {
@@ -63,7 +60,7 @@ const CoreInput = (props: Props) => {
     helperText,
     disabled,
     rules,
-    variant = 'standard',
+    variant = "standard",
     onBlur: onBlurAction,
     disableDecimal,
     disableNegative,
@@ -74,27 +71,25 @@ const CoreInput = (props: Props) => {
     isViewProp,
     onChangeValue,
     ...restProps
-  } = props
+  } = props;
 
-  const { t } = useTranslation(TRANSLATE.COMMON)
+  const router = useRouter();
+  const { actionType } = router.query;
+  const isView = isViewProp ?? actionType === "VIEW";
 
-  const router = useRouter()
-  const { actionType } = router.query
-  const isView = isViewProp ?? actionType === 'VIEW'
+  let { transform } = props;
 
-  let { transform } = props
-
-  if (type === 'number') {
+  if (type === "number") {
     transform = {
       input: (value: any) => value,
       output: (e: any) => {
-        const output = e.target.value
-        if (output === 0) return 0
-        if (output === '' || output === null || output === undefined)
-          return null
-        else return Number.isNaN(output) ? null : Number(output)
+        const output = e.target.value;
+        if (output === 0) return 0;
+        if (output === "" || output === null || output === undefined)
+          return null;
+        else return Number.isNaN(output) ? null : Number(output);
       },
-    }
+    };
   }
 
   return (
@@ -109,27 +104,27 @@ const CoreInput = (props: Props) => {
           <>
             <TextField
               fullWidth
-              type={type === 'number' ? 'text' : type}
+              type={type === "number" ? "text" : type}
               label={isAutoGenCode ? <TooltipCode label={label} /> : label}
-              placeholder={getPlaceholder(
-                t,
-                'input',
-                placeholder,
-                label,
-                isView,
-                value
-              )}
+              // placeholder={getPlaceholder(
+              //   t,
+              //   "input",
+              //   placeholder,
+              //   label,
+              //   isView,
+              //   value
+              // )}
               variant={variant}
               onChange={(e) => {
-                onChange(transform ? transform?.output(e) : e)
+                onChange(transform ? transform?.output(e) : e);
                 if (onChangeValue) {
-                  onChangeValue(e.target.value)
+                  onChangeValue(e.target.value);
                 }
-                if (onAfterChangeValue) onAfterChangeValue()
+                if (onAfterChangeValue) onAfterChangeValue();
               }}
               onBlur={(e) => {
-                onBlur()
-                onBlurAction && onBlurAction(e)
+                onBlur();
+                onBlurAction && onBlurAction(e);
               }}
               value={transform ? transform?.input(value) : value}
               inputRef={ref}
@@ -153,7 +148,7 @@ const CoreInput = (props: Props) => {
               InputProps={{
                 disableUnderline: isView,
                 ...InputProps,
-                ...(type === 'number' && {
+                ...(type === "number" && {
                   inputComponent: NumberFormatCustom,
                 }),
               }}
@@ -165,7 +160,7 @@ const CoreInput = (props: Props) => {
         rules={!isView ? rules : {}}
       />
     </div>
-  )
-}
+  );
+};
 
-export default React.memo(CoreInput)
+export default React.memo(CoreInput);

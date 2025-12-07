@@ -1,7 +1,6 @@
-import { BLACK } from '@/helper/colors'
-import TurnedInIcon from '@mui/icons-material/TurnedIn'
-import { IconButton, Tooltip } from '@mui/material'
-import { ReactNode } from 'react'
+import TurnedInIcon from "@mui/icons-material/TurnedIn";
+import { IconButton, Tooltip } from "@mui/material";
+import { ReactNode } from "react";
 
 export const TooltipCode = ({ label }: { label: ReactNode }) => {
   return (
@@ -11,7 +10,7 @@ export const TooltipCode = ({ label }: { label: ReactNode }) => {
       componentsProps={{
         tooltip: {
           style: {
-            color: BLACK,
+            color: "#000",
           },
         },
       }}
@@ -23,5 +22,5 @@ export const TooltipCode = ({ label }: { label: ReactNode }) => {
         </IconButton>
       </div>
     </Tooltip>
-  )
-}
+  );
+};

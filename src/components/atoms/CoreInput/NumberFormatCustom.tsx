@@ -1,16 +1,16 @@
-import { useAppSelector } from '@/redux/hook'
-import { forwardRef, memo, useCallback } from 'react'
-import { NumericFormat } from 'react-number-format'
+import { useAppSelector } from "@/redux/hook";
+import { forwardRef, memo, useCallback } from "react";
+import { NumericFormat } from "react-number-format";
 
 const NumberFormatCustom = forwardRef<any, any>(function NumberFormatCustomBase(
   props,
-  ref,
+  ref
 ) {
-  const { onChange, disabledecimal, disablenegative, ...other } = props
+  const { onChange, disabledecimal, disablenegative, ...other } = props;
 
   const { thousandSeparator, decimalSeparator } = useAppSelector(
-    (state) => state.companyConfigData,
-  )
+    (state: any) => state.companyConfigData
+  );
 
   const handleChange = useCallback(
     (value: any) => {
@@ -20,23 +20,23 @@ const NumberFormatCustom = forwardRef<any, any>(function NumberFormatCustomBase(
             name: props.name,
             value: value.value,
           },
-        })
+        });
       }
     },
-    [props.name, onChange],
-  )
+    [props.name, onChange]
+  );
 
   return (
     <NumericFormat
       {...other}
-      thousandSeparator={thousandSeparator === 'COMMA' ? ',' : '.'}
-      decimalSeparator={decimalSeparator === 'DOTS' ? '.' : ','}
+      thousandSeparator={thousandSeparator === "COMMA" ? "," : "."}
+      decimalSeparator={decimalSeparator === "DOTS" ? "." : ","}
       decimalScale={disabledecimal ? 0 : other?.decimalScale ?? undefined}
       allowNegative={!disablenegative}
       getInputRef={ref}
       onValueChange={handleChange}
     />
-  )
-})
+  );
+});
 
-export default memo(NumberFormatCustom)
+export default memo(NumberFormatCustom);

@@ -1,6 +1,6 @@
-import { CoreAutoChip } from '@/components/atoms/CoreAutoChip'
-import { getPlaceholder } from '@/helper/getPlaceholder'
-import { TRANSLATE } from '@/routes'
+import { CoreAutoChip } from "@/components/atoms/CoreAutoChip";
+// import { getPlaceholder } from "@/helper/getPlaceholder";
+// import { TRANSLATE } from "@/routes";
 import {
   Autocomplete,
   AutocompleteProps,
@@ -8,12 +8,12 @@ import {
   FormHelperText,
   TextField,
   Typography,
-} from '@mui/material'
-import { find, get, isObject, join, map } from 'lodash'
-import { useTranslation } from 'next-i18next'
-import { useRouter } from 'next/router'
-import React, { ReactNode, useCallback } from 'react'
-import { Controller } from 'react-hook-form'
+} from "@mui/material";
+import { find, get, isObject, join, map } from "lodash";
+// import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import React, { ReactNode, useCallback } from "react";
+import { Controller } from "react-hook-form";
 
 export interface FormControlAutoCompleteProps<
   T,
@@ -22,34 +22,35 @@ export interface FormControlAutoCompleteProps<
   FreeSolo extends boolean | undefined = undefined
 > extends Omit<
     AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>,
-    'renderInput'
+    "renderInput"
   > {
-  control: any
-  name: string
-  label?: any
-  enableColor?: boolean
-  InputLabelProps?: any
-  inputProps?: any
-  InputProps?: any
-  required?: boolean
-  valuePath?: string
-  labelPath?: string
-  labelPathDisplay?: string[]
-  loading?: boolean
-  isHasMessageError?: boolean
-  returnValueType?: 'enum' | 'option'
-  helperText?: ReactNode | string
-  AutoCompleteClassName?: string
-  defaultValue?: any
-  rules?: any
-  endContent?: any
-  isCreateAble?: boolean
-  onAfterChangeValue?: any
-  errCustom?: boolean
-  variant?: 'outlined' | 'filled' | 'standard'
-  isViewProp?: boolean
-  onChangeValue?: (val: any) => void
-  onDeleteTag?: (val: any) => void
+  control: any;
+  name: string;
+  label?: any;
+  enableColor?: boolean;
+  InputLabelProps?: any;
+  inputProps?: any;
+  InputProps?: any;
+  required?: boolean;
+  valuePath?: string;
+  labelPath?: string;
+  labelPathDisplay?: string[];
+  loading?: boolean;
+  isHasMessageError?: boolean;
+  returnValueType?: "enum" | "option";
+  helperText?: ReactNode | string;
+  AutoCompleteClassName?: string;
+  defaultValue?: any;
+  rules?: any;
+  endContent?: any;
+  isCreateAble?: boolean;
+  onAfterChangeValue?: any;
+  errCustom?: boolean;
+  variant?: "outlined" | "filled" | "standard";
+  isViewProp?: boolean;
+  placeholder?: string;
+  onChangeValue?: (val: any) => void;
+  onDeleteTag?: (val: any) => void;
 }
 
 const CoreAutocomplete: <
@@ -75,12 +76,12 @@ const CoreAutocomplete: <
     required,
     readOnly,
     enableColor = false,
-    valuePath = 'value',
-    labelPath = 'label',
+    valuePath = "value",
+    labelPath = "label",
     labelPathDisplay = [labelPath],
     loading,
     isHasMessageError = true,
-    returnValueType = 'enum',
+    returnValueType = "enum",
     multiple,
     disabled,
     endContent,
@@ -91,7 +92,7 @@ const CoreAutocomplete: <
     defaultValue,
     size,
     errCustom,
-    variant = 'standard',
+    variant = "standard",
     isViewProp,
     onChangeValue,
     onAfterChangeValue,
@@ -99,47 +100,47 @@ const CoreAutocomplete: <
     renderOption,
 
     ...restProps
-  } = props
+  } = props;
 
-  const { t } = useTranslation(TRANSLATE.COMMON)
+  // const { t } = useTranslation(TRANSLATE.COMMON);
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const { actionType } = router.query
-  const isView = isViewProp ?? actionType === 'VIEW'
+  const { actionType } = router.query;
+  const isView = isViewProp ?? actionType === "VIEW";
 
   const getValueOption = useCallback(
     (value: any) => {
       if (multiple) {
         if (isCreateAble) {
-          return value
+          return value;
         }
         return map(value, (v) => {
           if (!isObject(v)) {
             return (
               find(options, (item) => {
-                return get(item, valuePath) === v
+                return get(item, valuePath) === v;
               }) ?? null
-            )
+            );
           }
-          return v
-        })
+          return v;
+        });
       }
 
-      if (returnValueType === 'enum') {
-        return find(options, (item) => get(item, valuePath) === value) ?? null
+      if (returnValueType === "enum") {
+        return find(options, (item) => get(item, valuePath) === value) ?? null;
       }
 
-      return value
+      return value;
     },
     [isCreateAble, multiple, options, returnValueType, valuePath]
-  )
+  );
 
   const formatOptionLabel = (option: any) =>
     join(
       labelPathDisplay.map((key) => get(option, key)),
-      ' - '
-    )
+      " - "
+    );
 
   return (
     <div className={className}>
@@ -151,7 +152,7 @@ const CoreAutocomplete: <
           field: { onChange, onBlur, value, ref },
           fieldState: { error },
         }) => {
-          const selectedOption = getValueOption(value)
+          const selectedOption = getValueOption(value);
           return (
             <Autocomplete
               forcePopupIcon={!isView}
@@ -161,9 +162,9 @@ const CoreAutocomplete: <
               defaultValue={defaultValue}
               isOptionEqualToValue={(option, value) => {
                 if (value instanceof Object) {
-                  return get(option, valuePath) === get(value, valuePath)
+                  return get(option, valuePath) === get(value, valuePath);
                 }
-                return get(option, valuePath) === value
+                return get(option, valuePath) === value;
               }}
               getOptionLabel={(option) => formatOptionLabel(option)}
               loading={loading}
@@ -183,24 +184,24 @@ const CoreAutocomplete: <
                   />
                 ))
               }
-              noOptionsText={t('form.autocomplete.no_options')}
+              noOptionsText={"Không có lựa chọn"}
               disabled={disabled}
               readOnly={isView || readOnly}
               onChange={(_, value: any) => {
                 const afterValue = multiple
                   ? value.map((v: any) => get(v, valuePath))
-                  : get(value, valuePath) ?? null
+                  : get(value, valuePath) ?? null;
                 if (onChangeValue) {
-                  returnValueType === 'enum'
+                  returnValueType === "enum"
                     ? onChangeValue(afterValue)
-                    : onChangeValue(value)
+                    : onChangeValue(value);
                 }
 
-                returnValueType === 'enum'
+                returnValueType === "enum"
                   ? onChange(afterValue)
-                  : onChange(value)
+                  : onChange(value);
 
-                if (onAfterChangeValue) onAfterChangeValue()
+                if (onAfterChangeValue) onAfterChangeValue();
               }}
               onBlur={onBlur}
               value={getValueOption(value) ?? (multiple ? [] : null)}
@@ -208,29 +209,21 @@ const CoreAutocomplete: <
                 return (
                   <li {...props} key={get(option, valuePath)}>
                     <Typography
-                      variant='body1'
+                      variant="body1"
                       title={get(option, labelPath)}
                       style={enableColor ? { color: option.color } : {}}
                     >
                       {formatOptionLabel(option)}
                     </Typography>
                   </li>
-                )
+                );
               }}
               renderInput={(params) => (
                 <>
                   <TextField
                     {...params}
                     variant={variant}
-                    placeholder={getPlaceholder(
-                      t,
-                      'autocomplete',
-                      placeholder,
-                      label,
-                      isView,
-                      value,
-                      multiple
-                    )}
+                    placeholder={placeholder ?? ""}
                     inputRef={ref}
                     label={label}
                     error={!!(error || errCustom)}
@@ -245,8 +238,8 @@ const CoreAutocomplete: <
                       ...params.inputProps,
                       ...inputProps,
                       style: enableColor
-                        ? { color: selectedOption?.color || 'inherit' }
-                        : { color: 'inherit' },
+                        ? { color: selectedOption?.color || "inherit" }
+                        : { color: "inherit" },
                     }}
                     // eslint-disable-next-line react/jsx-no-duplicate-props
                     InputProps={{
@@ -255,7 +248,7 @@ const CoreAutocomplete: <
                       endAdornment: (
                         <>
                           {loading ? (
-                            <CircularProgress color='inherit' size={20} />
+                            <CircularProgress color="inherit" size={20} />
                           ) : endContent ? (
                             <>{endContent}</>
                           ) : null}
@@ -271,12 +264,12 @@ const CoreAutocomplete: <
               )}
               {...restProps}
             />
-          )
+          );
         }}
         rules={!isView ? rules : {}}
       />
     </div>
-  )
-}
+  );
+};
 
-export default React.memo(CoreAutocomplete)
+export default React.memo(CoreAutocomplete);

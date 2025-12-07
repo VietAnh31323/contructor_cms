@@ -1,5 +1,5 @@
-import Image from 'next/image'
-import styles from './styles.module.css'
+import Image from "next/image";
+import styles from "./styles.module.css";
 
 const CoreLoading = () => {
   return (
@@ -13,14 +13,14 @@ const CoreLoading = () => {
         <div className={styles.loader__ball}></div>
       </div>
 
-      <Image
+      {/* <Image
         alt=""
         src={require('@/assets/svg/apodio_logo.svg')}
         height={40}
         width={112}
-      />
+      /> */}
     </div>
-  )
-}
+  );
+};
 
-export default CoreLoading
+export default CoreLoading;
