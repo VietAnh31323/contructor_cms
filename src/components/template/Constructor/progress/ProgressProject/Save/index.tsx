@@ -5,9 +5,7 @@ import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
 import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
-import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
 
@@ -15,12 +13,10 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import CoreSwitch from "@/components/atoms/CoreSwitch";
-import useCategorySave from "./useCategorySave";
-export default function CategorySave() {
-  const [value, handle] = useCategorySave();
-  const [date, setDate] = useState<Date | null>(null);
-  const { columns, tableData, page, rowsPerPage } = value;
-  const { setPage, setRowsPerPage } = handle;
+import { ROUTES } from "@/routes";
+import useProgressProjectSave from "./useProgressProjectSave";
+export default function ProgressProjectSave() {
+  const [value, handle] = useProgressProjectSave();
   const { control } = useForm();
   return (
     <Grid
@@ -36,7 +32,13 @@ export default function CategorySave() {
       <PageContainer
         title={
           <CoreBreadcrumbs
-            breadcrumbs={[{ title: "Quản lý hạng mục" }, { title: "Thêm mới" }]}
+            breadcrumbs={[
+              {
+                title: "Quản lý tiến trình",
+                pathname: ROUTES.PROGRESS_PROJECT,
+              },
+              { title: "Thêm mới" },
+            ]}
           />
         }
       >
@@ -48,20 +50,20 @@ export default function CategorySave() {
               content: (
                 <form className="flex flex-col py-6 ">
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                       <CoreInputCustom
                         control={control}
                         name="code"
-                        label="Mã hạng mục"
-                        placeholder="Nhập mã hạng mục"
+                        label="Mã tiến trình"
+                        placeholder="Nhập mã tiến trình"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Grid item xs={12} sm={12} md={6} lg={6}>
                       <CoreInputCustom
                         control={control}
                         name="name"
-                        label="Tên hạng mục"
-                        placeholder="Nhập tên hạng mục"
+                        label="Tên tiến trình"
+                        placeholder="Nhập tên tiến trình"
                       />
                     </Grid>
 

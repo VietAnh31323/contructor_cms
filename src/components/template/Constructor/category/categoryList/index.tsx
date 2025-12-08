@@ -11,10 +11,10 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
-import useConstructionProjectList from "./useCategoryList";
+import useCategoryList from "./useCategoryList";
 
 export default function CategoryList() {
-  const [value, handle] = useConstructionProjectList();
+  const [value, handle] = useCategoryList();
 
   const { columns, tableData, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
@@ -68,7 +68,7 @@ export default function CategoryList() {
             }}
             theme="submit"
           >
-            {"Thêm mới"}
+            Thêm mới
           </CoreButton>
         </div>
         <CoreTable

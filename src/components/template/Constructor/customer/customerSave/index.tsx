@@ -14,6 +14,8 @@ import { useState } from "react";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
+import { ROUTES } from "@/routes";
+import CoreSwitch from "@/components/atoms/CoreSwitch";
 export default function CustomerSave() {
   const [value, handle] = useEmployeeList();
   const [date, setDate] = useState<Date | null>(null);
@@ -34,7 +36,13 @@ export default function CustomerSave() {
       <PageContainer
         title={
           <CoreBreadcrumbs
-            breadcrumbs={[{ title: "Quản lý nhân sư" }, { title: "Thêm mới" }]}
+            breadcrumbs={[
+              {
+                title: "Quản lý thông tin khách hàng",
+                pathname: ROUTES.CUSTOMER,
+              },
+              { title: "Chi tiết" },
+            ]}
           />
         }
       >
@@ -42,7 +50,7 @@ export default function CustomerSave() {
         <CoreNavbar
           breadcrumbs={[
             {
-              title: "Thêm mới",
+              title: "Chi tiết",
               content: (
                 <form className="flex flex-col py-6 ">
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -50,74 +58,16 @@ export default function CustomerSave() {
                       <CoreInputCustom
                         control={control}
                         name="code"
-                        label="Mã nhân sự"
-                        placeholder="Nhập mã nhân sự"
+                        label="Mã yêu cầu"
+                        placeholder=" "
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="email"
-                        label="Email"
-                        placeholder="Nhập email"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreAutocomplete
-                        options={[
-                          { label: "Quản trị viên", value: "admin" },
-                          { label: "Quản lý", value: "manager" },
-                          { label: "Nhân viên", value: "staff" },
-                        ]}
-                        control={control}
-                        name="role"
-                        label="Chức vụ"
-                        placeholder="Chọn chức vụ"
-                        valuePath="value"
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="firstName"
-                        label="FirstName"
-                        placeholder="Nhập FirstName"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="lastName"
-                        label="LastName"
-                        placeholder="Nhập LastName"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <DatePicker
-                        selected={date}
-                        onChange={(d) => setDate(d)}
-                        placeholderText="Chọn ngày"
-                        customInput={
-                          <TextField
-                            label="Chọn ngày"
-                            variant="standard"
-                            fullWidth
-                            focused
-                            placeholder="Chọn ngày"
-                          />
-                        }
-                        popperPlacement="bottom"
-                        className="w-full "
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="address"
-                        label="Địa chỉ"
-                        placeholder="Nhập địa chỉ"
+                        name="name"
+                        label="Họ tên khách hàng"
+                        placeholder=" "
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -125,9 +75,44 @@ export default function CustomerSave() {
                         control={control}
                         name="phone"
                         label="Số điện thoại"
-                        placeholder="Nhập số điện thoại"
+                        placeholder=" "
                       />
                     </Grid>
+
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="email"
+                        label="Email"
+                        placeholder=" "
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="address"
+                        label="Địa chỉ"
+                        placeholder=" "
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="status"
+                        label="Trạng thái"
+                        placeholder="Đang liên hệ"
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={12} md={4} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="address"
+                        label="Địa chỉ"
+                        placeholder="Nhập địa chỉ"
+                      />
+                    </Grid>
+
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
                         options={[
@@ -144,6 +129,17 @@ export default function CustomerSave() {
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <CoreInputCustom
                         control={control}
+                        name="description"
+                        label="Mô tả"
+                        placeholder="Nhập mô tả"
+                        multiline
+                        rows={2}
+                        sx={{ width: "100%", padding: "0" }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <CoreInputCustom
+                        control={control}
                         name="class"
                         label="Ghi chú"
                         placeholder="Nhập ghi chú"
@@ -152,6 +148,15 @@ export default function CustomerSave() {
                         rows={4}
                         sx={{ width: "100%", padding: "0" }}
                       />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <Grid item xs={12} sm={12} md={12} lg={12}>
+                        <CoreSwitch
+                          control={control}
+                          name="isActive"
+                          label="Khách hàng hàng tiềm năng"
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
                   <div className="py-4 flex justify-center gap-4 items-center">
