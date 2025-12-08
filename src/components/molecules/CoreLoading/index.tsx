@@ -1,4 +1,3 @@
-import Image from "next/image";
 import styles from "./styles.module.css";
 
 const CoreLoading = () => {
@@ -12,13 +11,6 @@ const CoreLoading = () => {
         <div className={styles.loader__bar}></div>
         <div className={styles.loader__ball}></div>
       </div>
-
-      {/* <Image
-        alt=""
-        src={require('@/assets/svg/apodio_logo.svg')}
-        height={40}
-        width={112}
-      /> */}
     </div>
   );
 };

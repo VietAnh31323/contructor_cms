@@ -15,6 +15,8 @@ import {
   AnalyticsOutlined,
   MenuOpen,
 } from "@mui/icons-material";
+import { ROUTES } from "@/routes";
+import router from "next/router";
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -53,8 +55,10 @@ export default function AppSidebar() {
         {/* --- Dashboard --- */}
         <MenuItem
           icon={<HomeOutlined />}
-          component={<Link href="/Dashboard" />}
-          active={isActive("/Dashboard")}
+          onClick={() => {
+            router.push(ROUTES.DASHBOARD);
+          }}
+          active={isActive(ROUTES.DASHBOARD)}
         >
           Thống kê
         </MenuItem>
@@ -72,14 +76,16 @@ export default function AppSidebar() {
             component={<Link href="/Constructor/Project" />}
             active={isActive("/Constructor/Project")}
           >
-            Danh sách
+            Danh sách dự án
           </MenuItem>
 
           <MenuItem
-            component={<Link href="/Constructor/Category" />}
-            active={isActive("/Constructor/Category")}
+            onClick={() => {
+              router.push(ROUTES.CATEGORY);
+            }}
+            active={isActive(ROUTES.CATEGORY)}
           >
-            Hạng mục
+            Hạng mục dự án
           </MenuItem>
 
           <MenuItem
@@ -91,13 +97,24 @@ export default function AppSidebar() {
         </SubMenu>
 
         {/* --- Nhân sự --- */}
-        <MenuItem
-          icon={<PersonPinOutlined />}
-          component={<Link href="/Constructor/Employee" />}
-          active={isActive("/Constructor/Employee")}
-        >
-          Nhân sự
-        </MenuItem>
+        <SubMenu icon={<PersonPinOutlined />} label="Nhân sự">
+          <MenuItem
+            onClick={() => {
+              router.push(ROUTES.EMPLOYEE);
+            }}
+            active={isActive(ROUTES.EMPLOYEE)}
+          >
+            Danh sách nhân sự
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              router.push(ROUTES.ACCOUNT);
+            }}
+            active={isActive(ROUTES.ACCOUNT)}
+          >
+            Quản lý tài khoản
+          </MenuItem>
+        </SubMenu>
 
         {/* --- Thống kê thép --- */}
         <MenuItem
@@ -111,20 +128,31 @@ export default function AppSidebar() {
         {/* --- Khách hàng --- */}
         <MenuItem
           icon={<SupportAgentOutlined />}
-          component={<Link href="/Constructor/Customer" />}
-          active={isActive("/Constructor/Customer")}
+          onClick={() => {
+            router.push(ROUTES.CUSTOMER);
+          }}
+          active={isActive(ROUTES.CUSTOMER)}
         >
           Khách hàng
         </MenuItem>
 
         {/* --- Tiến độ dự án --- */}
-        <MenuItem
-          icon={<AnalyticsOutlined />}
-          component={<Link href="/project-progress" />}
-          active={isActive("/project-progress")}
-        >
-          Tiến độ dự án
-        </MenuItem>
+        <SubMenu icon={<AnalyticsOutlined />} label="Tiến độ dự án">
+          <MenuItem
+            component={<Link href="/project-progress" />}
+            active={isActive("/project-progress")}
+          >
+            Danh sách tiến độ dự án
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              router.push(ROUTES.PROGRESS_PROJECT);
+            }}
+            active={isActive(ROUTES.PROGRESS_PROJECT)}
+          >
+            Quản lý tiến trình
+          </MenuItem>
+        </SubMenu>
       </Menu>
     </Sidebar>
   );

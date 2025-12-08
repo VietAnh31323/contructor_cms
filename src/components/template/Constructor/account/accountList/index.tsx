@@ -5,16 +5,16 @@ import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
 import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
-import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
 import router from "next/router";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
 import { ROUTES } from "@/routes";
+import useAccountList from "./useAccountList";
 
-export default function Employee() {
-  const [value, handle] = useEmployeeList();
+export default function Account() {
+  const [value, handle] = useAccountList();
 
   const { columns, tableData, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
@@ -31,7 +31,9 @@ export default function Employee() {
       }}
     >
       <PageContainer
-        title={<CoreBreadcrumbs breadcrumbs={[{ title: "Quản lý nhân sư" }]} />}
+        title={
+          <CoreBreadcrumbs breadcrumbs={[{ title: "Quản lý tài khoản" }]} />
+        }
       >
         <form className="flex flex-col py-6 ">
           <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -64,7 +66,7 @@ export default function Employee() {
         <div className="flex justify-end py-5">
           <CoreButton
             onClick={() => {
-              router.push(ROUTES.EMPLOYEE + "/addNew");
+              router.push(ROUTES.ACCOUNT + "/addNew");
             }}
             theme="submit"
           >

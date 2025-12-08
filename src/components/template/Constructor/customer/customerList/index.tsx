@@ -12,6 +12,7 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import router from "next/router";
 import { CoreTable } from "@/components/organism/CoreTable";
+import { ROUTES } from "@/routes";
 
 export default function CustomerList() {
   const [value, handle] = useCustomerList();
@@ -66,7 +67,7 @@ export default function CustomerList() {
         <div className="flex justify-end py-5">
           <CoreButton
             onClick={() => {
-              // router.push("/Constructor/Employee/addNew");
+              router.push(ROUTES.CUSTOMER + "/addNew");
             }}
             theme="submit"
           >
@@ -79,6 +80,12 @@ export default function CustomerList() {
           data={tableData || []}
           page={page}
           isShowColumnStt
+          onRowClick={(id: number) => {
+            router.push({
+              pathname: `${ROUTES.CUSTOMER}/${id}`,
+              query: { actionType: "VIEW" },
+            });
+          }}
         />
       </PageContainer>
     </Grid>
