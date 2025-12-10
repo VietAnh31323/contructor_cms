@@ -15,4 +15,7 @@ export const ROUTES = {
   CUSTOMER: "/Constructor/Customer",
   PROGRESS_PROJECT: "/Constructor/Progress/ProgressProject",
   PROGRESS_PROJECT_ADD: "/Constructor/Progress/ProgressProject/addNew",
+  PROJECT: "/Constructor/Project",
+  STEELSTATISTICS: "/Constructor/steelStatistics",
+  STEELSTATISTICSNEW: "/Constructor/steelStatistics/addNew",
 };
