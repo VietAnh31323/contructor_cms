@@ -128,6 +128,11 @@ const CoreInputCustom = (props: Props) => {
                 shrink: placeholder ? true : undefined,
                 required,
                 ...InputLabelProps,
+                sx: {
+                  "& .MuiFormLabel-asterisk": {
+                    color: "red",
+                  },
+                },
               }}
               inputProps={{
                 readOnly: isView || readOnly,

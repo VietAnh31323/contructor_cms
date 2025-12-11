@@ -1,4 +1,11 @@
-import { Autocomplete, Button, Grid, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Grid,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 import statistics from "@/assets/svg/statistics.svg";
 import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
@@ -10,31 +17,35 @@ import CoreNavbar from "@/components/organism/CoreNavbar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
-
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
-export default function ConstructionProjectSaveSave() {
-  const [value, handle] = useEmployeeList();
+import useConstructionProjectSave from "./useConstructionProjectSave";
+import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
+import EditText from "@/components/atoms/EditText";
+import UploadFiles from "@/components/atoms/UploadFiles";
+import upload from "@/assets/png/upload.png";
+export default function ConstructionProjectSave() {
+  const [value, handle] = useConstructionProjectSave();
   const [date, setDate] = useState<Date | null>(null);
   const { columns, tableData, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
   const { control } = useForm();
+  const [editorText, setEditorText] = useState("");
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
-        overflowX: "hidden",
+        overflowY: "auto",
       }}
     >
       <PageContainer
         title={
           <CoreBreadcrumbs
-            breadcrumbs={[{ title: "Quản lý nhân sư" }, { title: "Thêm mới" }]}
+            breadcrumbs={[{ title: "Quản lý dự án" }, { title: "Thêm mới" }]}
           />
         }
       >
@@ -50,68 +61,28 @@ export default function ConstructionProjectSaveSave() {
                       <CoreInputCustom
                         control={control}
                         name="code"
-                        label="Mã nhân sự"
-                        placeholder="Nhập mã nhân sự"
+                        label="Mã hồ sơ"
+                        placeholder="Nhập mã hồ sơ"
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="email"
-                        label="Email"
-                        placeholder="Nhập email"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreAutocomplete
-                        options={[
-                          { label: "Quản trị viên", value: "admin" },
-                          { label: "Quản lý", value: "manager" },
-                          { label: "Nhân viên", value: "staff" },
-                        ]}
-                        control={control}
-                        name="role"
-                        label="Chức vụ"
-                        placeholder="Chọn chức vụ"
-                        valuePath="value"
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="firstName"
-                        label="FirstName"
-                        placeholder="Nhập FirstName"
+                        name="name"
+                        label="Tên công trình dự án"
+                        placeholder="Nhập tên công trình dự án"
+                        required
+                        rules={{ required: "Trường này là bắt buộc" }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="lastName"
-                        label="LastName"
-                        placeholder="Nhập LastName"
+                        name="investor"
+                        label="Chủ đầu tư"
+                        placeholder="Nhập tên chủ đầu tư"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <DatePicker
-                        selected={date}
-                        onChange={(d) => setDate(d)}
-                        placeholderText="Chọn ngày"
-                        customInput={
-                          <TextField
-                            label="Chọn ngày"
-                            variant="standard"
-                            fullWidth
-                            focused
-                            placeholder="Chọn ngày"
-                          />
-                        }
-                        popperPlacement="bottom"
-                        className="w-full "
-                      />
-                    </Grid>
-
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
@@ -123,36 +94,264 @@ export default function ConstructionProjectSaveSave() {
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="phone"
-                        label="Số điện thoại"
-                        placeholder="Nhập số điện thoại"
+                        name="contract"
+                        label="Giá trị hợp đồng"
+                        placeholder=" "
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="advance"
+                        label="Tạm ứng hợp đồng"
+                        placeholder=" "
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="remaining"
+                        label="Số tiền còn lại"
+                        placeholder=" "
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <div style={{ width: "100%" }}>
+                        <DatePicker
+                          selected={date}
+                          onChange={(d) => setDate(d)}
+                          placeholderText=" "
+                          customInput={
+                            <TextField
+                              label="Ngày kí hợp đồng"
+                              variant="standard"
+                              fullWidth
+                              focused
+                              placeholder=" "
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    <CalendarMonthIcon
+                                      sx={{ cursor: "pointer" }}
+                                    />
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                          }
+                          popperPlacement="bottom"
+                          wrapperClassName="w-full"
+                          className="w-full"
+                        />
+                      </div>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <div style={{ width: "100%" }}>
+                        <DatePicker
+                          selected={date}
+                          onChange={(d) => setDate(d)}
+                          placeholderText=" "
+                          customInput={
+                            <TextField
+                              label="Ngày giao hồ sơ dự kiến"
+                              variant="standard"
+                              fullWidth
+                              focused
+                              placeholder=" "
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    <CalendarMonthIcon
+                                      sx={{ cursor: "pointer" }}
+                                    />
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                          }
+                          popperPlacement="bottom"
+                          wrapperClassName="w-full"
+                          className="w-full"
+                        />
+                      </div>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <Typography
+                        sx={{
+                          fontWeight: 700,
+                        }}
+                      >
+                        Hạng mục
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreAutocomplete
+                        control={control}
+                        name="category"
+                        label="Hạng mục"
+                        placeholder=" "
+                        options={[
+                          { label: "Thiết kế kiến trúc", value: "abc" },
+                          { label: "Thiết kế nội thất", value: "adeg" },
+                        ]}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <Typography
+                        sx={{
+                          fontWeight: 700,
+                        }}
+                      >
+                        Nhân sự dự án
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreAutocomplete
+                        control={control}
+                        name="createPerson"
+                        label="Người tạo dự án"
+                        placeholder=" "
+                        options={[
+                          { label: "KTS.Nguyễn Văn A", value: "abc" },
+                          { label: "KS. Nguyễn Văn B", value: "adeg" },
+                        ]}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
+                        control={control}
+                        name="Person"
+                        label="Chủ nhiệm dự án"
+                        placeholder=" "
                         options={[
-                          { label: "Nam", value: "admin" },
-                          { label: "Nữ", value: "manager" },
+                          { label: "KTS.Nguyễn Văn A", value: "abc" },
+                          { label: "KS. Nguyễn Văn B", value: "adeg" },
                         ]}
-                        control={control}
-                        name="role"
-                        label="Giới tính"
-                        placeholder="Chọn giới tính"
-                        valuePath="value"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <CoreInputCustom
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreAutocomplete
                         control={control}
-                        name="class"
-                        label="Ghi chú"
-                        placeholder="Nhập ghi chú"
-                        variant="standard"
-                        multiline
-                        rows={4}
-                        sx={{ width: "100%", padding: "0" }}
+                        name="CSKH"
+                        label="Nhân viên chăm sóc"
+                        placeholder=" "
+                        options={[
+                          { label: "KTS.Nguyễn Văn A", value: "abc" },
+                          { label: "KS. Nguyễn Văn B", value: "adeg" },
+                        ]}
                       />
                     </Grid>
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                      }}
+                    >
+                      Thanh toán
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <RowBoxCommon title=" " data={"Đã thanh toán"} />
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                      }}
+                    >
+                      Mô tả dự án
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <EditText
+                      editorText={editorText}
+                      setEditorText={setEditorText}
+                      disabled={false}
+                      error={
+                        editorText.length === 0 ? "Vui lòng nhập nội dung" : ""
+                      }
+                      height={300}
+                    />
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                      }}
+                    >
+                      Ghi chú
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <EditText
+                      editorText={editorText}
+                      setEditorText={setEditorText}
+                      disabled={false}
+                      error={
+                        editorText.length === 0 ? "Vui lòng nhập nội dung" : ""
+                      }
+                      height={300}
+                    />
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <CoreAutocomplete
+                      control={control}
+                      name="status"
+                      label="Trạng thái"
+                      placeholder=" "
+                      options={[
+                        { label: "Chưa bắt đầu", value: "abc" },
+                        { label: "Hoàn thành", value: "adeg" },
+                        { label: "Đã bắt đầu", value: "as" },
+                      ]}
+                    />
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        marginBottom: 2,
+                      }}
+                    >
+                      Hợp đồng dự án
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Image src={upload} alt="upload" className="h-100vh" />
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        marginBottom: 2,
+                      }}
+                    >
+                      Hình ảnh mẫu
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Image src={upload} alt="upload" className="h-100vh" />
+                  </Grid>
+                  <br />
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        marginBottom: 2,
+                      }}
+                    >
+                      Hình ảnh công trình
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12}>
+                    <Image src={upload} alt="upload" className="h-100vh" />
                   </Grid>
                   <div className="py-4 flex justify-center gap-4 items-center">
                     <CoreButton onClick={() => {}} theme="cancel">
