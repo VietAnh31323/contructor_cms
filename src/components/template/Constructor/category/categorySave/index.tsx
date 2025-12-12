@@ -16,10 +16,11 @@ import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import CoreSwitch from "@/components/atoms/CoreSwitch";
 import useCategorySave from "./useCategorySave";
+import { ROUTES } from "@/routes";
 export default function CategorySave() {
   const [value, handle] = useCategorySave();
   const [date, setDate] = useState<Date | null>(null);
-  const { columns, tableData, page, rowsPerPage } = value;
+  const { isView, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
   const { control } = useForm();
   return (
@@ -36,7 +37,10 @@ export default function CategorySave() {
       <PageContainer
         title={
           <CoreBreadcrumbs
-            breadcrumbs={[{ title: "Quản lý hạng mục" }, { title: "Thêm mới" }]}
+            breadcrumbs={[
+              { title: "Quản lý hạng mục", pathname: ROUTES.CATEGORY },
+              { title: "Thêm mới" },
+            ]}
           />
         }
       >
@@ -68,7 +72,7 @@ export default function CategorySave() {
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <CoreInputCustom
                         control={control}
-                        name="content"
+                        name="description"
                         label="Mô tả"
                         placeholder="Nhập mô tả"
                         variant="standard"
@@ -85,14 +89,16 @@ export default function CategorySave() {
                       />
                     </Grid>
                   </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+                  {!isView && (
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton onClick={() => {}} theme="cancel">
+                        {"Hủy bỏ"}
+                      </CoreButton>
+                      <CoreButton onClick={() => {}} theme="submit">
+                        {"Lưu"}
+                      </CoreButton>
+                    </div>
+                  )}
                 </form>
               ),
             },

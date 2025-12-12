@@ -139,8 +139,10 @@ export default function AppSidebar() {
         {/* --- Tiến độ dự án --- */}
         <SubMenu icon={<AnalyticsOutlined />} label="Tiến độ dự án">
           <MenuItem
-            component={<Link href="/project-progress" />}
-            active={isActive("/project-progress")}
+            onClick={() => {
+              router.push(ROUTES.PROGRESS_MANAGE);
+            }}
+            active={isActive(ROUTES.PROGRESS_MANAGE)}
           >
             Danh sách tiến độ dự án
           </MenuItem>

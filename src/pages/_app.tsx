@@ -11,8 +11,13 @@ import { theme } from "@/components/layouts/theme";
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
+
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
+
+  const [queryClient] = useState(() => new QueryClient());
 
   const isAuthPage =
     router.pathname.startsWith("/login") ||
@@ -21,15 +26,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const Layout = isAuthPage ? AuthLayout : AdminLayout;
 
   return (
-    <Provider store={store}>
-      <RecoilRoot>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ThemeProvider>
-      </RecoilRoot>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <RecoilRoot>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ThemeProvider>
+        </RecoilRoot>
+      </Provider>
+    </QueryClientProvider>
   );
 }

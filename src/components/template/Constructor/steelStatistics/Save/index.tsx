@@ -8,6 +8,7 @@ import CoreStep from "@/components/atoms/CoreStep"; // <-- thêm CoreStep
 import { divide } from "lodash";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import Step1 from "./components/step1";
+import Step2 from "./components/step2";
 
 export default function SteelStatisticsSave() {
   const stepList = ["Thông tin chung", "Chi tiết thống kê"];
@@ -52,9 +53,7 @@ export default function SteelStatisticsSave() {
 
                   <div className="mt-6 ">
                     {step === 0 && <Step1 />}
-                    {step === 1 && (
-                      <div> Nội dung bước 2: Chi tiết thống kê</div>
-                    )}
+                    {step === 1 && <Step2 />}
                   </div>
 
                   <div className="flex gap-3 mt-8 justify-center">

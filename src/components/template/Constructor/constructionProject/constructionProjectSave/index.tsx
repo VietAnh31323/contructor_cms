@@ -26,6 +26,8 @@ import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
 import EditText from "@/components/atoms/EditText";
 import UploadFiles from "@/components/atoms/UploadFiles";
 import upload from "@/assets/png/upload.png";
+import CoreAutoCompleteAPI from "@/components/atoms/CoreAutoCompleteAPI";
+import { getCategoryList } from "@/service/constructor/Category/getList";
 export default function ConstructionProjectSave() {
   const [value, handle] = useConstructionProjectSave();
   const [date, setDate] = useState<Date | null>(null);
@@ -185,15 +187,12 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreAutocomplete
+                      <CoreAutoCompleteAPI
                         control={control}
                         name="category"
                         label="Hạng mục"
                         placeholder=" "
-                        options={[
-                          { label: "Thiết kế kiến trúc", value: "abc" },
-                          { label: "Thiết kế nội thất", value: "adeg" },
-                        ]}
+                        fetchDataFn={getCategoryList}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
