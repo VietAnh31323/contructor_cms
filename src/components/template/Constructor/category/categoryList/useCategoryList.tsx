@@ -33,7 +33,6 @@ const useCategoryList = () => {
     setQueryPage(input);
   };
   const { data, isLoading } = useCategoryListQuery();
-  console.log("data", data);
   const columns = useMemo(
     () => [
       { header: "Mã hạng mục", fieldName: "code" },

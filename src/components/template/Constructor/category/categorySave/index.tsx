@@ -34,8 +34,8 @@ export default function CategorySave() {
         <DialogTitle>Xác nhận xóa</DialogTitle>
         <DialogContent>Bạn có chắc chắn muốn xóa hạng mục này?</DialogContent>
         <DialogActions>
-          <Button onClick={hideDialog}>Hủy</Button>
-          <Button
+          <CoreButton onClick={hideDialog}>Hủy</CoreButton>
+          <CoreButton
             color="error"
             onClick={async () => {
               try {
@@ -49,7 +49,7 @@ export default function CategorySave() {
             }}
           >
             Đồng ý
-          </Button>
+          </CoreButton>
         </DialogActions>
       </Dialog>
     );

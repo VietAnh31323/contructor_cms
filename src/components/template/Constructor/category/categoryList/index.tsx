@@ -60,7 +60,6 @@ export default function CategoryList() {
             </Grid>
 
             <Grid item xs={12} sm={12} md={6} lg={4}>
-              {" "}
               <div className="py-4 flex justify-center gap-4 items-center">
                 <CoreButton onClick={() => {}} theme="cancel">
                   Hủy

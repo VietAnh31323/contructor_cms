@@ -1,4 +1,13 @@
-import { Autocomplete, Button, Grid, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+} from "@mui/material";
 import Image from "next/image";
 import statistics from "@/assets/svg/statistics.svg";
 import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
@@ -15,17 +24,51 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import CoreSwitch from "@/components/atoms/CoreSwitch";
 import { ROUTES } from "@/routes";
 import useProgressProjectSave from "./useProgressProjectSave";
+import CoreLoading from "@/components/molecules/CoreLoading";
+import { TopAction } from "@/components/molecules/TopAction";
+import router from "next/router";
+import { deleteCategory } from "@/service/constructor/Category/delete";
+import { toastError, toastSuccess } from "@/toast";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
+import { deleteProgressProject } from "@/service/constructor/ProgressProject/delete";
 export default function ProgressProjectSave() {
   const [value, handle] = useProgressProjectSave();
-  const { control } = useForm();
+  const { isView, control, isLoading, id } = value;
+  const { onSubmit } = handle;
+  const { showDialog, hideDialog } = useDialog();
+  const handleDelete = (id: number) => {
+    showDialog(
+      <Dialog open onClose={hideDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn xóa hạng mục này?</DialogContent>
+        <DialogActions>
+          <CoreButton onClick={hideDialog}>Hủy</CoreButton>
+          <CoreButton
+            color="error"
+            onClick={async () => {
+              try {
+                await deleteProgressProject({ id });
+                toastSuccess("Xóa thành công!");
+                hideDialog();
+                router.push(ROUTES.PROGRESS_PROJECT);
+              } catch (err: any) {
+                toastError(err?.message || "Xóa thất bại");
+              }
+            }}
+          >
+            Đồng ý
+          </CoreButton>
+        </DialogActions>
+      </Dialog>
+    );
+  };
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -37,7 +80,7 @@ export default function ProgressProjectSave() {
                 title: "Quản lý tiến trình",
                 pathname: ROUTES.PROGRESS_PROJECT,
               },
-              { title: "Thêm mới" },
+              { title: isView ? "Chi tiết" : "Chỉnh sửa" },
             ]}
           />
         }
@@ -46,9 +89,23 @@ export default function ProgressProjectSave() {
         <CoreNavbar
           breadcrumbs={[
             {
-              title: "Thêm mới",
-              content: (
-                <form className="flex flex-col py-6 ">
+              title: isView ? "Chi tiết" : "Chỉnh sửa",
+              rightAction: isView && (
+                <TopAction
+                  actionList={["delete", "edit"]}
+                  onEditAction={() => {
+                    router.push({
+                      pathname: `${ROUTES.PROGRESS_PROJECT}/[id]`,
+                      query: { id: Number(id) },
+                    });
+                  }}
+                  onDeleteAction={() => handleDelete(id)}
+                />
+              ),
+              content: isLoading ? (
+                <CoreLoading />
+              ) : (
+                <form className="flex flex-col py-6 " onSubmit={onSubmit}>
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
                       <CoreInputCustom
@@ -70,7 +127,7 @@ export default function ProgressProjectSave() {
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <CoreInputCustom
                         control={control}
-                        name="content"
+                        name="description"
                         label="Mô tả"
                         placeholder="Nhập mô tả"
                         variant="standard"
@@ -91,7 +148,12 @@ export default function ProgressProjectSave() {
                     <CoreButton onClick={() => {}} theme="cancel">
                       {"Hủy bỏ"}
                     </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
+                    <CoreButton
+                      onClick={() => {}}
+                      theme="submit"
+                      type="submit"
+                      loading={isLoading}
+                    >
                       {"Lưu"}
                     </CoreButton>
                   </div>

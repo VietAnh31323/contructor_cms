@@ -58,7 +58,16 @@ export default function ProgressProjectList() {
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={6} lg={4}></Grid>
+            <Grid item xs={12} sm={12} md={6} lg={4}>
+              <div className="py-4 flex justify-center gap-4 items-center">
+                <CoreButton onClick={() => {}} theme="cancel">
+                  Hủy
+                </CoreButton>
+                <CoreButton theme="submit" type="submit">
+                  Tìm kiếm
+                </CoreButton>
+              </div>
+            </Grid>
           </Grid>
         </form>
         <div className="flex justify-end py-5">
@@ -77,6 +86,12 @@ export default function ProgressProjectList() {
           data={tableData || []}
           page={page}
           isShowColumnStt
+          onRowClick={(id: number) => {
+            router.push({
+              pathname: `${ROUTES.PROGRESS_PROJECT}/${id}`,
+              query: { actionType: "VIEW" },
+            });
+          }}
         />
       </PageContainer>
     </Grid>
