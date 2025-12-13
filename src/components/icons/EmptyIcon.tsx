@@ -1,11 +1,11 @@
-import Image from 'next/image'
-import { memo } from 'react'
+import Image from "next/image";
+import { memo } from "react";
 
 const EditIcon = (props: any) => {
-  const {} = props
+  const {} = props;
 
   return (
-    <div {...props}>
+    <div {...props} className="flex justify-center">
       <svg
         width="150"
         height="150"
@@ -60,7 +60,7 @@ const EditIcon = (props: any) => {
         </defs>
       </svg>
     </div>
-  )
-}
+  );
+};
 
-export default memo(EditIcon)
+export default memo(EditIcon);

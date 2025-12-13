@@ -67,14 +67,13 @@ export default function AppSidebar() {
         <SubMenu
           icon={<ConstructionOutlined />}
           label="Dự án xây dựng"
-          defaultOpen={
-            pathname.startsWith("/projects") ||
-            pathname.startsWith("/Constructor")
-          }
+          defaultOpen={true}
         >
           <MenuItem
-            component={<Link href="/Constructor/Project" />}
-            active={isActive("/Constructor/Project")}
+            onClick={() => {
+              router.push(ROUTES.PROJECT);
+            }}
+            active={isActive(ROUTES.PROJECT)}
           >
             Danh sách dự án
           </MenuItem>
@@ -86,13 +85,6 @@ export default function AppSidebar() {
             active={isActive(ROUTES.CATEGORY)}
           >
             Hạng mục dự án
-          </MenuItem>
-
-          <MenuItem
-            component={<Link href="/projects/cost" />}
-            active={isActive("/projects/cost")}
-          >
-            Thùng rác
           </MenuItem>
         </SubMenu>
 
@@ -117,13 +109,21 @@ export default function AppSidebar() {
         </SubMenu>
 
         {/* --- Thống kê thép --- */}
-        <MenuItem
-          icon={<AutoGraphOutlined />}
-          component={<Link href="/steel-statistics" />}
-          active={isActive("/steel-statistics")}
-        >
-          Thống kê thép
-        </MenuItem>
+        <SubMenu icon={<AutoGraphOutlined />} label="Thống kê thép">
+          <MenuItem
+            onClick={() => router.push(ROUTES.STEELSTATISTICS)}
+            active={pathname === ROUTES.STEELSTATISTICS}
+          >
+            Dự án thống kê thép
+          </MenuItem>
+
+          <MenuItem
+            onClick={() => router.push(ROUTES.STEELSTATISTICSNEW)}
+            active={pathname === ROUTES.STEELSTATISTICSNEW}
+          >
+            Thêm dự án thống kê
+          </MenuItem>
+        </SubMenu>
 
         {/* --- Khách hàng --- */}
         <MenuItem
@@ -139,8 +139,10 @@ export default function AppSidebar() {
         {/* --- Tiến độ dự án --- */}
         <SubMenu icon={<AnalyticsOutlined />} label="Tiến độ dự án">
           <MenuItem
-            component={<Link href="/project-progress" />}
-            active={isActive("/project-progress")}
+            onClick={() => {
+              router.push(ROUTES.PROGRESS_MANAGE);
+            }}
+            active={isActive(ROUTES.PROGRESS_MANAGE)}
           >
             Danh sách tiến độ dự án
           </MenuItem>

@@ -1,6 +1,6 @@
 import EditIcon from "@/components/icons/EditIcon";
 import PrintIcon from "@/components/icons/PrintIcon";
-import { TRANSLATE } from "@/routes";
+// import { TRANSLATE } from "@/routes";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import { Box, IconButton, Typography } from "@mui/material";
 import { useTranslation } from "next-i18next";
@@ -53,7 +53,7 @@ export const TopAction = ({
   onAssignAction,
   onPrintAction,
 }: Props) => {
-  const { t } = useTranslation(TRANSLATE.COMMON);
+  const { t } = useTranslation();
 
   return (
     <div className="flex items-center gap-4">
@@ -98,7 +98,7 @@ export const TopAction = ({
           <EditIcon />
           {isShowText && (
             <Typography variant="body2" sx={{ color: "#0078D4" }}>
-              {t("btn.edit")}
+              Chỉnh sửa
             </Typography>
           )}
         </div>
@@ -136,7 +136,7 @@ export const TopAction = ({
           </IconButton>
           {isShowText && (
             <Typography variant="body2" sx={{ color: "#FF4956" }}>
-              {t("btn.delete")}
+              Xóa
             </Typography>
           )}
         </Box>

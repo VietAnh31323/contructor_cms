@@ -11,7 +11,7 @@ export const toastSuccess = (
   if (msg)
     toast(<SuccessMessage message={msg} title={title} />, {
       closeButton: () => (
-        <div className="px-12 my-auto border-l">
+        <div className="px-6 my-auto border-l">
           <CloseOutlinedIcon fontSize="small" />
         </div>
       ),
@@ -52,7 +52,7 @@ export const toastError = (error: any, setError?: any) => {
   } else if (typeof error === "string") {
     toast(<ErrorMessage message={error} />, {
       closeButton: () => (
-        <div className="px-12 my-auto border-l">
+        <div className="px-2 my-auto border-l">
           <CloseOutlinedIcon fontSize="small" color={"error"} />
         </div>
       ),
@@ -61,7 +61,7 @@ export const toastError = (error: any, setError?: any) => {
   } else
     toast(<ErrorMessage message="Có lỗi xảy ra" />, {
       closeButton: () => (
-        <div className="px-12 my-auto border-l">
+        <div className="px-2 my-auto border-l">
           <CloseOutlinedIcon fontSize="small" color={"error"} />
         </div>
       ),

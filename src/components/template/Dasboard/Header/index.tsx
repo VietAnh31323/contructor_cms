@@ -14,6 +14,7 @@ import PasswordIcon from "@mui/icons-material/Password";
 import LanguageIcon from "@mui/icons-material/Language";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import React from "react";
 import router from "next/router";
@@ -35,14 +36,40 @@ export default function Header({
   const handleClose = () => setAnchorEl(null);
 
   return (
-    <div className="bg-[#0078D4] p-2 text-white flex justify-between items-center">
-      <Typography sx={{ fontWeight: 500 }}>
+    <div className="bg-[#0078D4] p-2 px-5 text-white flex justify-between items-center">
+      <Typography
+        sx={{
+          fontWeight: 500,
+          animation: "fadeIn 0.6s ease-in-out",
+        }}
+      >
         Công ty cổ phần kiến trúc, xây dựng ABC
       </Typography>
 
-      <Avatar onClick={handleClick} className="w-10 h-10 cursor-pointer">
-        H
-      </Avatar>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
+
+      <div
+        className="relative flex items-center gap-3 cursor-pointer"
+        onClick={handleClick}
+      >
+        <Avatar className="w-10 h-10"></Avatar>
+
+        <KeyboardArrowDownIcon
+          sx={{
+            fontSize: 20,
+            color: "white",
+          }}
+        />
+
+        <span className="absolute bottom-0 right-7 w-3 h-3 bg-green-500 rounded-full ring-2 "></span>
+      </div>
 
       {/* --- MENU --- */}
       <Menu

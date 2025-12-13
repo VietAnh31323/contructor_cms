@@ -1,5 +1,4 @@
 import { useDialog } from "@/components/hooks/dialog/useDialog";
-import { TRANSLATE } from "@/routes";
 import { toastError, toastSuccess } from "@/toast";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
@@ -12,32 +11,26 @@ export const useDeleteDialog = (
   URL: string,
   params?: any
 ) => {
-  const { t } = useTranslation(TRANSLATE.COMMON);
-
+  const { t } = useTranslation();
   const router = useRouter();
   const { hideDialog } = useDialog();
   const { handleSubmit } = useForm({
-    defaultValues: {
-      id,
-      ...params,
-    },
+    defaultValues: { id, ...params },
   });
 
   const deleteBrandApi = useMutation(fetchDataFn, {
     onSuccess: () => {
       toastSuccess(t("message.success"));
-      router.push({
-        pathname: `${URL}`,
-      });
+      hideDialog();
+      router.push(URL);
     },
     onError: (error: any) => {
       toastError(error);
     },
   });
 
-  const onSubmit = handleSubmit(async (input?: any) => {
+  const onSubmit = handleSubmit((input?: any) => {
     deleteBrandApi.mutate(input);
-    hideDialog();
   });
 
   return [{}, { onSubmit }] as const;
