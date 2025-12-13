@@ -14,6 +14,10 @@ import { CssBaseline } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { DialogProvider } from "@/components/hooks/dialog/useDialog";
+
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
@@ -31,12 +35,26 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <RecoilRoot>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <DialogProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </DialogProvider>
           </ThemeProvider>
         </RecoilRoot>
       </Provider>
+
+      <ToastContainer
+        position="top-center"
+        autoClose={0}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </QueryClientProvider>
   );
 }

@@ -1,24 +1,30 @@
-import { GREEN, RED } from '@/helper/colors'
-import { Box, FormControl, Switch, SwitchProps, Typography } from '@mui/material'
-import { useRouter } from 'next/router'
-import React, { ReactElement } from 'react'
-import { Controller } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { GREEN, RED } from "@/helper/colors";
+import {
+  Box,
+  FormControl,
+  Switch,
+  SwitchProps,
+  Typography,
+} from "@mui/material";
+import { useRouter } from "next/router";
+import React, { ReactElement } from "react";
+import { Controller } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 interface Props extends SwitchProps {
-  control: any
-  className?: string
-  name: string
-  label?: string | ReactElement
-  helpText?: string
-  isViewProp?: boolean
-  labelActive?: string
-  labelInActive?: string
-  onChangeValue?: (val: any) => void
+  control: any;
+  className?: string;
+  name: string;
+  label?: string | ReactElement;
+  helpText?: string;
+  isViewProp?: boolean;
+  labelActive?: string;
+  labelInActive?: string;
+  onChangeValue?: (val: any) => void;
 }
 
 const CoreSwitch = (props: Props) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation("common");
   const {
     className,
     control,
@@ -26,15 +32,15 @@ const CoreSwitch = (props: Props) => {
     name,
     label,
     isViewProp,
-    labelActive = 'Active',
-    labelInActive = 'Inactive',
+    labelActive = "Hoạt động",
+    labelInActive = "Ngưng hoạt động",
     onChangeValue,
     ...restProps
-  } = props
+  } = props;
 
-  const router = useRouter()
-  const { actionType } = router.query
-  const isView = isViewProp ?? actionType === 'VIEW'
+  const router = useRouter();
+  const { actionType } = router.query;
+  const isView = isViewProp ?? actionType === "VIEW";
 
   return (
     <div className={className}>
@@ -44,7 +50,7 @@ const CoreSwitch = (props: Props) => {
         render={({ field: { onChange, value } }) => {
           return isView ? (
             <div className="flex gap-5">
-              <Typography variant="body1">{t('common:status')}</Typography>
+              <Typography variant="body1">Trạng thái</Typography>
               <Typography
                 variant="body1"
                 style={{
@@ -57,17 +63,17 @@ const CoreSwitch = (props: Props) => {
           ) : (
             <FormControl component="fieldset">
               <Box className="flex items-center">
-                <Typography>{label ?? t('status')}</Typography>
+                <Typography>{label ?? t("status")}</Typography>
                 <Switch
                   checked={value}
                   onChange={(e) => {
-                    onChange(e)
+                    onChange(e);
 
                     if (onChangeValue) {
-                      onChangeValue(e)
+                      onChangeValue(e);
                     }
                   }}
-                  inputProps={{ 'aria-label': 'controlled' }}
+                  inputProps={{ "aria-label": "controlled" }}
                   {...restProps}
                 />
               </Box>
@@ -77,11 +83,11 @@ const CoreSwitch = (props: Props) => {
                 </Typography>
               )}
             </FormControl>
-          )
+          );
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default React.memo(CoreSwitch)
+export default React.memo(CoreSwitch);

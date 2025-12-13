@@ -16,7 +16,7 @@ export const SuccessMessage = ({ message, title }: MessageProps) => {
         style={{ height: 30, width: 30 }}
         color="primary"
       />
-      <div className="px-12 vds-toast__msg" style={{ color: "#242424" }}>
+      <div className="px-6 vds-toast__msg" style={{ color: "#242424" }}>
         <Typography variant="subtitle2" className="mb-3">
           {title ?? "Thành công"}
         </Typography>
