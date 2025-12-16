@@ -1,68 +1,61 @@
+import { useFormCustom } from "@/lib/form";
+
+import { useTranslation } from "next-i18next";
+import { useParams, useSearchParams } from "next/navigation";
+import router from "next/router";
 import { useMemo, useState } from "react";
+import { useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { DropResult } from "react-beautiful-dnd";
 
 const useConstructionProjectSave = () => {
   const [page, setPage] = useState(0);
+  const searchParams = useSearchParams();
+  const params = useParams();
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const columns = useMemo(
-    () => [
-      { header: "Mã nhân sự", fieldName: "code" },
-      { header: "Họ và tên", fieldName: "name" },
-      { header: "Ngày sinh", fieldName: "date" },
-      { header: "Số điện thoại", fieldName: "phone" },
-      { header: "Chức vụ", fieldName: "position" },
-    ],
-    []
-  );
+  const actionType = searchParams.get("actionType");
+  const isView = actionType === "VIEW";
+  const methodForm = useFormCustom<any>({
+    defaultValues: {
+      valueFormalTypes: [
+        {
+          id: Date.now(),
+          value: "",
+        },
+      ],
+    },
+  });
 
-  const tableData = [
-    {
-      code: "NV001",
-      name: "Nguyễn Văn A",
-      date: "1990-05-12",
-      phone: "0987654321",
-      position: "Kỹ sư",
-    },
-    {
-      code: "NV002",
-      name: "Trần Thị B",
-      date: "1988-11-23",
-      phone: "0912345678",
-      position: "Kế toán",
-    },
-    {
-      code: "NV003",
-      name: "Lê Văn C",
-      date: "1992-07-08",
-      phone: "0978123456",
-      position: "Nhân viên thi công",
-    },
-    {
-      code: "NV004",
-      name: "Phạm Thị D",
-      date: "1995-03-15",
-      phone: "0904567891",
-      position: "Quản lý dự án",
-    },
-    {
-      code: "NV005",
-      name: "Hoàng Văn E",
-      date: "1985-09-30",
-      phone: "0939876543",
-      position: "Kỹ thuật viên",
-    },
-    {
-      code: "NV006",
-      name: "Đặng Thị F",
-      date: "1993-12-05",
-      phone: "0961234567",
-      position: "Nhân viên hành chính",
-    },
-  ];
+  const { handleSubmit, reset, setError, control, watch, setValue } =
+    methodForm;
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: "valueFormalTypes",
+  });
+  const { t } = useTranslation();
 
-  return [
-    { columns, tableData, page, rowsPerPage },
-    { setPage, setRowsPerPage },
-  ];
+  const handleDragEnd = (result: DropResult) => {
+    if (isView) return;
+
+    const { source, destination } = result;
+    if (!destination) return;
+
+    move(source.index, destination.index);
+  };
+
+  return {
+    page,
+    t,
+    rowsPerPage,
+    setPage,
+    setRowsPerPage,
+    fields,
+    append,
+    remove,
+    handleDragEnd,
+    isView,
+    control,
+    methodForm,
+  };
 };
 
 export default useConstructionProjectSave;

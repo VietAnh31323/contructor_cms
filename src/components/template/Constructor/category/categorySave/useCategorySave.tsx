@@ -17,7 +17,7 @@ const defaultValues = {
   isActive: true,
 };
 
-export default function CustomerSave() {
+export default function CategorySave() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();

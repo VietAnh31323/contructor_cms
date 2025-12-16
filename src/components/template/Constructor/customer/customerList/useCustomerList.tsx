@@ -1,68 +1,67 @@
+import { getEnum } from "@/components/atoms/TextColor";
+import { BLUE, GREEN, ORANGE, RED } from "@/helper/colors";
+import { useCustomerListQuery } from "@/service/constructor/Customer/getList";
+import { RequestBody } from "@/service/constructor/Customer/getList/type";
+import _ from "lodash";
 import { useMemo, useState } from "react";
-
+import { useForm } from "react-hook-form";
+const defaultValues = {
+  search: "",
+  page: 0,
+  size: 20,
+};
 const useCustomerList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const methodForm = useForm<RequestBody["GET"]>({
+    defaultValues,
+  });
+  const { handleSubmit } = methodForm;
+
+  const [queryPage, setQueryPage] = useState<any>(
+    _.omitBy(defaultValues, _.isNil)
+  );
+  const onSubmit = handleSubmit(async (input) => {
+    setQueryPage(input);
+  });
+  const onChangePageSize = (val: any) => {
+    const { page, size } = val;
+    const input = { ...queryPage, page, size };
+
+    setQueryPage(input);
+  };
+  const { data, isLoading } = useCustomerListQuery();
   const columns = useMemo(
     () => [
       { header: "Mã khách hàng", fieldName: "code" },
       { header: "Tên khách hàng", fieldName: "name" },
       { header: "Số điện thoại", fieldName: "phone" },
       { header: "Email", fieldName: "email" },
-      { header: "Nội dung tư vấn", fieldName: "decription" },
-      { header: "Trạng thái", fieldName: "status" },
+      { header: "Nội dung tư vấn", fieldName: "description" },
+      { header: "Trạng thái", fieldName: "contactStatus" },
       { header: "KH tiềm năng", fieldName: "isPotential" },
     ],
     []
   );
 
-  const tableData = [
-    {
-      code: "KH001",
-      name: "Nguyễn Văn A",
-      phone: "0987654321",
-      email: "vana.nguyen@example.com",
-      decription: "Quan tâm đến gói xây dựng nhà cấp 4.",
-      status: "Đang tư vấn",
-      isPotential: "Có",
-    },
-    {
-      code: "KH002",
-      name: "Trần Thị B",
-      phone: "0912345678",
-      email: "thib.tran@example.com",
-      decription: "Muốn thiết kế nội thất cho chung cư.",
-      status: "Tiềm năng cao",
-      isPotential: "Có",
-    },
-    {
-      code: "KH003",
-      name: "Lê Văn C",
-      phone: "0978123456",
-      email: "vanc.le@example.com",
-      decription: "Đã hoàn thành tư vấn, chờ ký hợp đồng.",
-      status: "Đã chốt",
-      isPotential: "Có",
-    },
-    {
-      code: "KH004",
-      name: "Phạm Thị D",
-      phone: "0904567891",
-      email: "thid.pham@example.com",
-      decription: "Quan tâm đến dịch vụ bảo trì công trình.",
-      status: "Tiềm năng trung bình",
-      isPotential: "Có",
-    },
-    {
-      code: "KH005",
-      name: "Hoàng Văn E",
-      phone: "0939876543",
-      email: "vane.hoang@example.com",
-      decription: "Muốn báo giá gói thi công trọn gói.",
-      status: "Đang liên hệ lại",
-      isPotential: "Có",
-    },
-  ];
+  const tableData =
+    data?.data?.content?.map((item) => ({
+      ...item,
+      contactStatus: getEnum(item?.contactStatus, [
+        {
+          label: "Chưa liên hệ",
+          value: "NOT_CONTACTED",
+          color: ORANGE,
+        },
+        { label: "Đã liên hệ", value: "CONTACTED", color: GREEN },
+        {
+          label: "Không phản hồi",
+          value: "NO_RESPONSE",
+          color: RED,
+        },
+        { label: "Đã phản hồi", value: "RESPONDED", color: BLUE },
+      ]),
+    })) ?? [];
 
   return [
     { columns, tableData, page, rowsPerPage },

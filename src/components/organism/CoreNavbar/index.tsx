@@ -58,7 +58,7 @@ const CoreNavbar = (props: Props) => {
             alignItems: "revert",
           }}
         >
-          <div className="right-10 mt-2 absolute">
+          <div className="right-10 mt-2 justify-end">
             {breadcrumbs[currentTab]?.rightAction}
           </div>
         </div>
