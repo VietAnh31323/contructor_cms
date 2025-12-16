@@ -34,6 +34,7 @@ import CoreLoading from "@/components/molecules/CoreLoading";
 import { TopAction } from "@/components/molecules/TopAction";
 import { BLUE, GREEN, ORANGE, RED } from "@/helper/colors";
 import { deleteCustomer } from "@/service/constructor/Customer/delete";
+import CoreCheckbox from "@/components/atoms/CoreCheckbox";
 export default function CustomerSave() {
   const [value, handle] = useCustomerSave();
   const { isView, control, isLoading, id } = value;
@@ -201,7 +202,7 @@ export default function CustomerSave() {
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <CoreSwitch
+                        <CoreCheckbox
                           control={control}
                           name="isPotential"
                           label="Khách hàng hàng tiềm năng"

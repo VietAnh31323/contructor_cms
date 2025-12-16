@@ -2,9 +2,12 @@ import { getEnum } from "@/components/atoms/TextColor";
 import { BLUE, GREEN, ORANGE, RED } from "@/helper/colors";
 import { useCustomerListQuery } from "@/service/constructor/Customer/getList";
 import { RequestBody } from "@/service/constructor/Customer/getList/type";
+import { CheckBox } from "@mui/icons-material";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import Checkbox from "@mui/material/Checkbox";
+
 const defaultValues = {
   search: "",
   page: 0,
@@ -61,6 +64,7 @@ const useCustomerList = () => {
         },
         { label: "Đã phản hồi", value: "RESPONDED", color: BLUE },
       ]),
+      isPotential: <Checkbox checked={Boolean(item.isPotential)} disabled />,
     })) ?? [];
 
   return [
