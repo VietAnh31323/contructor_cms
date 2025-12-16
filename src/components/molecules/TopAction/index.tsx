@@ -56,7 +56,7 @@ export const TopAction = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 justify-end">
       {actionList.includes("print") && (
         <div
           className="flex items-center cursor-pointer"

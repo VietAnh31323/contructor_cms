@@ -203,6 +203,7 @@ export default function ConstructionProjectSave() {
                           label="Hạng mục"
                           placeholder=" "
                           fetchDataFn={getCategoryList}
+                          multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -224,6 +225,7 @@ export default function ConstructionProjectSave() {
                             { label: "KTS.Nguyễn Văn A", value: "abc" },
                             { label: "KS. Nguyễn Văn B", value: "adeg" },
                           ]}
+                          multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -236,6 +238,7 @@ export default function ConstructionProjectSave() {
                             { label: "KTS.Nguyễn Văn A", value: "abc" },
                             { label: "KS. Nguyễn Văn B", value: "adeg" },
                           ]}
+                          multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -248,6 +251,7 @@ export default function ConstructionProjectSave() {
                             { label: "KTS.Nguyễn Văn A", value: "abc" },
                             { label: "KS. Nguyễn Văn B", value: "adeg" },
                           ]}
+                          multiple
                         />
                       </Grid>
                     </Grid>
@@ -395,6 +399,7 @@ export default function ConstructionProjectSave() {
                         Mô tả dự án
                       </Typography>
                     </Grid>
+                    <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <EditText
                         editorText={editorText}
@@ -418,17 +423,15 @@ export default function ConstructionProjectSave() {
                         Ghi chú
                       </Typography>
                     </Grid>
+                    <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <EditText
-                        editorText={editorText}
-                        setEditorText={setEditorText}
-                        disabled={false}
-                        error={
-                          editorText.length === 0
-                            ? "Vui lòng nhập nội dung"
-                            : ""
-                        }
-                        height={300}
+                      <CoreInputCustom
+                        control={control}
+                        name="note"
+                        label="Ghi chú"
+                        placeholder=" "
+                        rows={4}
+                        multiline
                       />
                     </Grid>
                     <br />

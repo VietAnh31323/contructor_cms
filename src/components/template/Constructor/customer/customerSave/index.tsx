@@ -1,4 +1,13 @@
-import { Autocomplete, Button, Grid, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+} from "@mui/material";
 import Image from "next/image";
 import statistics from "@/assets/svg/statistics.svg";
 import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
@@ -16,20 +25,54 @@ import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { ROUTES } from "@/routes";
 import CoreSwitch from "@/components/atoms/CoreSwitch";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
+import { deleteCategory } from "@/service/constructor/Category/delete";
+import { toastError, toastSuccess } from "@/toast";
+import router from "next/router";
+import useCustomerSave from "./useCustomerSave";
+import CoreLoading from "@/components/molecules/CoreLoading";
+import { TopAction } from "@/components/molecules/TopAction";
+import { BLUE, GREEN, ORANGE, RED } from "@/helper/colors";
+import { deleteCustomer } from "@/service/constructor/Customer/delete";
 export default function CustomerSave() {
-  const [value, handle] = useEmployeeList();
-  const [date, setDate] = useState<Date | null>(null);
-  const { columns, tableData, page, rowsPerPage } = value;
-  const { setPage, setRowsPerPage } = handle;
-  const { control } = useForm();
+  const [value, handle] = useCustomerSave();
+  const { isView, control, isLoading, id } = value;
+  const { onSubmit } = handle;
+  const { showDialog, hideDialog } = useDialog();
+
+  const handleDelete = (id: number) => {
+    showDialog(
+      <Dialog open onClose={hideDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn xóa hạng mục này?</DialogContent>
+        <DialogActions>
+          <CoreButton onClick={hideDialog}>Hủy</CoreButton>
+          <CoreButton
+            color="error"
+            onClick={async () => {
+              try {
+                await deleteCustomer({ id }); // dùng id trực tiếp
+                toastSuccess("Xóa thành công!");
+                hideDialog();
+                router.push(ROUTES.CUSTOMER);
+              } catch (err: any) {
+                toastError(err?.message || "Xóa thất bại");
+              }
+            }}
+          >
+            Đồng ý
+          </CoreButton>
+        </DialogActions>
+      </Dialog>
+    );
+  };
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -41,7 +84,7 @@ export default function CustomerSave() {
                 title: "Quản lý thông tin khách hàng",
                 pathname: ROUTES.CUSTOMER,
               },
-              { title: "Chi tiết" },
+              { title: isView ? "Chi tiết" : "Chỉnh sửa" },
             ]}
           />
         }
@@ -51,8 +94,22 @@ export default function CustomerSave() {
           breadcrumbs={[
             {
               title: "Chi tiết",
-              content: (
-                <form className="flex flex-col py-6 ">
+              rightAction: isView && (
+                <TopAction
+                  actionList={["delete", "edit"]}
+                  onEditAction={() => {
+                    router.push({
+                      pathname: `${ROUTES.CUSTOMER}/[id]`,
+                      query: { id: Number(id) },
+                    });
+                  }}
+                  onDeleteAction={() => handleDelete(id)}
+                />
+              ),
+              content: isLoading ? (
+                <CoreLoading />
+              ) : (
+                <form className="flex flex-col py-6" onSubmit={onSubmit}>
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
@@ -96,42 +153,35 @@ export default function CustomerSave() {
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="status"
-                        label="Trạng thái"
-                        placeholder="Đang liên hệ"
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={4} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="address"
-                        label="Địa chỉ"
-                        placeholder="Nhập địa chỉ"
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
                         options={[
-                          { label: "Nam", value: "admin" },
-                          { label: "Nữ", value: "manager" },
+                          {
+                            label: "Chưa liên hệ",
+                            value: "NOT_CONTACTED",
+                            ORANGE,
+                          },
+                          { label: "Đã liên hệ", value: "CONTACTED", GREEN },
+                          {
+                            label: "Không phản hồi",
+                            value: "NO_RESPONSE",
+                            RED,
+                          },
+                          { label: "Đã phản hồi", value: "RESPONDED", BLUE },
                         ]}
                         control={control}
-                        name="role"
-                        label="Giới tính"
-                        placeholder="Chọn giới tính"
+                        name="contactStatus"
+                        label="Trạng thái"
+                        placeholder="Chọn trạng thái"
                         valuePath="value"
                       />
                     </Grid>
+
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <CoreInputCustom
                         control={control}
                         name="description"
-                        label="Mô tả"
-                        placeholder="Nhập mô tả"
+                        label="Nội dung tư vấn"
+                        placeholder="Nhập nội dung tư vấn"
                         multiline
                         rows={2}
                         sx={{ width: "100%", padding: "0" }}
@@ -140,7 +190,7 @@ export default function CustomerSave() {
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <CoreInputCustom
                         control={control}
-                        name="class"
+                        name="note"
                         label="Ghi chú"
                         placeholder="Nhập ghi chú"
                         variant="standard"
@@ -153,20 +203,26 @@ export default function CustomerSave() {
                       <Grid item xs={12} sm={12} md={12} lg={12}>
                         <CoreSwitch
                           control={control}
-                          name="isActive"
+                          name="isPotential"
                           label="Khách hàng hàng tiềm năng"
                         />
                       </Grid>
                     </Grid>
                   </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+                  {!isView && (
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton onClick={() => {}} theme="cancel">
+                        Hủy bỏ
+                      </CoreButton>
+                      <CoreButton
+                        theme="submit"
+                        type="submit"
+                        loading={isLoading}
+                      >
+                        Lưu
+                      </CoreButton>
+                    </div>
+                  )}
                 </form>
               ),
             },
