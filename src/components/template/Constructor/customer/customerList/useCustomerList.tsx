@@ -19,7 +19,7 @@ const useCustomerList = () => {
   const methodForm = useForm<RequestBody["GET"]>({
     defaultValues,
   });
-  const { handleSubmit } = methodForm;
+  const { handleSubmit, control } = methodForm;
 
   const [queryPage, setQueryPage] = useState<any>(
     _.omitBy(defaultValues, _.isNil)
@@ -68,7 +68,7 @@ const useCustomerList = () => {
     })) ?? [];
 
   return [
-    { columns, tableData, page, rowsPerPage },
+    { columns, tableData, page, rowsPerPage, control },
     { setPage, setRowsPerPage },
   ];
 };
