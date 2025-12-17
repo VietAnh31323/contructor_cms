@@ -28,6 +28,7 @@ import { getCategoryList } from "@/service/constructor/Category/getList";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import NineDot from "@/components/icons/NineDot";
 import { Action } from "@/components/molecules/Action";
+import { getEmployeeList } from "@/service/constructor/Employee/getList";
 export default function ConstructionProjectSave() {
   const {
     setPage,
@@ -216,41 +217,32 @@ export default function ConstructionProjectSave() {
                         </Typography>
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <CoreAutocomplete
+                        <CoreAutoCompleteAPI
                           control={control}
                           name="createPerson"
                           label="Người tạo dự án"
                           placeholder=" "
-                          options={[
-                            { label: "KTS.Nguyễn Văn A", value: "abc" },
-                            { label: "KS. Nguyễn Văn B", value: "adeg" },
-                          ]}
+                          fetchDataFn={getEmployeeList}
                           multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <CoreAutocomplete
+                        <CoreAutoCompleteAPI
                           control={control}
                           name="Person"
                           label="Chủ nhiệm dự án"
                           placeholder=" "
-                          options={[
-                            { label: "KTS.Nguyễn Văn A", value: "abc" },
-                            { label: "KS. Nguyễn Văn B", value: "adeg" },
-                          ]}
+                          fetchDataFn={getEmployeeList}
                           multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <CoreAutocomplete
+                        <CoreAutoCompleteAPI
                           control={control}
                           name="CSKH"
                           label="Nhân viên chăm sóc"
                           placeholder=" "
-                          options={[
-                            { label: "KTS.Nguyễn Văn A", value: "abc" },
-                            { label: "KS. Nguyễn Văn B", value: "adeg" },
-                          ]}
+                          fetchDataFn={getEmployeeList}
                           multiple
                         />
                       </Grid>

@@ -1,10 +1,10 @@
 import { BaseResponse } from "@/service/type";
-import { CustomerList } from "../getList/type";
+import { EmployeeList } from "../getList/type";
 
-export type CustomerDetail = CustomerList;
+export type EmployeeDetail = EmployeeList;
 
 export type Response = {
-  GET: BaseResponse<CustomerDetail>;
+  GET: BaseResponse<EmployeeDetail>;
 };
 
 export type RequestParams = {

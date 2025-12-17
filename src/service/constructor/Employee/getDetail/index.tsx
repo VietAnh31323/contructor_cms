@@ -2,10 +2,10 @@ import { ConsApi } from "@/config/axios";
 import { Response } from "./type";
 import { useQuery } from "@tanstack/react-query";
 
-export const getCustomerDetail = async (
+export const getEmployeeDetail = async (
   id: number
 ): Promise<Response["GET"]> => {
-  const res = await ConsApi.get("/api/v1/customer", {
+  const res = await ConsApi.get("/api/v1/staff", {
     params: { id },
   });
 
@@ -16,14 +16,14 @@ export const getCustomerDetail = async (
   };
 };
 
-export const useCustomerDetailQuery = (
+export const useEmployeeDetailQuery = (
   id?: number,
   options?: {
     enabled?: boolean;
   }
 ) =>
   useQuery({
-    queryKey: ["customer-detail", id],
-    queryFn: () => getCustomerDetail(id as number),
+    queryKey: ["staff-detail", id],
+    queryFn: () => getEmployeeDetail(id as number),
     enabled: !!id && options?.enabled !== false,
   });

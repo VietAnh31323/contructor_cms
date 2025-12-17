@@ -1,7 +1,7 @@
-import { CustomerList } from "../getList/type";
+import { EmployeeList } from "../getList/type";
 
-export type CustomerSave = CustomerList;
+export type EmployeeSave = EmployeeList;
 
 export type RequestBody = {
-  SAVE: CustomerSave;
+  SAVE: EmployeeSave;
 };

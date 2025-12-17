@@ -1,6 +1,6 @@
 import { PageResponse } from "@/service/type";
 
-export type CustomerList = {
+export type EmployeeList = {
   id: number;
   code: string;
   email: string;
@@ -13,7 +13,7 @@ export type CustomerList = {
 };
 
 export type Response = {
-  GET: PageResponse<CustomerList[]>;
+  GET: PageResponse<EmployeeList[]>;
 };
 
 export type RequestBody = {
