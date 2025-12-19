@@ -1,3 +1,4 @@
+import { getEnum } from "@/components/atoms/TextColor";
 import { useEmployeeListQuery } from "@/service/constructor/Employee/getList";
 import { RequestBody } from "@/service/constructor/Employee/getList/type";
 import _ from "lodash";
@@ -32,11 +33,10 @@ const useEmployee = () => {
   const columns = useMemo(
     () => [
       { header: "Mã nhân sự", fieldName: "code" },
-      { header: "First Name", fieldName: "name" },
-      { header: "Last Name", fieldName: "phone" },
+      { header: "Tên nhân sự", fieldName: "name" },
       { header: "Email", fieldName: "email" },
-      { header: "Số điện thoại", fieldName: "description" },
-      { header: "Chức vụ", fieldName: "contactStatus" },
+      { header: "Số điện thoại", fieldName: "phone" },
+      { header: "Chức vụ", fieldName: "position" },
     ],
     []
   );
@@ -44,6 +44,16 @@ const useEmployee = () => {
   const tableData =
     data?.data?.content?.map((item) => ({
       ...item,
+      position: getEnum(item.position, [
+        { label: "Kiến trúc sư", value: "ARCHITECT" },
+        { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
+        {
+          label: "Kĩ sư kết cấu",
+          value: "STRUCTURAL_ENGINEER",
+        },
+        { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
+        { label: "Dự toán viên", value: "SUPERVISOR" },
+      ]),
     })) ?? [];
 
   return [
