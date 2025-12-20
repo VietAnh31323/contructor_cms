@@ -16,24 +16,21 @@ import useAccountList from "./useAccountList";
 export default function Account() {
   const [value, handle] = useAccountList();
 
-  const { columns, tableData, page, rowsPerPage } = value;
+  const { columns, tableData, page, rowsPerPage, control } = value;
   const { setPage, setRowsPerPage } = handle;
-  const { control } = useForm();
+  // const { control } = useForm();
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
       <PageContainer
-        title={
-          <CoreBreadcrumbs breadcrumbs={[{ title: "Quản lý tài khoản" }]} />
-        }
+        title={<CoreBreadcrumbs breadcrumbs={[{ title: "Quản lý nhân sư" }]} />}
       >
         <form className="flex flex-col py-6 ">
           <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -60,25 +57,40 @@ export default function Account() {
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={6} lg={4}></Grid>
+            <Grid item xs={12} sm={12} md={6} lg={4}>
+              <div className="py-4 flex justify-center gap-4 items-center">
+                <CoreButton onClick={() => {}} theme="cancel">
+                  Hủy
+                </CoreButton>
+                <CoreButton theme="submit" type="submit">
+                  Tìm kiếm
+                </CoreButton>
+              </div>
+            </Grid>
           </Grid>
         </form>
-        <div className="flex justify-end py-5">
+        {/* <div className="flex justify-end py-5">
           <CoreButton
             onClick={() => {
-              router.push(ROUTES.ACCOUNT + "/addNew");
+              router.push(ROUTES.EMPLOYEE + "/addNew");
             }}
             theme="submit"
           >
             {"Thêm mới"}
           </CoreButton>
-        </div>
+        </div> */}
         <CoreTable
           tableName="abc"
           columns={columns || []}
           data={tableData || []}
           page={page}
           isShowColumnStt
+          onRowClick={(id: number) => {
+            router.push({
+              pathname: `${ROUTES.ACCOUNT}/${id}`,
+              query: { actionType: "VIEW" },
+            });
+          }}
         />
       </PageContainer>
     </Grid>

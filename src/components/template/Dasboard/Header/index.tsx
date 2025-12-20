@@ -18,6 +18,9 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import React from "react";
 import router from "next/router";
+import { useMutation } from "@tanstack/react-query";
+import { Logout } from "@/service/Login/Logout";
+import { toastError, toastSuccess } from "@/toast";
 
 export default function Header({
   toggleDark,
@@ -34,6 +37,20 @@ export default function Header({
   };
 
   const handleClose = () => setAnchorEl(null);
+  const { mutate: logoutMutate } = useMutation({
+    mutationFn: Logout,
+    onSuccess: () => {
+      toastSuccess("Đăng xuất thành công");
+
+      // Xóa token ở localStorage hoặc cookie
+      localStorage.removeItem("access_token");
+
+      router.push(ROUTES.LOGIN);
+    },
+    onError: (err: any) => {
+      toastError(err?.message || "Lỗi đăng xuất");
+    },
+  });
 
   return (
     <div className="bg-[#0078D4] p-2 px-5 text-white flex justify-between items-center">
@@ -134,7 +151,7 @@ export default function Header({
 
         <MenuItem
           sx={{ display: "flex", justifyContent: "center", color: "#0078D4" }}
-          onClick={() => router.push(ROUTES.LOGIN)}
+          onClick={() => logoutMutate({})}
         >
           Đăng xuất
         </MenuItem>

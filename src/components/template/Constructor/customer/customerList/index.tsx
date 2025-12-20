@@ -17,9 +17,9 @@ import { ROUTES } from "@/routes";
 export default function CustomerList() {
   const [value, handle] = useCustomerList();
 
-  const { columns, tableData, page, rowsPerPage } = value;
+  const { columns, tableData, page, rowsPerPage, control } = value;
   const { setPage, setRowsPerPage } = handle;
-  const { control } = useForm();
+
   return (
     <Grid
       container

@@ -2,9 +2,12 @@ import { getEnum } from "@/components/atoms/TextColor";
 import { BLUE, GREEN, ORANGE, RED } from "@/helper/colors";
 import { useCustomerListQuery } from "@/service/constructor/Customer/getList";
 import { RequestBody } from "@/service/constructor/Customer/getList/type";
+import { CheckBox } from "@mui/icons-material";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import Checkbox from "@mui/material/Checkbox";
+
 const defaultValues = {
   search: "",
   page: 0,
@@ -16,7 +19,7 @@ const useCustomerList = () => {
   const methodForm = useForm<RequestBody["GET"]>({
     defaultValues,
   });
-  const { handleSubmit } = methodForm;
+  const { handleSubmit, control } = methodForm;
 
   const [queryPage, setQueryPage] = useState<any>(
     _.omitBy(defaultValues, _.isNil)
@@ -61,10 +64,11 @@ const useCustomerList = () => {
         },
         { label: "Đã phản hồi", value: "RESPONDED", color: BLUE },
       ]),
+      isPotential: <Checkbox checked={Boolean(item.isPotential)} disabled />,
     })) ?? [];
 
   return [
-    { columns, tableData, page, rowsPerPage },
+    { columns, tableData, page, rowsPerPage, control },
     { setPage, setRowsPerPage },
   ];
 };

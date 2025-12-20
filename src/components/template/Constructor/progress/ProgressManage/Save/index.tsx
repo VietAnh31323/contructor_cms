@@ -16,6 +16,7 @@ import CoreSwitch from "@/components/atoms/CoreSwitch";
 import { ROUTES } from "@/routes";
 import useProgressManageSave from "./useProgressManageSave";
 import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
+import ProgressTimeline from "./components/progressTimeline/ProgressTimeline";
 export default function ProgressManageSave() {
   const [value, handle] = useProgressManageSave();
   const { control } = useForm();
@@ -25,8 +26,7 @@ export default function ProgressManageSave() {
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -92,6 +92,11 @@ export default function ProgressManageSave() {
                     </Grid>
                     <Grid item xs={12} sm={12} md={4} lg={4}>
                       <RowBoxCommon title="Thời gian còn lại" data={""} />
+                    </Grid>
+                  </Grid>
+                  <Grid container mt={4}>
+                    <Grid item xs={12}>
+                      <ProgressTimeline />
                     </Grid>
                   </Grid>
                   <div className="py-4 flex justify-center gap-4 items-center">

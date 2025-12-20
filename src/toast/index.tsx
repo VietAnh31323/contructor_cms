@@ -44,10 +44,10 @@ export const toastError = (error: any, setError?: any) => {
           if (ele !== "orgId")
             setError(ele, {
               type: "be",
-              message: item.message,
+              message: "Thất bại",
             });
         });
-      } else toastError(item.message);
+      } else toastError("Không thành công");
     });
   } else if (typeof error === "string") {
     toast(<ErrorMessage message={error} />, {

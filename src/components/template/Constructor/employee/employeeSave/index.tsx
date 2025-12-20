@@ -1,6 +1,10 @@
 import {
   Autocomplete,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   InputAdornment,
   TextField,
@@ -20,27 +24,66 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
+import useEmployeeSave from "./useEmployeeLSave";
+import { deleteEmployee } from "@/service/constructor/Employee/delete";
+import { toastError, toastSuccess } from "@/toast";
+import router from "next/router";
+import { ROUTES } from "@/routes";
+import { TopAction } from "@/components/molecules/TopAction";
+import CoreLoading from "@/components/molecules/CoreLoading";
+import CoreInput from "@/components/atoms/CoreInput";
 export default function EmployeeSave() {
-  const [value, handle] = useEmployeeList();
+  const [value, handle] = useEmployeeSave();
   const [date, setDate] = useState<Date | null>(null);
-  const { columns, tableData, page, rowsPerPage } = value;
-  const { setPage, setRowsPerPage } = handle;
-  const { control } = useForm();
+  const { isView, control, isLoading, id } = value;
+  const { onSubmit } = handle;
+  const { showDialog, hideDialog } = useDialog();
+
+  const handleDelete = (id: number) => {
+    showDialog(
+      <Dialog open onClose={hideDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn xóa hạng mục này?</DialogContent>
+        <DialogActions>
+          <CoreButton onClick={hideDialog}>Hủy</CoreButton>
+          <CoreButton
+            color="error"
+            onClick={async () => {
+              try {
+                await deleteEmployee({ id }); // dùng id trực tiếp
+                toastSuccess("Xóa thành công!");
+                hideDialog();
+                router.push(ROUTES.EMPLOYEE);
+              } catch (err: any) {
+                toastError(err?.message || "Xóa thất bại");
+              }
+            }}
+          >
+            Đồng ý
+          </CoreButton>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
       <PageContainer
         title={
           <CoreBreadcrumbs
-            breadcrumbs={[{ title: "Quản lý nhân sư" }, { title: "Thêm mới" }]}
+            breadcrumbs={[
+              { title: "Quản lý nhân sư", pathname: ROUTES.EMPLOYEE },
+              { title: isView ? "Chi tiết" : "Chỉnh sửa" },
+            ]}
           />
         }
       >
@@ -49,8 +92,22 @@ export default function EmployeeSave() {
           breadcrumbs={[
             {
               title: "Thêm mới",
-              content: (
-                <form className="flex flex-col py-6 ">
+              rightAction: isView && (
+                <TopAction
+                  actionList={["delete", "edit"]}
+                  onEditAction={() => {
+                    router.push({
+                      pathname: `${ROUTES.EMPLOYEE}/[id]`,
+                      query: { id: Number(id) },
+                    });
+                  }}
+                  onDeleteAction={() => handleDelete(id)}
+                />
+              ),
+              content: isLoading ? (
+                <CoreLoading />
+              ) : (
+                <form className="flex flex-col py-6 " onSubmit={onSubmit}>
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
@@ -71,12 +128,17 @@ export default function EmployeeSave() {
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
                         options={[
-                          { label: "Quản trị viên", value: "admin" },
-                          { label: "Quản lý", value: "manager" },
-                          { label: "Nhân viên", value: "staff" },
+                          { label: "Kiến trúc sư", value: "ARCHITECT" },
+                          { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
+                          {
+                            label: "Kĩ sư kết cấu",
+                            value: "STRUCTURAL_ENGINEER",
+                          },
+                          { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
+                          { label: "Dự toán viên", value: "SUPERVISOR" },
                         ]}
                         control={control}
-                        name="role"
+                        name="position"
                         label="Chức vụ"
                         placeholder="Chọn chức vụ"
                         valuePath="value"
@@ -105,12 +167,14 @@ export default function EmployeeSave() {
                           selected={date}
                           onChange={(d) => setDate(d)}
                           placeholderText="Chọn ngày"
+                          name="birthDate"
                           customInput={
                             <TextField
                               label="Chọn ngày"
                               variant="standard"
                               fullWidth
                               focused
+                              name="birthDate"
                               placeholder="Chọn ngày"
                               InputProps={{
                                 endAdornment: (
@@ -149,20 +213,29 @@ export default function EmployeeSave() {
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
                         options={[
-                          { label: "Nam", value: "admin" },
-                          { label: "Nữ", value: "manager" },
+                          { label: "Nam", value: "MALE" },
+                          { label: "Nữ", value: "FEMALE" },
                         ]}
                         control={control}
-                        name="role"
+                        name="gender"
                         label="Giới tính"
                         placeholder="Chọn giới tính"
                         valuePath="value"
                       />
                     </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInput
+                        control={control}
+                        name="genPassword"
+                        label="Mật khẩu ban đầu"
+                        placeholder="Chọn giới tính"
+                        disabled={true}
+                      />
+                    </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <CoreInputCustom
                         control={control}
-                        name="class"
+                        name="description"
                         label="Ghi chú"
                         placeholder="Nhập ghi chú"
                         variant="standard"
@@ -172,14 +245,20 @@ export default function EmployeeSave() {
                       />
                     </Grid>
                   </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+                  {!isView && (
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton onClick={() => {}} theme="cancel">
+                        Hủy bỏ
+                      </CoreButton>
+                      <CoreButton
+                        theme="submit"
+                        type="submit"
+                        loading={isLoading}
+                      >
+                        Lưu
+                      </CoreButton>
+                    </div>
+                  )}
                 </form>
               ),
             },
