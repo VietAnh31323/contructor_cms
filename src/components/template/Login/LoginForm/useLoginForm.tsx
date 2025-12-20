@@ -17,27 +17,27 @@ export const useLoginForm = () => {
     defaultValues,
   });
 
-  const { reset, handleSubmit, control } = methodForm;
+  const { handleSubmit, control } = methodForm;
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (body: RequestBody["SAVE"]) => Login(body),
 
     onSuccess: (res: any) => {
       toastSuccess("Thành công");
-      if (res?.data?.id) {
+
+      if (res?.data?.userId) {
         router.push(ROUTES.DASHBOARD);
       }
     },
 
     onError: (error: any) => {
-      toastError(error?.message || "Có lỗi xảy ra");
+      toastError("Có lỗi xảy ra");
     },
   });
 
   const onSubmit = handleSubmit((data) => {
     mutate(data);
-    router.push(ROUTES.DASHBOARD);
   });
 
-  return [{ control }, { onSubmit }];
+  return [{ control, isPending }, { onSubmit }];
 };

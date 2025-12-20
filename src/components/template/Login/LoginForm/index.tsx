@@ -8,25 +8,31 @@ import {
   Autocomplete,
   Checkbox,
   FormControlLabel,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import { useLoginForm } from "./useLoginForm";
 import { useRouter } from "next/router";
 import { MENU_URL, ROUTES } from "@/routes";
 import { useState } from "react";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function LoginForm() {
   const [values, handle] = useLoginForm();
   const { control } = values;
   const { onSubmit } = handle;
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShow = () => setShowPassword((prev) => !prev);
 
   const handleForgotPassword = () => {
     router.push(ROUTES.RESET_PASSWORD);
   };
-  const handleSubmit = (e: React.FormEvent) => {
-    router.push(ROUTES.DASHBOARD);
-  };
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   router.push(ROUTES.DASHBOARD);
+  // };
   return (
     <Box
       sx={{
@@ -70,25 +76,30 @@ export default function LoginForm() {
                 rules={{
                   required: "Trường này không được để trống",
                 }}
-                // focused
                 sx={{ width: "100%" }}
               />
             </Grid>
             <br />
-            <Grid item xs={12}>
-              <CoreInput
-                control={control}
-                label="Mật khẩu"
-                name="password"
-                placeholder="Nhập mật khẩu"
-                required
-                rules={{
-                  required: "Trường này không được để trống",
-                }}
-                // focused
-                sx={{ width: "100%" }}
-              />
-            </Grid>
+            <CoreInput
+              control={control}
+              name="password"
+              label="Mật khẩu"
+              placeholder="Nhập mật khẩu"
+              type={showPassword ? "text" : "password"}
+              rules={{
+                required: "Trường này không được để trống",
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={toggleShow} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
             <br />
             <Grid item xs={12}>
               <CoreAutocomplete
@@ -102,6 +113,10 @@ export default function LoginForm() {
                 label="Chức vụ"
                 placeholder="Chọn chức vụ"
                 valuePath="value"
+                required
+                rules={{
+                  required: "Bạn bắt buộc phải chọn chức vụ",
+                }}
               />
             </Grid>
             <br />
