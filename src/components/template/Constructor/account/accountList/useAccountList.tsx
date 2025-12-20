@@ -1,80 +1,64 @@
+import { getEnum } from "@/components/atoms/TextColor";
+import { useEmployeeListQuery } from "@/service/constructor/Employee/getList";
+import { RequestBody } from "@/service/constructor/Employee/getList/type";
+import _ from "lodash";
 import { useMemo, useState } from "react";
-
+import { useForm } from "react-hook-form";
+const defaultValues = {
+  search: "",
+  page: 0,
+  size: 20,
+};
 const useAccountList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const methodForm = useForm<RequestBody["GET"]>({
+    defaultValues,
+  });
+  const { handleSubmit, control } = methodForm;
+
+  const [queryPage, setQueryPage] = useState<any>(
+    _.omitBy(defaultValues, _.isNil)
+  );
+  const onSubmit = handleSubmit(async (input) => {
+    setQueryPage(input);
+  });
+  const onChangePageSize = (val: any) => {
+    const { page, size } = val;
+    const input = { ...queryPage, page, size };
+
+    setQueryPage(input);
+  };
+  const { data, isLoading } = useEmployeeListQuery();
   const columns = useMemo(
     () => [
       { header: "Mã nhân sự", fieldName: "code" },
-      { header: "Họ và tên", fieldName: "name" },
-      { header: "Ngày sinh", fieldName: "date" },
-      { header: "Số điện thoại", fieldName: "phone" },
+      { header: "Tên nhân sự", fieldName: "name" },
       { header: "Email", fieldName: "email" },
+      { header: "Số điện thoại", fieldName: "phone" },
       { header: "Chức vụ", fieldName: "position" },
-      { header: "Quyền", fieldName: "power" },
+      { header: "Quyền", fieldName: " " },
     ],
     []
   );
 
-  const tableData = [
-    {
-      code: "NV001",
-      name: "Nguyễn Văn A",
-      date: "1990-05-12",
-      phone: "0987654321",
-      email: "a@example.com",
-      position: "Kỹ sư",
-      power: "Admin",
-    },
-    {
-      code: "NV002",
-      name: "Trần Thị B",
-      date: "1988-11-23",
-      phone: "0912345678",
-      email: "b@example.com",
-      position: "Kế toán",
-      power: "User",
-    },
-    {
-      code: "NV003",
-      name: "Lê Văn C",
-      date: "1992-07-08",
-      phone: "0978123456",
-      email: "c@example.com",
-      position: "Nhân viên thi công",
-      power: "User",
-    },
-    {
-      code: "NV004",
-      name: "Phạm Thị D",
-      date: "1995-03-15",
-      phone: "0904567891",
-      email: "d@example.com",
-      position: "Quản lý dự án",
-      power: "Manager",
-    },
-    {
-      code: "NV005",
-      name: "Hoàng Văn E",
-      date: "1985-09-30",
-      phone: "0939876543",
-      email: "e@example.com",
-      position: "Kỹ thuật viên",
-      power: "User",
-    },
-    {
-      code: "NV006",
-      name: "Đặng Thị F",
-      date: "1993-12-05",
-      phone: "0961234567",
-      email: "f@example.com",
-      position: "Nhân viên hành chính",
-      power: "User",
-    },
-  ];
+  const tableData =
+    data?.data?.content?.map((item) => ({
+      ...item,
+      position: getEnum(item.position, [
+        { label: "Kiến trúc sư", value: "ARCHITECT" },
+        { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
+        {
+          label: "Kĩ sư kết cấu",
+          value: "STRUCTURAL_ENGINEER",
+        },
+        { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
+        { label: "Dự toán viên", value: "SUPERVISOR" },
+      ]),
+    })) ?? [];
 
   return [
-    { columns, tableData, page, rowsPerPage },
+    { columns, tableData, page, rowsPerPage, control },
     { setPage, setRowsPerPage },
   ];
 };

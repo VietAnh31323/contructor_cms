@@ -26,16 +26,19 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { ROUTES } from "@/routes";
+import useAccountSave from "./useAccountSave";
+import CoreLoading from "@/components/molecules/CoreLoading";
+import router from "next/router";
 type Permission = {
   id: number;
   label: string;
 };
 export default function EmployeeSave() {
-  const [value, handle] = useEmployeeList();
+  const [value, handle] = useAccountSave();
   const [date, setDate] = useState<Date | null>(null);
-  const { columns, tableData, page, rowsPerPage } = value;
-  const { setPage, setRowsPerPage } = handle;
-  const { control } = useForm();
+  const { isView, control, isLoading, id } = value;
+  const {} = handle;
+
   const [permissions, setPermissions] = useState([
     { id: 1, label: "Quản lý", checked: true },
     { id: 2, label: "Nhân viên", checked: false },
@@ -78,40 +81,94 @@ export default function EmployeeSave() {
         <CoreNavbar
           breadcrumbs={[
             {
-              title: "Thêm mới",
-              content: (
+              title: "Phân quyền",
+              content: isLoading ? (
+                <CoreLoading />
+              ) : (
                 <form className="flex flex-col py-6 ">
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Grid item xs={12} sm={12} md={4} lg={4}>
                       <CoreInputCustom
                         control={control}
                         name="code"
                         label="Mã nhân sự"
-                        placeholder="Nhập mã nhân sự"
+                        placeholder="Mã nhân sự"
+                        // isViewProp={false}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Grid item xs={12} sm={12} md={4} lg={4}>
                       <CoreInputCustom
                         control={control}
                         name="email"
                         label="Email"
-                        placeholder="Nhập email"
+                        placeholder="Email nhân sự"
+                        // isViewProp={false}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreAutocomplete
+                        options={[
+                          { label: "Kiến trúc sư", value: "ARCHITECT" },
+                          { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
+                          {
+                            label: "Kĩ sư kết cấu",
+                            value: "STRUCTURAL_ENGINEER",
+                          },
+                          { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
+                          { label: "Dự toán viên", value: "SUPERVISOR" },
+                        ]}
+                        control={control}
+                        name="position"
+                        label="Chức vụ"
+                        placeholder="Chọn chức vụ"
+                        valuePath="value"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
                         name="firstName"
                         label="First Name"
-                        placeholder=" "
+                        placeholder="First Name"
+                        // isViewProp={false}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
                         name="lastName"
                         label="Last Name"
-                        placeholder=" "
+                        placeholder="Last Name"
+                        // isViewProp={false}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="phone"
+                        label="Số điện thoại"
+                        placeholder="Nhập số điện thoại"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreAutocomplete
+                        options={[
+                          { label: "Nam", value: "MALE" },
+                          { label: "Nữ", value: "FEMALE" },
+                        ]}
+                        control={control}
+                        name="gender"
+                        label="Giới tính"
+                        placeholder="Chọn giới tính"
+                        valuePath="value"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="address"
+                        label="Địa chỉ"
+                        placeholder="Nhập địa chỉ"
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -125,7 +182,6 @@ export default function EmployeeSave() {
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <Box display="flex" gap={2}>
-                        {/* LEFT FIELDSET */}
                         <Box
                           component="fieldset"
                           sx={{
@@ -186,7 +242,12 @@ export default function EmployeeSave() {
                     </Grid>
                   </Grid>
                   <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
+                    <CoreButton
+                      onClick={() => {
+                        router.push(ROUTES.ACCOUNT);
+                      }}
+                      theme="cancel"
+                    >
                       {"Hủy bỏ"}
                     </CoreButton>
                     <CoreButton onClick={() => {}} theme="submit">
