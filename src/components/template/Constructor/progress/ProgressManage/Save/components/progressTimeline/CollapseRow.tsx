@@ -8,8 +8,13 @@ import { CoreTable } from "@/components/organism/CoreTable";
 // import { useQueryQC } from "@/service/manufactory/productionSlip/getQC";
 import { GREEN, RED } from "@/helper/colors";
 import { CategoryList } from "@/service/constructor/Category/getList/type";
+import { Grid } from "@mui/material";
+import { CoreButton } from "@/components/atoms/CoreButton";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
+import SubTask from "../../Dialog/SubTask";
 
 const CollapseRow = ({ row }: { row: any }) => {
+  const { showDialog } = useDialog();
   // const { data, isLoading, refetch } = useQueryQC({ id: row })
   // const tableData = (data?.data ?? []).map((item) => {
   //   return {
@@ -32,30 +37,40 @@ const CollapseRow = ({ row }: { row: any }) => {
         {
           title: "Sub-task",
           content: (
-            <CoreTable
-              className="mt-15"
-              columns={[
-                {
-                  header: "Mã phiếu",
-                  fieldName: "code",
-                },
-                {
-                  header: "SKU",
-                  fieldName: "sku",
-                },
-                {
-                  header: "Số lượng đạt",
-                  fieldName: "passQuantity",
-                },
-                {
-                  header: "Kết quả",
-                  fieldName: "statusResult",
-                },
-              ]}
-              data={tableData}
-              isShowColumnStt
-              paginationHidden={tableData.length < 1}
-            />
+            <Grid>
+              <CoreTable
+                className="mt-15"
+                columns={[
+                  {
+                    header: "Mã phiếu",
+                    fieldName: "code",
+                  },
+                  {
+                    header: "SKU",
+                    fieldName: "sku",
+                  },
+                  {
+                    header: "Số lượng đạt",
+                    fieldName: "passQuantity",
+                  },
+                  {
+                    header: "Kết quả",
+                    fieldName: "statusResult",
+                  },
+                ]}
+                data={tableData}
+                isShowColumnStt
+                paginationHidden={tableData.length < 1}
+              />
+              <br />
+              <CoreButton
+                onClick={() => {
+                  showDialog(<SubTask />);
+                }}
+              >
+                Thêm Công việc con
+              </CoreButton>
+            </Grid>
           ),
         },
       ]}
