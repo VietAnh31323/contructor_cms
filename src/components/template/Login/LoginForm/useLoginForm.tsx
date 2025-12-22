@@ -25,11 +25,14 @@ export const useLoginForm = () => {
     onSuccess: (res: any) => {
       toastSuccess("Thành công");
 
-      if (res?.data?.userId) {
-        router.push(ROUTES.DASHBOARD);
-      }
-    },
+      const token = res?.data?.token;
+      const refresh = res?.data?.refreshToken;
 
+      localStorage.setItem("access_token", token);
+      localStorage.setItem("refresh_token", refresh);
+      console.log("anc", token);
+      router.push(ROUTES.DASHBOARD);
+    },
     onError: (error: any) => {
       toastError("Có lỗi xảy ra");
     },

@@ -194,10 +194,11 @@ export default function EmployeeSave() {
                         />
                       </div> */}
                       <CoreDatePicker
-                        name="date"
+                        name="birthDate"
                         control={control!}
                         label={"Ngày sinh"}
                         required={!isView}
+                        placeholder="Chọn ngày sinh"
                         rules={{
                           required: "Bạn phải nhập ngày sinh",
                         }}
