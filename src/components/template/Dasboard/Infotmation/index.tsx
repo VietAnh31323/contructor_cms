@@ -192,6 +192,9 @@ export default function Information() {
                           name="email"
                           label="Email"
                           placeholder="Nhập email"
+                          rules={{
+                            required: "Trường dữ liệu này không được để trống",
+                          }}
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={6}>

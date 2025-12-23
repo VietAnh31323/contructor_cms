@@ -19,10 +19,47 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
+type PasswordStrength = {
+  label: string;
+  value: number; // 20 - 100
+  level: number; // 1 - 5
+};
+
+const checkPasswordStrength = (password: string): PasswordStrength => {
+  let score = 0;
+
+  if (password.length >= 8) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  const levels = [
+    { label: "Rất yếu", color: "error.main" },
+    { label: "Yếu", color: "error.main" },
+    { label: "Trung bình", color: "warning.main" },
+    { label: "Mạnh", color: "success.main" },
+    { label: "Rất mạnh", color: "success.main" },
+  ];
+
+  return {
+    label: levels[score - 1]?.label || "Rất yếu",
+    value: (score / 5) * 100,
+    level: score || 1,
+  };
+};
+
+const strengthColorMap: Record<number, string> = {
+  1: "error.main",
+  2: "error.main",
+  3: "warning.main",
+  4: "success.main",
+  5: "success.main",
+};
 export default function ResetPass() {
   const [values, handle] = useResetPass();
   const { control } = values;
-  const { sendOtp, verifyOtp, resetPass } = handle;
+  const { sendOtp, verifyOtp, resetPass, watch } = handle;
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState<"SEND" | "VERIFY" | "RESET">("SEND");
   const toggleShow = () => setShowPassword((prev) => !prev);
@@ -30,7 +67,8 @@ export default function ResetPass() {
     router.push(ROUTES.LOGIN);
   };
   const [timer, setTimer] = useState(300);
-
+  const newPassword = watch?.("newPassword") ?? "";
+  const strength = checkPasswordStrength(newPassword);
   useEffect(() => {
     if (timer <= 0) return;
 
@@ -164,6 +202,33 @@ export default function ResetPass() {
                     ),
                   }}
                 />
+                {newPassword && (
+                  <Box mt={1}>
+                    <Box display="flex" gap={0.5}>
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Box
+                          key={i}
+                          flex={1}
+                          height={6}
+                          borderRadius={2}
+                          bgcolor={
+                            strength.level >= i
+                              ? strengthColorMap[strength.level]
+                              : "grey.300"
+                          }
+                          sx={{ transition: "background-color 0.3s" }}
+                        />
+                      ))}
+                    </Box>
+
+                    <Typography
+                      variant="caption"
+                      color={strengthColorMap[strength.level]}
+                    >
+                      Độ mạnh mật khẩu: {strength.label}
+                    </Typography>
+                  </Box>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <CoreInput

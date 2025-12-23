@@ -1,9 +1,9 @@
 import { IconButton } from '@mui/material'
-import { memo } from 'react'
+import React from 'react'
 
-const PlusIcon = ({ onClick }: { onClick?: () => void }) => {
+const ViewIcon = (props: any) => {
   return (
-    <IconButton onClick={onClick}>
+    <IconButton {...props}>
       <svg
         width='16'
         height='16'
@@ -12,15 +12,15 @@ const PlusIcon = ({ onClick }: { onClick?: () => void }) => {
         xmlns='http://www.w3.org/2000/svg'
       >
         <path
-          d='M2.5 8H13.5'
-          stroke='#00CC6A'
+          d='M7.25 12.5C10.1495 12.5 12.5 10.1495 12.5 7.25C12.5 4.35051 10.1495 2 7.25 2C4.35051 2 2 4.35051 2 7.25C2 10.1495 4.35051 12.5 7.25 12.5Z'
+          stroke='#747475'
           strokeWidth='1.2'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
         <path
-          d='M8 2.5V13.5'
-          stroke='#00CC6A'
+          d='M10.9619 10.9629L13.9995 14.0004'
+          stroke='#747475'
           strokeWidth='1.2'
           strokeLinecap='round'
           strokeLinejoin='round'
@@ -30,4 +30,4 @@ const PlusIcon = ({ onClick }: { onClick?: () => void }) => {
   )
 }
 
-export default memo(PlusIcon)
+export default React.memo(ViewIcon)

@@ -10,6 +10,7 @@ import { ResetPassword } from "@/service/Login/forgotPassword/reset";
 import { toastError, toastSuccess } from "@/toast";
 import { useMutation } from "@tanstack/react-query";
 import router from "next/router";
+import { UseFormWatch } from "react-hook-form";
 
 const defaultValues = {
   username: "",
@@ -28,6 +29,7 @@ type UseResetPassReturn = [
     sendOtp: () => void;
     verifyOtp: () => void;
     resetPass: () => void;
+    watch: UseFormWatch<any>;
   }
 ];
 
@@ -36,7 +38,7 @@ export const useResetPass = (): UseResetPassReturn => {
     defaultValues,
   });
 
-  const { handleSubmit, control } = methodForm;
+  const { handleSubmit, control, watch } = methodForm;
 
   const { mutate: sendOtpMutate, isPending: isPendingForgot } = useMutation({
     mutationFn: (body: ForgotRequest["SAVE"]) => Forgot(body),
@@ -56,9 +58,9 @@ export const useResetPass = (): UseResetPassReturn => {
         : "";
       if (token && scheme) {
         localStorage.setItem("otpToken", token);
-        console.log("abc", token);
+        // console.log("abc", token);
         localStorage.setItem("otpScheme", formattedScheme);
-        console.log("vịdh", scheme);
+        // console.log("vịdh", scheme);
       }
     },
     onError: () => toastError("OTP không đúng"),
@@ -67,7 +69,7 @@ export const useResetPass = (): UseResetPassReturn => {
   const { mutate: resetPassMutate, isPending: isPendingReset } = useMutation({
     mutationFn: (body: ResetPass["SAVE"]) => ResetPassword(body),
     onSuccess: (res) => {
-      toastSuccess(res?.errorCodes?.message);
+      toastSuccess(res?.message);
       router.push("http://localhost:3000/login");
     },
     onError: () => toastError("Lỗi khi đổi mật khẩu mới"),
@@ -94,6 +96,6 @@ export const useResetPass = (): UseResetPassReturn => {
   });
   return [
     { control, isPendingForgot, isPendingVerify, isPendingReset },
-    { sendOtp, verifyOtp, resetPass },
+    { sendOtp, verifyOtp, resetPass, watch },
   ];
 };

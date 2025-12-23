@@ -29,6 +29,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import NineDot from "@/components/icons/NineDot";
 import { Action } from "@/components/molecules/Action";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
+import UploadFilesAndImages from "@/components/atoms/UploadFilesAndImages";
 export default function ConstructionProjectSave() {
   const {
     setPage,
@@ -452,7 +453,7 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <Image src={upload} alt="upload" className="h-100vh" />
+                      <UploadFilesAndImages nameDynamic={`file`} />
                     </Grid>
                     <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -466,7 +467,7 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <Image src={upload} alt="upload" className="h-100vh" />
+                      <UploadFilesAndImages nameDynamic={`image`} />
                     </Grid>
                     <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -480,7 +481,7 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <Image src={upload} alt="upload" className="h-100vh" />
+                      <UploadFilesAndImages nameDynamic={`image`} />
                     </Grid>
                     <div className="py-4 flex justify-center gap-4 items-center">
                       <CoreButton onClick={() => {}} theme="cancel">

@@ -1,0 +1,43 @@
+import { IconButton } from '@mui/material'
+import React from 'react'
+
+const PlusCircle = ({
+  className,
+  onClick,
+}: {
+  className?: string
+  onClick?: any
+}) => {
+  return (
+    <IconButton className={className} onClick={onClick}>
+      <svg
+        width='16'
+        height='16'
+        viewBox='0 0 16 16'
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path
+          d='M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z'
+          stroke='#00CC6A'
+          strokeMiterlimit='10'
+        />
+        <path
+          d='M5.5 8H10.5'
+          stroke='#00CC6A'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+        <path
+          d='M8 5.5V10.5'
+          stroke='#00CC6A'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+      </svg>
+      {/* </div> */}
+    </IconButton>
+  )
+}
+
+export default React.memo(PlusCircle)

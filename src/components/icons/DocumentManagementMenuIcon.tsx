@@ -1,0 +1,30 @@
+import React from 'react'
+
+const DocumentManagementMenuIcon = ({ className }: { className?: string }) => {
+  return (
+    <div className={className}>
+      <svg
+        width='20'
+        height='20'
+        viewBox='0 0 16 16'
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path
+          d='M3 14C3 13.6022 3.15804 13.2206 3.43934 12.9393C3.72064 12.658 4.10218 12.5 4.5 12.5H13V2H4.5C4.10218 2 3.72064 2.15804 3.43934 2.43934C3.15804 2.72064 3 3.10218 3 3.5V14Z'
+          stroke='#242424'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+        <path
+          d='M3 14V14.5H12'
+          stroke='#242424'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+      </svg>
+    </div>
+  )
+}
+
+export default React.memo(DocumentManagementMenuIcon)

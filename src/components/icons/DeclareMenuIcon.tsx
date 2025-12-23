@@ -1,9 +1,8 @@
-import { IconButton } from '@mui/material'
-import { memo } from 'react'
+import React from 'react'
 
-const SquaresFour = ({ onClick }: { onClick: () => void }) => {
+const DeclareMenuIcon = ({ className }: { className?: string }) => {
   return (
-    <IconButton onClick={onClick}>
+    <div className={className}>
       <svg
         width='20'
         height='20'
@@ -12,32 +11,32 @@ const SquaresFour = ({ onClick }: { onClick: () => void }) => {
         xmlns='http://www.w3.org/2000/svg'
       >
         <path
-          d='M7 3H3V7H7V3Z'
+          d='M7 7H11'
           stroke='#242424'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
         <path
-          d='M13 3H9V7H13V3Z'
+          d='M7 9H11'
           stroke='#242424'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
         <path
-          d='M7 9H3V13H7V9Z'
+          d='M13 2.5H3C2.72386 2.5 2.5 2.72386 2.5 3V13C2.5 13.2761 2.72386 13.5 3 13.5H13C13.2761 13.5 13.5 13.2761 13.5 13V3C13.5 2.72386 13.2761 2.5 13 2.5Z'
           stroke='#242424'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
         <path
-          d='M13 9H9V13H13V9Z'
+          d='M5 2.5V13.5'
           stroke='#242424'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
       </svg>
-    </IconButton>
+    </div>
   )
 }
 
-export default memo(SquaresFour)
+export default React.memo(DeclareMenuIcon)

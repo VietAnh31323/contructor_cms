@@ -8,17 +8,19 @@ import { toastError, toastSuccess } from "@/toast";
 import { useMutation } from "@tanstack/react-query";
 import router from "next/router";
 import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
 const defaultValues = {};
 export default function useForgotPass() {
   const methodForm = useFormCustom<RequestDetail["GET"]>({
     defaultValues,
   });
+
   const { reset } = methodForm;
   const { data, isLoading, refetch } = useAccountDetailQuery();
   const methodForms = useFormCustom<RequestBody["SAVE"]>({
     defaultValues,
   });
-  const { handleSubmit, control } = methodForms;
+  const { handleSubmit, control, watch } = methodForms;
   const { mutate } = useMutation({
     mutationFn: (body: RequestBody["SAVE"]) => putChangePass(body),
 
@@ -43,5 +45,8 @@ export default function useForgotPass() {
       reset(data.data);
     }
   }, [data, reset]);
-  return [{ data, control, isLoading }, { onSubmit }];
+  return [
+    { data, control, isLoading },
+    { onSubmit, watch },
+  ];
 }

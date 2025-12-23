@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import queryString from "query-string";
 export const ConsApi = axios.create({
   baseURL: "http://localhost:8078",
 });
@@ -19,4 +19,18 @@ ConsApi.interceptors.request.use((config) => {
   }
 
   return config;
+});
+export const requestAuth = axios.create({
+  timeout: 26405,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  paramsSerializer: {
+    serialize: (params: any) =>
+      queryString.stringify(params, {
+        arrayFormat: "comma",
+        skipNull: true,
+        skipEmptyString: true,
+      }),
+  },
 });
