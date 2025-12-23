@@ -1,9 +1,11 @@
 import {
   Autocomplete,
   Avatar,
+  Box,
   Button,
   Grid,
   InputAdornment,
+  LinearProgress,
   TextField,
   Typography,
 } from "@mui/material";
@@ -17,7 +19,7 @@ import useInformation from "@/components/template/Dasboard/Infotmation/useInform
 import CoreNavbar from "@/components/organism/CoreNavbar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
@@ -30,12 +32,57 @@ import { getEnum } from "@/components/atoms/TextColor";
 import router from "next/router";
 import { ROUTES } from "@/routes";
 import CoreLoading from "@/components/molecules/CoreLoading";
+import { toastError, toastSuccess } from "@/toast";
+import { fileUpload } from "@/service/upload";
 export default function Information() {
   const [value, handle] = useInformation();
   const { onSubmit } = handle;
   const { control, data, isLoading } = value;
   const [date, setDate] = useState<Date | null>(null);
   console.log("data", data);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [avatarUrl, setAvatarUrl] = useState(data?.data?.avatar);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Optional: validate ảnh
+    if (!file.type.startsWith("image/")) {
+      toastError("Chỉ cho phép upload ảnh");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setUploadProgress(0);
+
+      const res = await fileUpload(
+        formData,
+        { folder: "avatar" },
+        (progressEvent) => {
+          if (!progressEvent.total) return;
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percent);
+        }
+      );
+
+      const imageUrl = res.data?.data?.url;
+      setAvatarUrl(imageUrl);
+
+      toastSuccess("Cập nhật ảnh đại diện thành công");
+    } catch (error) {
+      toastError("Upload ảnh thất bại");
+    } finally {
+      setUploadProgress(0);
+    }
+  };
+
   return (
     <Grid
       container
@@ -62,34 +109,47 @@ export default function Information() {
                 <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                   <Grid item xs={12} sm={12} md={3} lg={3}>
                     <Avatar
-                      src={data?.data?.avatar}
-                      alt="statistics"
+                      src={avatarUrl ?? data?.data?.avatar}
+                      alt="avatar"
                       sx={{
                         width: 220,
                         height: 220,
                         margin: "0 auto",
+                        border: "3px solid #0078D4",
+                        boxShadow: 5,
                       }}
                     />
 
-                    <Typography
-                      align="center"
-                      color={"#0078D4"}
-                      display={"flex"}
-                      justifyContent={"center"}
-                      marginTop={"10px"}
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      mt={1}
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => fileInputRef.current?.click()}
                     >
-                      Cập nhật hình ảnh
-                      <Image
-                        src={edit}
-                        alt="statistics"
-                        width={20}
-                        height={20}
-                        style={{
-                          margin: " 0 5px",
-                        }}
+                      <Typography color="#0078D4">Cập nhật hình ảnh</Typography>
+                      <Image src={edit} alt="edit" width={20} height={20} />
+                    </Box>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      name="avatar"
+                      ref={fileInputRef}
+                      onChange={handleUpload}
+                    />
+
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                      <LinearProgress
+                        variant="determinate"
+                        value={uploadProgress}
+                        sx={{ mt: 1 }}
                       />
-                    </Typography>
+                    )}
                   </Grid>
+
                   <Grid item xs={12} sm={12} md={9} lg={9}>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <RowBoxCommon

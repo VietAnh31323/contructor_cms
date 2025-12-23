@@ -15,13 +15,15 @@ import LanguageIcon from "@mui/icons-material/Language";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-
+import { RequestBody as RequestDetail } from "@/service/constructor/Account/getDetail/type";
 import React from "react";
 import router from "next/router";
 import { useMutation } from "@tanstack/react-query";
 import { Logout } from "@/service/Login/Logout";
 import { toastError, toastSuccess } from "@/toast";
-
+import { useFormCustom } from "@/lib/form";
+import { useAccountDetailQuery } from "@/service/constructor/Account/getDetail";
+const defaultValues = {};
 export default function Header({
   toggleDark,
   isDark,
@@ -31,7 +33,10 @@ export default function Header({
 }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
+  const methodForm = useFormCustom<RequestDetail["GET"]>({
+    defaultValues,
+  });
+  const { data, isLoading, refetch } = useAccountDetailQuery();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -42,7 +47,6 @@ export default function Header({
     onSuccess: () => {
       toastSuccess("Đăng xuất thành công");
 
-      // Xóa token ở localStorage hoặc cookie
       localStorage.removeItem("access_token");
 
       router.push(ROUTES.LOGIN);
@@ -76,7 +80,14 @@ export default function Header({
         className="relative flex items-center gap-3 cursor-pointer"
         onClick={handleClick}
       >
-        <Avatar className="w-10 h-10"></Avatar>
+        <Avatar
+          src={data?.data?.avatar}
+          className="w-10 h-10"
+          sx={{
+            boxShadow: 5,
+            border: "3px solid #fff",
+          }}
+        ></Avatar>
 
         <KeyboardArrowDownIcon
           sx={{
@@ -85,7 +96,10 @@ export default function Header({
           }}
         />
 
-        <span className="absolute bottom-0 right-7 w-3 h-3 bg-green-500 rounded-full ring-2 "></span>
+        <span
+          className="absolute bottom-0 right-7 w-3 h-3 bg-green-500 rounded-full ring-2 "
+          style={{ border: "1px solid #fff" }}
+        ></span>
       </div>
 
       {/* --- MENU --- */}

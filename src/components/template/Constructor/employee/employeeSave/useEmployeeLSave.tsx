@@ -26,9 +26,11 @@ const useEmployeeSave = () => {
   const methodForm = useFormCustom<RequestBody["SAVE"]>({
     defaultValues,
   });
-
+  const methodForms = useFormCustom<any>({
+    defaultValues,
+  });
   const { reset, handleSubmit, control } = methodForm;
-
+  const { setValue } = methodForms;
   const { data, isLoading } = useEmployeeDetailQuery(id, {
     enabled: !!id,
   });
@@ -61,7 +63,7 @@ const useEmployeeSave = () => {
 
   return [
     { isView, page, rowsPerPage, control, isUpdate, isLoading, id },
-    { setPage, setRowsPerPage, onSubmit },
+    { setPage, setRowsPerPage, onSubmit, setValue },
   ];
 };
 
