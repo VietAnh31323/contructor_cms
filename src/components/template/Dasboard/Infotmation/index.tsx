@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Avatar,
   Button,
   Grid,
   InputAdornment,
@@ -24,19 +25,23 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import avatar from "@/assets/png/Avatar.png";
 import edit from "@/assets/svg/edit.svg";
 import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
+import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
+import { getEnum } from "@/components/atoms/TextColor";
+import router from "next/router";
+import { ROUTES } from "@/routes";
 export default function Information() {
   const [value, handle] = useInformation();
+  const { onSubmit } = handle;
+  const { control, data } = value;
   const [date, setDate] = useState<Date | null>(null);
-
-  const { control } = useForm();
+  console.log("data", data);
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -53,15 +58,16 @@ export default function Information() {
               content: (
                 <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                   <Grid item xs={12} sm={12} md={3} lg={3}>
-                    <Image
-                      src={avatar}
+                    <Avatar
+                      src={data?.data?.avatar}
                       alt="statistics"
-                      width={250}
-                      height={250}
-                      style={{
-                        margin: " 0 auto",
+                      sx={{
+                        width: 220,
+                        height: 220,
+                        margin: "0 auto",
                       }}
                     />
+
                     <Typography
                       align="center"
                       color={"#0078D4"}
@@ -85,45 +91,96 @@ export default function Information() {
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <RowBoxCommon
                         title=" "
-                        data={"Nguyễn Việt Anh - MNV01.023"}
+                        data={
+                          data?.data?.code +
+                          " - " +
+                          data?.data?.firstName +
+                          " " +
+                          data?.data?.lastName
+                        }
                         dataStyle={{ fontSize: "1.5rem", color: "#0078D4" }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon title="Vị trí" data={"Kiến trúc sư"} />
+                      <RowBoxCommon
+                        title="Vị trí"
+                        data={
+                          getEnum(data?.data?.position, [
+                            { label: "Kiến trúc sư", value: "ARCHITECT" },
+                            { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
+                            {
+                              label: "Kĩ sư kết cấu",
+                              value: "STRUCTURAL_ENGINEER",
+                            },
+                            { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
+                            { label: "Dự toán viên", value: "SUPERVISOR" },
+                          ]) ?? "N/A"
+                        }
+                      />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon title="Ngày sinh" data={"31/03/2003"} />
+                      <RowBoxCommon
+                        title="Ngày sinh"
+                        data={data?.data?.birthDate ?? "N/A"}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon title="Email" data={"nvietanh@gmail.com"} />
+                      <RowBoxCommon
+                        title="Email"
+                        data={data?.data?.email ?? "N/A"}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
                       <RowBoxCommon
                         title="Địa chỉ"
-                        data={"Ngõ A, Thôn B, Đường C, Tỉnh D, Việt Nam"}
+                        data={data?.data?.address ?? "N/A"}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon title="Số điện thoại" data={"0982848203"} />
+                      <RowBoxCommon
+                        title="Số điện thoại"
+                        data={data?.data?.phone ?? "N/A"}
+                      />
                     </Grid>
                   </Grid>
-                  <form className="flex flex-col p-6 ">
+                  <form className="flex flex-col p-6 " onSubmit={onSubmit}>
                     <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                       <Grid item xs={12} sm={12} md={6} lg={6}>
                         <CoreInputCustom
                           control={control}
-                          name="name"
-                          label="Họ và tên"
-                          placeholder=" "
+                          name="firstName"
+                          label="First Name"
+                          placeholder="Nhập họ và tên"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={6}>
                         <CoreInputCustom
                           control={control}
-                          name="school"
-                          label="Học vấn"
-                          placeholder=" "
+                          name="lastName"
+                          label="Last Name"
+                          placeholder="Nhập họ và tên"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <CoreInputCustom
+                          control={control}
+                          name="phone"
+                          label="Số điện thoại"
+                          placeholder="Nhập số điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <CoreAutocomplete
+                          options={[
+                            { label: "Nam", value: "MALE" },
+                            { label: "Nữ", value: "FEMALE" },
+                          ]}
+                          control={control}
+                          name="gender"
+                          label="Giới tính"
+                          placeholder="Chọn giới tính"
+                          valuePath="value"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={6}>
@@ -131,39 +188,52 @@ export default function Information() {
                           control={control}
                           name="email"
                           label="Email"
-                          placeholder=" "
+                          placeholder="Nhập email"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
+                        <CoreAutocomplete
+                          options={[
+                            { label: "Kiến trúc sư", value: "ARCHITECT" },
+                            { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
+                            {
+                              label: "Kĩ sư kết cấu",
+                              value: "STRUCTURAL_ENGINEER",
+                            },
+                            { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
+                            { label: "Dự toán viên", value: "SUPERVISOR" },
+                          ]}
                           control={control}
                           name="position"
-                          label="Vị trí"
-                          placeholder=" "
+                          label="Chức vụ"
+                          placeholder="Chọn chức vụ"
+                          valuePath="value"
                         />
                       </Grid>
+
                       <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="phone"
-                          label="Số điện thoại"
-                          placeholder=" "
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="date"
-                          label="Ngày sinh"
-                          placeholder=" "
+                        <CoreDatePicker
+                          name="birthDate"
+                          control={control!}
+                          label={"Ngày sinh"}
+                          placeholder="Chọn ngày sinh"
                         />
                       </Grid>
                     </Grid>
                     <div className="py-4 flex justify-center gap-4 items-center">
-                      <CoreButton onClick={() => {}} theme="cancel">
+                      <CoreButton
+                        onClick={() => {
+                          router.push(ROUTES.DASHBOARD);
+                        }}
+                        theme="cancel"
+                      >
                         {"Hủy bỏ"}
                       </CoreButton>
-                      <CoreButton onClick={() => {}} theme="submit">
+                      <CoreButton
+                        // onClick={() => {}}
+                        theme="submit"
+                        type="submit"
+                      >
                         {"Lưu"}
                       </CoreButton>
                     </div>
