@@ -33,6 +33,7 @@ import { ROUTES } from "@/routes";
 import { TopAction } from "@/components/molecules/TopAction";
 import CoreLoading from "@/components/molecules/CoreLoading";
 import CoreInput from "@/components/atoms/CoreInput";
+import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
 export default function EmployeeSave() {
   const [value, handle] = useEmployeeSave();
   const [date, setDate] = useState<Date | null>(null);
@@ -162,7 +163,7 @@ export default function EmployeeSave() {
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <div style={{ width: "100%" }}>
+                      {/* <div style={{ width: "100%" }}>
                         <DatePicker
                           selected={date}
                           onChange={(d) => setDate(d)}
@@ -191,7 +192,17 @@ export default function EmployeeSave() {
                           wrapperClassName="w-full"
                           className="w-full"
                         />
-                      </div>
+                      </div> */}
+                      <CoreDatePicker
+                        name="birthDate"
+                        control={control!}
+                        label={"Ngày sinh"}
+                        required={!isView}
+                        placeholder="Chọn ngày sinh"
+                        rules={{
+                          required: "Bạn phải nhập ngày sinh",
+                        }}
+                      />
                     </Grid>
 
                     <Grid item xs={12} sm={12} md={6} lg={4}>

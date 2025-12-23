@@ -20,19 +20,24 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
+import useForgotPass from "./useForgotPass";
+import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
+import { ROUTES } from "@/routes";
+import router from "next/router";
+import CoreLoading from "@/components/molecules/CoreLoading";
 export default function ForgotPassword() {
-  const [value, handle] = useInformation();
+  const [value, handle] = useForgotPass();
+  const { data, control, isLoading } = value;
+  const { onSubmit } = handle;
   const [date, setDate] = useState<Date | null>(null);
 
-  const { control } = useForm();
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -46,51 +51,72 @@ export default function ForgotPassword() {
           breadcrumbs={[
             {
               title: " Mật khẩu",
-              content: (
-                <form className="flex flex-col py-6 ">
+              content: isLoading ? (
+                <CoreLoading />
+              ) : (
+                <Grid>
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <CoreInputCustom
-                        control={control}
-                        name="user"
-                        label="Tài khoản đăng nhập"
-                        placeholder="Nhập tài khoản đăng nhập"
-                      />
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <RowBoxCommon
+                          title="Tài khoản đăng nhập"
+                          data={data?.data?.email ?? "N/A"}
+                        />
+                      </Grid>
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <CoreInputCustom
-                        control={control}
-                        name="oldPass"
-                        label="Mật khẩu cũ"
-                        placeholder="Nhập mật khẩu cũ"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <CoreInputCustom
-                        control={control}
-                        name="newPass"
-                        label="Mật khẩu mới"
-                        placeholder="Nhập mật khẩu mới"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <CoreInputCustom
-                        control={control}
-                        name="conFirm"
-                        label="Xác nhận mật khẩu"
-                        placeholder="Nhập lại mật khẩu mới"
-                      />
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <RowBoxCommon
+                          title="Tên người dùng"
+                          data={
+                            data?.data?.firstName + " " + data?.data?.lastName
+                          }
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
-                  <div className="py-5 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
-                </form>
+                  <form className="flex flex-col py-6 " onSubmit={onSubmit}>
+                    <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <CoreInputCustom
+                          control={control}
+                          name="oldPassword"
+                          label="Mật khẩu cũ"
+                          placeholder="Nhập mật khẩu cũ"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <CoreInputCustom
+                          control={control}
+                          name="newPassword"
+                          label="Mật khẩu mới"
+                          placeholder="Nhập mật khẩu mới"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <CoreInputCustom
+                          control={control}
+                          name="confirmPassword"
+                          label="Xác nhận mật khẩu"
+                          placeholder="Nhập lại mật khẩu mới"
+                        />
+                      </Grid>
+                    </Grid>
+                    <div className="py-5 flex justify-center gap-4 items-center">
+                      <CoreButton
+                        onClick={() => {
+                          router.push(ROUTES.DASHBOARD);
+                        }}
+                        theme="cancel"
+                      >
+                        {"Hủy bỏ"}
+                      </CoreButton>
+                      <CoreButton theme="submit" type="submit">
+                        {"Lưu"}
+                      </CoreButton>
+                    </div>
+                  </form>
+                </Grid>
               ),
             },
           ]}

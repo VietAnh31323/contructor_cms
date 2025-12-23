@@ -27,7 +27,7 @@ export default function ProgressManageSave() {
       alignItems="center"
       sx={{
         overflowY: "auto",
-        overflowX: "hidden",
+        overflowX: "auto",
       }}
     >
       <PageContainer

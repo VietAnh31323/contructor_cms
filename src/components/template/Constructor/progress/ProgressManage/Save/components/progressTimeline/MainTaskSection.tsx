@@ -3,10 +3,13 @@ import {
   ColumnProps,
   TableCollapse,
 } from "@/components/organism/TableCollapse";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import CollapseRow from "./CollapseRow";
 import { useMemo } from "react";
 import { CategoryList } from "@/service/constructor/Category/getList/type";
+import { CoreButton } from "@/components/atoms/CoreButton";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
+import Task from "../../Dialog/Task";
 export type WorkProgressRow = {
   id: number;
   code: string; // Mã công việc
@@ -20,6 +23,7 @@ export type WorkProgressRow = {
 };
 
 export default function MainTaskSection() {
+  const { showDialog } = useDialog();
   const columns = useMemo(
     () =>
       [
@@ -94,32 +98,39 @@ export default function MainTaskSection() {
               <Box
                 sx={{
                   overflowX: "auto",
+                  // width: "100vw",
                 }}
               >
-                <Box sx={{ minWidth: 500 }}>
-                  <TableCollapse
-                    nameCheck="code"
-                    columns={columns}
-                    data={tableData}
-                    isShowColumnStt
-                    tableName="abc"
-                    paginationHidden
-                    // totalPages={totalPages}
-                    // onChangePageSize={onChangePageSize}
-                    // isLoading={isLoadingTable}
-                    // page={page}
-                    // size={size}
-                    // onRowClick={(id) => {
-                    //   router.push({
-                    //     pathname: `${RO}/[id]`,
-                    //     query: { id, actionType: "VIEW" },
-                    //   });
-                    // }}
-                    renderCollapse={(row) => {
-                      return <CollapseRow row={row.id} />;
-                    }}
-                  />
-                </Box>
+                <TableCollapse
+                  nameCheck="code"
+                  columns={columns}
+                  data={tableData}
+                  isShowColumnStt
+                  tableName="abc"
+                  paginationHidden
+                  // totalPages={totalPages}
+                  // onChangePageSize={onChangePageSize}
+                  // isLoading={isLoadingTable}
+                  // page={page}
+                  // size={size}
+                  // onRowClick={(id) => {
+                  //   router.push({
+                  //     pathname: `${RO}/[id]`,
+                  //     query: { id, actionType: "VIEW" },
+                  //   });
+                  // }}
+                  renderCollapse={(row) => {
+                    return <CollapseRow row={row.id} />;
+                  }}
+                />
+                <br />
+                <CoreButton
+                  onClick={() => {
+                    showDialog(<Task />);
+                  }}
+                >
+                  Thêm Công việc mới
+                </CoreButton>
               </Box>
             ),
           },

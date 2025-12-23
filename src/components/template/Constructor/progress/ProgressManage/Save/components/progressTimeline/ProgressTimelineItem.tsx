@@ -32,7 +32,7 @@ export function ProgressTimelineItem({
         <TimelineConnector />
       </TimelineSeparator>
 
-      <TimelineContent sx={{ pt: 0, pb: 3 }}>
+      <TimelineContent sx={{ pt: 0, pb: 3, width: "95%" }}>
         <Paper variant="outlined" sx={{ border: "none" }}>
           {children}
         </Paper>
