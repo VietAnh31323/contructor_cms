@@ -29,10 +29,11 @@ import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
 import { getEnum } from "@/components/atoms/TextColor";
 import router from "next/router";
 import { ROUTES } from "@/routes";
+import CoreLoading from "@/components/molecules/CoreLoading";
 export default function Information() {
   const [value, handle] = useInformation();
   const { onSubmit } = handle;
-  const { control, data } = value;
+  const { control, data, isLoading } = value;
   const [date, setDate] = useState<Date | null>(null);
   console.log("data", data);
   return (
@@ -55,7 +56,9 @@ export default function Information() {
           breadcrumbs={[
             {
               title: "Thông tin ",
-              content: (
+              content: isLoading ? (
+                <CoreLoading />
+              ) : (
                 <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                   <Grid item xs={12} sm={12} md={3} lg={3}>
                     <Avatar
@@ -217,6 +220,14 @@ export default function Information() {
                           control={control!}
                           label={"Ngày sinh"}
                           placeholder="Chọn ngày sinh"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={6}>
+                        <CoreInputCustom
+                          control={control}
+                          name="address"
+                          label="Địa chỉ"
+                          placeholder="Nhập địa chỉ"
                         />
                       </Grid>
                     </Grid>
