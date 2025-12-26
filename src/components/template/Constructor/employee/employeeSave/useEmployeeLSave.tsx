@@ -62,7 +62,7 @@ const useEmployeeSave = () => {
   }, [id, data, reset]);
 
   return [
-    { isView, page, rowsPerPage, control, isUpdate, isLoading, id },
+    { isView, page, rowsPerPage, control, isUpdate, isLoading, id, data },
     { setPage, setRowsPerPage, onSubmit, setValue },
   ];
 };

@@ -1,5 +1,6 @@
 import { TableCell, TableRow, Typography } from "@mui/material";
 import EmptyIcon from "@/components/icons/EmptyIcon";
+import { Margin } from "@mui/icons-material";
 
 type Props = {
   colSpan: number;

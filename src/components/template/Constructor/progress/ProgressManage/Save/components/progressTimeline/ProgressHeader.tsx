@@ -29,6 +29,9 @@ export default function ProgressHeader({
             label=""
             placeholder="Chọn tiến trình"
             valuePath="value"
+            params={{
+              isActive: true,
+            }}
           />
         </Grid>
       </Grid>

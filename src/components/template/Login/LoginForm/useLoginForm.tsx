@@ -23,18 +23,22 @@ export const useLoginForm = () => {
     mutationFn: (body: RequestBody["SAVE"]) => Login(body),
 
     onSuccess: (res: any) => {
+      if (!res?.data?.token) {
+        toastError(res?.errorCodes?.message || "Đăng nhập thất bại");
+        return;
+      }
+
       toastSuccess("Thành công");
 
-      const token = res?.data?.token;
-      const refresh = res?.data?.refreshToken;
+      const token = res.data.token;
+      const refresh = res.data.refreshToken;
+      const accountId = res.data.userId;
 
+      localStorage.setItem("accountId", accountId.toString());
       localStorage.setItem("access_token", token);
       localStorage.setItem("refresh_token", refresh);
-      console.log("anc", token);
+
       router.push(ROUTES.DASHBOARD);
-    },
-    onError: (error: any) => {
-      toastError("Có lỗi xảy ra");
     },
   });
 

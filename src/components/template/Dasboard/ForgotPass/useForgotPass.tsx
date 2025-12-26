@@ -16,7 +16,9 @@ export default function useForgotPass() {
   });
 
   const { reset } = methodForm;
-  const { data, isLoading, refetch } = useAccountDetailQuery();
+  const accountId = Number(localStorage.getItem("accountId"));
+  console.log("accountId", accountId);
+  const { data, isLoading, refetch } = useAccountDetailQuery(accountId);
   const methodForms = useFormCustom<RequestBody["SAVE"]>({
     defaultValues,
   });
@@ -42,7 +44,7 @@ export default function useForgotPass() {
   });
   useEffect(() => {
     if (data?.data) {
-      reset(data.data);
+      reset(data.data as any);
     }
   }, [data, reset]);
   return [

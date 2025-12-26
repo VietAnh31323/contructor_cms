@@ -15,7 +15,7 @@ export const ErrorMessage = ({ message, title }: MessageProps) => {
       <HighlightOffIcon style={{ height: 30, width: 30 }} color="error" />
       <div className="px-6 vds-toast__msg" style={{ color: "#242424" }}>
         <Typography variant="subtitle2" className="mb-3">
-          {title ?? t("message.fail")}
+          {title ?? "Có lỗi xảy ra"}
         </Typography>
         <Typography variant="body2" style={{ color: "#747475" }} mt={0.5}>
           {message}

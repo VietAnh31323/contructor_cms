@@ -1,12 +1,12 @@
-import { ReactElement } from 'react'
+import { ReactElement } from "react";
 
 type Type =
-  | 'input'
-  | 'autocomplete'
-  | 'date'
-  | 'datetime'
-  | 'time'
-  | 'daterange'
+  | "input"
+  | "autocomplete"
+  | "date"
+  | "datetime"
+  | "time"
+  | "daterange";
 
 export const getPlaceholder = (
   t: any,
@@ -17,35 +17,35 @@ export const getPlaceholder = (
   value: any,
   multiple = false
 ): string => {
-  if (isView) return ''
+  if (isView) return "";
 
-  if (multiple && value?.length > 0) return ''
+  if (multiple && value?.length > 0) return "";
 
-  if (!multiple && Boolean(value)) return ''
+  if (!multiple && Boolean(value)) return "";
 
-  if (placeholder) return String(placeholder)
+  if (placeholder) return String(placeholder);
 
-  if (type === 'input')
+  if (type === "input")
     return String(
-      t('form.input.placeholder', {
-        label: typeof label === 'string' ? label?.toLowerCase() : '',
+      t("form.input.placeholder", {
+        label: typeof label === "string" ? label?.toLowerCase() : "",
       })
-    )
+    );
 
-  if (type === 'autocomplete')
+  if (type === "autocomplete")
     return String(
-      t('form.autocomplete.placeholder', {
-        label: typeof label === 'string' ? label?.toLowerCase() : '',
+      t("Không có lựa chọn", {
+        label: typeof label === "string" ? label?.toLowerCase() : "",
       })
-    )
+    );
 
-  if (type === 'datetime') return 'DD/MM/YYYY HH:mm'
+  if (type === "datetime") return "DD/MM/YYYY HH:mm";
 
-  if (type === 'daterange') return 'DD/MM/YYYY - DD/MM/YYYY'
+  if (type === "daterange") return "DD/MM/YYYY - DD/MM/YYYY";
 
-  if (type === 'date') return 'DD/MM/YYYY'
+  if (type === "date") return "DD/MM/YYYY";
 
-  if (type === 'time') return 'HH:mm'
+  if (type === "time") return "HH:mm";
 
-  return ''
-}
+  return "";
+};

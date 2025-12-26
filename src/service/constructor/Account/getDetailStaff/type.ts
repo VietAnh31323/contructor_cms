@@ -2,6 +2,17 @@ import { BaseResponse } from "@/service/type";
 
 export type AccountDetail = {
   id: number;
+  username: string;
+  roles: Role[];
+  staff: Staff;
+};
+export interface Role {
+  id: number;
+  name: string;
+}
+
+export interface Staff {
+  id: number;
   code: string;
   email: string;
   position: string;
@@ -15,7 +26,7 @@ export type AccountDetail = {
   gender: string;
   description: string;
   genPassword: string;
-};
+}
 export type Response = {
   GET: BaseResponse<AccountDetail>;
 };

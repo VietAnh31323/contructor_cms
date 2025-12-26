@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Avatar,
   Box,
   Button,
   Checkbox,
@@ -20,32 +21,59 @@ import useEmployeeList from "@/components/template/Constructor/employee/employee
 import CoreNavbar from "@/components/organism/CoreNavbar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
-import { useForm, useFormContext } from "react-hook-form";
+import { useForm, useFormContext, useWatch } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { ROUTES } from "@/routes";
 import useAccountSave from "./useAccountSave";
 import CoreLoading from "@/components/molecules/CoreLoading";
 import router from "next/router";
+import { TopAction } from "@/components/molecules/TopAction";
 type Permission = {
   id: number;
   label: string;
+  name?: string;
 };
-export default function EmployeeSave() {
-  const [value, handle] = useAccountSave();
-  const [date, setDate] = useState<Date | null>(null);
-  const { isView, control, isLoading, id } = value;
-  const {} = handle;
 
+export default function EmployeeSave() {
+  const [selected, setSelected] = useState<Permission[]>([]);
+  const [value, handle] = useAccountSave(selected);
+  const [date, setDate] = useState<Date | null>(null);
+  const { isView, control, isLoading, id, data, setValue } = value;
+  const { onSubmit } = handle;
   const [permissions, setPermissions] = useState([
-    { id: 1, label: "Quản lý", checked: true },
-    { id: 2, label: "Nhân viên", checked: false },
-    { id: 3, label: "CSKH", checked: true },
+    { id: 1, label: "Quản lý", name: "ADMIN", checked: true },
+    { id: 2, label: "Nhân viên", name: "STAFF", checked: false },
+    { id: 3, label: "CSKH", name: "CUSTOMER_CARE", checked: true },
   ]);
 
-  const [selected, setSelected] = useState<Permission[]>([]);
+  const avatar = useWatch<any>({
+    control,
+    name: "staff.avatar",
+  });
+  const accountRoles = data?.data?.roles;
+  useEffect(() => {
+    const apiRoles = data?.data?.roles;
+    if (!apiRoles?.length) return;
+
+    const mappedSelected = permissions.filter((p) =>
+      apiRoles.some((r: any) => r.name === p.name)
+    );
+
+    setSelected(mappedSelected);
+
+    if (!setValue) return;
+
+    setValue(
+      "roles",
+      selected.map((r) => ({
+        id: r.id,
+        name: r.name,
+      }))
+    );
+  }, [data, permissions, setValue]);
 
   const handleToggle = (item: Permission) => {
     const exists = selected.some((p) => p.id === item.id);
@@ -62,8 +90,7 @@ export default function EmployeeSave() {
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -82,27 +109,51 @@ export default function EmployeeSave() {
           breadcrumbs={[
             {
               title: "Phân quyền",
+              rightAction: isView && (
+                <TopAction
+                  actionList={["delete", "edit"]}
+                  onEditAction={() => {
+                    router.push({
+                      pathname: `${ROUTES.ACCOUNT}/[id]`,
+                      query: { id: Number(id) },
+                    });
+                  }}
+                />
+              ),
               content: isLoading ? (
                 <CoreLoading />
               ) : (
-                <form className="flex flex-col py-6 ">
+                <form className="flex flex-col py-6 " onSubmit={onSubmit}>
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                    <Grid item xs={12} sm={12} md={4} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="code"
-                        label="Mã nhân sự"
-                        placeholder="Mã nhân sự"
-                        // isViewProp={false}
+                    <Grid item xs={12} sm={12} md={12} lg={12}>
+                      <Avatar
+                        src={avatar}
+                        alt="avatar"
+                        sx={{
+                          width: 250,
+                          height: 250,
+                          borderRadius: 5,
+                          boxShadow: 5,
+                        }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={4} lg={4}>
+
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="email"
+                        name="staff.code"
+                        label="Mã nhân sự"
+                        placeholder="Mã nhân sự"
+                        isViewProp={true}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="staff.email"
                         label="Email"
                         placeholder="Email nhân sự"
-                        // isViewProp={false}
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -118,36 +169,38 @@ export default function EmployeeSave() {
                           { label: "Dự toán viên", value: "SUPERVISOR" },
                         ]}
                         control={control}
-                        name="position"
+                        name="staff.position"
                         label="Chức vụ"
                         placeholder="Chọn chức vụ"
                         valuePath="value"
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="firstName"
+                        name="staff.firstName"
                         label="First Name"
                         placeholder="First Name"
-                        // isViewProp={false}
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="lastName"
+                        name="staff.lastName"
                         label="Last Name"
                         placeholder="Last Name"
-                        // isViewProp={false}
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="phone"
+                        name="staff.phone"
                         label="Số điện thoại"
                         placeholder="Nhập số điện thoại"
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -157,18 +210,20 @@ export default function EmployeeSave() {
                           { label: "Nữ", value: "FEMALE" },
                         ]}
                         control={control}
-                        name="gender"
+                        name="staff.gender"
                         label="Giới tính"
                         placeholder="Chọn giới tính"
                         valuePath="value"
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
-                        name="address"
+                        name="staff.address"
                         label="Địa chỉ"
                         placeholder="Nhập địa chỉ"
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -180,6 +235,7 @@ export default function EmployeeSave() {
                         Phân quyền nhân sự
                       </Typography>
                     </Grid>
+
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <Box display="flex" gap={2}>
                         <Box
@@ -207,6 +263,7 @@ export default function EmployeeSave() {
                                     (p) => p.id === item.id
                                   )}
                                   onChange={() => handleToggle(item)}
+                                  disabled={isView}
                                 />
                               }
                               label={item.label}
@@ -241,19 +298,21 @@ export default function EmployeeSave() {
                       </Box>
                     </Grid>
                   </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton
-                      onClick={() => {
-                        router.push(ROUTES.ACCOUNT);
-                      }}
-                      theme="cancel"
-                    >
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+                  {!isView && (
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton
+                        onClick={() => {
+                          router.push(ROUTES.ACCOUNT);
+                        }}
+                        theme="cancel"
+                      >
+                        {"Hủy bỏ"}
+                      </CoreButton>
+                      <CoreButton type="submit" theme="submit">
+                        {"Lưu"}
+                      </CoreButton>
+                    </div>
+                  )}
                 </form>
               ),
             },

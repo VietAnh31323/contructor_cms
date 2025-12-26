@@ -1,6 +1,17 @@
-import { BaseResponse } from "@/service/type";
+import { AccountDetail } from "../getDetail/type";
 
-export type AccountDetail = {
+export type UpdateRole = {
+  id: number;
+  username: string;
+  roles: Role[];
+  staff: Staff;
+};
+export interface Role {
+  id: number;
+  name: string;
+}
+
+export interface Staff {
   id: number;
   code: string;
   email: string;
@@ -15,13 +26,7 @@ export type AccountDetail = {
   gender: string;
   description: string;
   genPassword: string;
-};
-export type Response = {
-  GET: BaseResponse<AccountDetail>;
-};
-
+}
 export type RequestBody = {
-  GET: {
-    accountId?: number;
-  };
+  SAVE: UpdateRole;
 };

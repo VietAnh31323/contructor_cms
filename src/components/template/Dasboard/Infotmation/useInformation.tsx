@@ -32,14 +32,16 @@ export default function useInformation() {
     defaultValues,
   });
   const { reset } = methodForm;
-  const { handleSubmit, control } = methodForms;
-  const { data, isLoading, refetch } = useAccountDetailQuery();
+  const { handleSubmit, control, setValue } = methodForms;
+  const accountId = Number(localStorage.getItem("accountId"));
+  console.log("accountId", accountId);
+  const { data, isLoading, refetch } = useAccountDetailQuery(accountId);
 
   useEffect(() => {
     if (id && data?.data) {
-      reset(data.data);
+      reset(data.data as any);
     }
-  }, [id, data, reset]);
+  }, [accountId, data, reset]);
 
   const { mutate } = useMutation({
     mutationFn: (body: RequestBody["SAVE"]) => putAccount(body),
@@ -62,6 +64,6 @@ export default function useInformation() {
   });
   return [
     { isView, page, rowsPerPage, control, isUpdate, isLoading, id, data },
-    { setPage, setRowsPerPage, onSubmit },
+    { setPage, setRowsPerPage, onSubmit, setValue },
   ];
 }

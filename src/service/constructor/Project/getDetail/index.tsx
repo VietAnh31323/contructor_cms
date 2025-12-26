@@ -2,11 +2,11 @@ import { ConsApi } from "@/config/axios";
 import { Response } from "./type";
 import { useQuery } from "@tanstack/react-query";
 
-export const getAccountDetail = async (
-  accountId: number
+export const getProjectDetail = async (
+  id: number
 ): Promise<Response["GET"]> => {
-  const res = await ConsApi.get("/api/v1/account", {
-    params: { accountId },
+  const res = await ConsApi.get("/api/v1/project", {
+    params: { id },
   });
 
   return {
@@ -16,12 +16,14 @@ export const getAccountDetail = async (
   };
 };
 
-export const useAccountDetailQuery = (
-  id: number,
-  options?: { enabled?: boolean }
+export const useProjectDetailQuery = (
+  id?: number,
+  options?: {
+    enabled?: boolean;
+  }
 ) =>
   useQuery({
-    queryKey: ["account-detail", id],
-    queryFn: () => getAccountDetail(id),
+    queryKey: ["project-detail", id],
+    queryFn: () => getProjectDetail(id as number),
     enabled: !!id && options?.enabled !== false,
   });

@@ -13,11 +13,23 @@ export interface Role {
 
 export interface Staff {
   id: number;
+  username: string;
+  roles: Role[];
+  staff: Staff;
+}
+export interface Role {
+  id: number;
+  name: string;
+}
+
+export interface Staff {
+  id: number;
   code: string;
   email: string;
   position: string;
   firstName: string;
   lastName: string;
+  name: string;
   avatar: string;
   birthDate: string;
   address: string;
@@ -26,6 +38,7 @@ export interface Staff {
   description: string;
   genPassword: string;
 }
+
 export type Response = {
   GET: PageResponse<AccountList[]>;
 };

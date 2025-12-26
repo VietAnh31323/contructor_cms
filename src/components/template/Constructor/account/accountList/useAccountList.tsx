@@ -1,6 +1,7 @@
 import { getEnum } from "@/components/atoms/TextColor";
 import { useAccountListQuery } from "@/service/constructor/Account/getList";
 import { RequestBody } from "@/service/constructor/Employee/getList/type";
+import Avatar from "@mui/material/Avatar/Avatar";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -33,6 +34,25 @@ const useAccountList = () => {
   const columns = useMemo(
     () => [
       { header: "Mã nhân sự", fieldName: "code" },
+      {
+        header: "Ảnh đại diện",
+        fieldName: "avatar",
+        render: (row: any) => {
+          return (
+            <Avatar
+              src={row.avatar}
+              alt="avatar"
+              sx={{
+                width: 40,
+                height: 40,
+                border: 3,
+                borderColor: "#0078D4",
+                boxShadow: 2,
+              }}
+            />
+          );
+        },
+      },
       { header: "Tên nhân sự", fieldName: "name" },
       { header: "Tên tài khoản", fieldName: "username" },
       { header: "Chức vụ", fieldName: "position" },
@@ -42,13 +62,10 @@ const useAccountList = () => {
   );
 
   const tableData =
-    data?.data?.content?.map((item) => ({
+    data?.data?.content.map((item) => ({
       ...item,
-      roles: getEnum(item.roles?.map((r) => r.name).join(", ") || "", [
-        { label: "Quản trị viên", value: "ADMIN" },
-        { label: "Nhân viên", value: "STAFF" },
-        { label: "Nhân viên CSKH", value: "CUSTOMER_CARE" },
-      ]),
+      avatar: item?.staff?.avatar,
+
       position: getEnum(item?.staff?.position, [
         { label: "Kiến trúc sư", value: "ARCHITECT" },
         { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
@@ -59,11 +76,25 @@ const useAccountList = () => {
         { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
         { label: "Dự toán viên", value: "SUPERVISOR" },
       ]),
-      name:
-        [item?.staff?.firstName, item?.staff?.lastName]
-          .filter(Boolean)
-          .join(" ") || "N/A",
+
       code: item?.staff?.code,
+      name: item?.staff?.name,
+      roles: item?.roles?.length ? (
+        <>
+          {item.roles.map((r, index) => (
+            <span key={r.id}>
+              {getEnum(r.name, [
+                { label: "Quản trị viên", value: "ADMIN" },
+                { label: "Nhân viên", value: "STAFF" },
+                { label: "CSKH", value: "CUSTOMER_CARE" },
+              ])}
+              {index < item.roles.length - 1 && ", "}
+            </span>
+          ))}
+        </>
+      ) : (
+        "N/A"
+      ),
     })) ?? [];
 
   return [

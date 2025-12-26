@@ -31,18 +31,20 @@ import { Action } from "@/components/molecules/Action";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
 import UploadFilesAndImages from "@/components/atoms/UploadFilesAndImages";
 export default function ConstructionProjectSave() {
+  const [value, handle] = useConstructionProjectSave();
   const {
-    setPage,
-    setRowsPerPage,
-    fields,
-    append,
-    t,
-    remove,
-    handleDragEnd,
     isView,
+    page,
+    rowsPerPage,
     control,
+    isUpdate,
+    isLoading,
+    id,
     methodForm,
-  } = useConstructionProjectSave();
+    fields,
+  } = value;
+  const { setPage, setRowsPerPage, onSubmit, append, remove, handleDragEnd } =
+    handle;
   const [date, setDate] = useState<Date | null>(null);
 
   const [editorText, setEditorText] = useState("");
@@ -206,6 +208,9 @@ export default function ConstructionProjectSave() {
                           placeholder=" "
                           fetchDataFn={getCategoryList}
                           multiple
+                          params={{
+                            isActive: true,
+                          }}
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -261,7 +266,7 @@ export default function ConstructionProjectSave() {
                     <Grid item xs={12} sm={12} md={12} lg={12}>
                       <div className="mt-2">
                         <DragDropContext onDragEnd={handleDragEnd}>
-                          <Droppable droppableId="valueFormalTypes">
+                          <Droppable droppableId="projectLines">
                             {(provided) => (
                               <div
                                 ref={provided.innerRef}
@@ -271,7 +276,7 @@ export default function ConstructionProjectSave() {
                                 {fields.map((item, index) => (
                                   <Draggable
                                     key={item.id}
-                                    draggableId={`valueFormalTypes-${item.id}`}
+                                    draggableId={`projectLines-${item.id}`}
                                     index={index}
                                   >
                                     {(provided) => (
@@ -338,7 +343,7 @@ export default function ConstructionProjectSave() {
                                             >
                                               <CoreInputCustom
                                                 control={control}
-                                                name={`valueFormalTypes.${index}.value`}
+                                                name={`projectLines.${index}.value`}
                                                 label={`Thanh toán lần ${
                                                   index + 1
                                                 }`}

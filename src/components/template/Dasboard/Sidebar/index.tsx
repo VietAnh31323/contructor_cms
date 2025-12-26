@@ -23,8 +23,11 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   // check active
-  const isActive = (path: string) =>
-    pathname === path || pathname.startsWith(path + "/");
+  const isActive = (path: string) => {
+    if (!pathname) return false;
+
+    return pathname === path || pathname.startsWith(path + "/");
+  };
 
   return (
     <Sidebar

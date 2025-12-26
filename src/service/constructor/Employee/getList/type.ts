@@ -4,12 +4,17 @@ export type EmployeeList = {
   id: number;
   code: string;
   email: string;
-  name: string;
+  position: string;
   firstName: string;
   lastName: string;
+  name: string;
+  avatar: string;
   birthDate: string;
+  address: string;
   phone: string;
-  position: string;
+  gender: string;
+  description: string;
+  genPassword: string;
 };
 
 export type Response = {

@@ -36,7 +36,7 @@ import { toastError, toastSuccess } from "@/toast";
 import { fileUpload } from "@/service/upload";
 export default function Information() {
   const [value, handle] = useInformation();
-  const { onSubmit } = handle;
+  const { onSubmit, setValue } = handle;
   const { control, data, isLoading } = value;
   const [date, setDate] = useState<Date | null>(null);
   console.log("data", data);
@@ -74,7 +74,10 @@ export default function Information() {
 
       const imageUrl = res.data?.data?.url;
       setAvatarUrl(imageUrl);
-
+      setValue?.("avatar", imageUrl, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
       toastSuccess("Cập nhật ảnh đại diện thành công");
     } catch (error) {
       toastError("Upload ảnh thất bại");

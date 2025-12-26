@@ -19,6 +19,7 @@ export default function Account() {
   const { columns, tableData, page, rowsPerPage, control } = value;
   const { setPage, setRowsPerPage } = handle;
   // const { control } = useForm();
+  console.log("avatar", tableData);
   return (
     <Grid
       container

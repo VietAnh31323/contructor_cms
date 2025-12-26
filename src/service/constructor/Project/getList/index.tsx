@@ -2,17 +2,16 @@ import { ConsApi } from "@/config/axios";
 import { Response } from "./type";
 import { useQuery } from "@tanstack/react-query";
 
-export type CategoryParams = {
+export type ProjectParams = {
   search?: string;
   page?: number;
   size?: number;
-  isActive?: boolean;
 };
 
-export const getCategoryList = async (
-  params?: CategoryParams
+export const getProjectList = async (
+  params?: ProjectParams
 ): Promise<Response["GET"]> => {
-  const res = await ConsApi.get("/api/v1/category/list", {
+  const res = await ConsApi.get("/api/v1/project/list", {
     params,
   });
 
@@ -23,9 +22,9 @@ export const getCategoryList = async (
   };
 };
 
-export const useCategoryListQuery = (params?: CategoryParams) =>
+export const useProjectListQuery = (params?: ProjectParams) =>
   useQuery({
-    queryKey: ["category-list", params],
-    queryFn: () => getCategoryList(params),
+    queryKey: ["project-list", params],
+    queryFn: () => getProjectList(params),
     enabled: true,
   });

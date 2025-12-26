@@ -1,4 +1,6 @@
+import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import CoreAutoCompleteAPI from "@/components/atoms/CoreAutoCompleteAPI";
+import { CoreButton } from "@/components/atoms/CoreButton";
 import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import EditText from "@/components/atoms/EditText";
@@ -13,8 +15,8 @@ export default function Task() {
   const { control } = useForm();
   return (
     <CoreDialog title={"Thêm mới công việc"} onClose={hideDialog} width={1200}>
-      <form className="flex flex-col px-10  ">
-        <Grid spacing={{ xs: 1, sm: 2, md: 3 }}>
+      <form className="flex flex-col px-10 mt-5  ">
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreInputCustom
               control={control}
@@ -35,16 +37,28 @@ export default function Task() {
             <CoreDatePicker
               name="date"
               control={control!}
-              label={"Ngày sinh"}
+              label={"Thời gian bắt đầu"}
               required
               rules={{
-                required: "Bạn phải nhập ngày sinh",
+                required: "Bạn phải chọn ngày bắt đầu",
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={12} md={6} lg={6}>
+            <CoreDatePicker
+              name="date"
+              control={control!}
+              label={"Thời gian kết thúc"}
+              required
+              rules={{
+                required: "Bạn phải nchọn ngày kết thúc",
               }}
             />
           </Grid>
           <br />
-          <Typography>Công việc được giao cho</Typography>
           <Grid item xs={12} sm={12} md={12} lg={12}>
+            <Typography>Công việc được giao cho</Typography>
+
             <CoreAutoCompleteAPI
               name="date"
               control={control!}
@@ -52,11 +66,13 @@ export default function Task() {
               label={" "}
               placeholder={"Chọn nhân viên giao việc"}
               required
+              multiple
               rules={{
                 required: "Bạn phải chọn người được giao task",
               }}
             />
           </Grid>
+
           <br />
           <Grid item xs={12} sm={12} md={12} lg={12}>
             <CoreInputCustom
@@ -68,7 +84,43 @@ export default function Task() {
               multiline
             />
           </Grid>
+          <Grid item xs={12} sm={12} md={4} lg={4}>
+            <Typography>Mức độ ưu tiên</Typography>
+
+            <CoreAutocomplete
+              name="dhfkjsdh"
+              control={control!}
+              options={[
+                {
+                  label: "Cao",
+                  value: "HIGH",
+                },
+                {
+                  label: "Trung Bình",
+                  value: "MEDIUM",
+                },
+                {
+                  label: "Thấp",
+                  value: "LOW",
+                },
+              ]}
+              label={" "}
+              placeholder={"Chọn mức độ ưu tiên của công việc"}
+              required
+              rules={{
+                required: "Bạn cần chọn mức độ ưu tiên công việc",
+              }}
+            />
+          </Grid>
         </Grid>
+        <div className="py-4 flex justify-center gap-4 items-center">
+          <CoreButton onClick={() => {}} theme="cancel">
+            {"Hủy bỏ"}
+          </CoreButton>
+          <CoreButton onClick={() => {}} theme="submit">
+            {"Lưu"}
+          </CoreButton>
+        </div>
       </form>
     </CoreDialog>
   );

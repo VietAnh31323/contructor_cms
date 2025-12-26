@@ -16,7 +16,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { RequestBody as RequestDetail } from "@/service/constructor/Account/getDetail/type";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import router from "next/router";
 import { useMutation } from "@tanstack/react-query";
 import { Logout } from "@/service/Login/Logout";
@@ -36,7 +36,18 @@ export default function Header({
   const methodForm = useFormCustom<RequestDetail["GET"]>({
     defaultValues,
   });
-  const { data, isLoading, refetch } = useAccountDetailQuery();
+  const [accountId, setAccountId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const accountId = localStorage.getItem("accountId");
+    if (accountId) {
+      setAccountId(Number(accountId));
+    }
+  }, []);
+  const { data, isLoading, refetch } = useAccountDetailQuery(
+    accountId as number
+  );
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -98,7 +109,7 @@ export default function Header({
 
         <span
           className="absolute bottom-0 right-7 w-3 h-3 bg-green-500 rounded-full ring-2 "
-          style={{ border: "1px solid #fff" }}
+          style={{ border: "1px solid #ffffff60" }}
         ></span>
       </div>
 

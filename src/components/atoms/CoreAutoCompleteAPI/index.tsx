@@ -274,7 +274,7 @@ const CoreAutoCompleteAPI: <
               disabled={disabled}
               readOnly={readOnly || isView}
               loading={isLoading}
-              noOptionsText={t("form.autocomplete.no_options")}
+              noOptionsText={"Không có lựa chọn"}
               onBlur={() => {
                 onBlur();
                 if (!value && hasAllOption) {

@@ -17,5 +17,6 @@ export type RequestBody = {
     search?: string;
     page?: number;
     size?: number;
+    isActive?: boolean;
   };
 };

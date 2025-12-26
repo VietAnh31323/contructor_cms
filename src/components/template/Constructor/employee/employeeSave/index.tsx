@@ -42,7 +42,7 @@ import { fileUpload } from "@/service/upload";
 export default function EmployeeSave() {
   const [value, handle] = useEmployeeSave();
   const [date, setDate] = useState<Date | null>(null);
-  const { isView, control, isLoading, id } = value;
+  const { isView, control, isLoading, id, data } = value;
   const { onSubmit, setValue } = handle;
   const { showDialog, hideDialog } = useDialog();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -158,50 +158,6 @@ export default function EmployeeSave() {
               ) : (
                 <form className="flex flex-col py-6 " onSubmit={onSubmit}>
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <Avatar
-                        src={avatarUrl}
-                        alt="avatar"
-                        sx={{
-                          width: 220,
-                          height: 220,
-                          margin: "0 auto",
-                          border: "3px solid #0078D4",
-                          boxShadow: 5,
-                        }}
-                      />
-
-                      <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        mt={1}
-                        sx={{ cursor: "pointer" }}
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Typography color="#0078D4">
-                          Cập nhật hình ảnh
-                        </Typography>
-                        {/* <Image src={edit} alt="edit" width={20} height={20} /> */}
-                      </Box>
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        name="avatar"
-                        ref={fileInputRef}
-                        onChange={handleUpload}
-                      />
-
-                      {uploadProgress > 0 && uploadProgress < 100 && (
-                        <LinearProgress
-                          variant="determinate"
-                          value={uploadProgress}
-                          sx={{ mt: 1 }}
-                        />
-                      )}
-                    </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
