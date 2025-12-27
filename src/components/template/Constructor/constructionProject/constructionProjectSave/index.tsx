@@ -1,6 +1,10 @@
 import {
   Autocomplete,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   InputAdornment,
   TextField,
@@ -30,6 +34,14 @@ import NineDot from "@/components/icons/NineDot";
 import { Action } from "@/components/molecules/Action";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
 import UploadFilesAndImages from "@/components/atoms/UploadFilesAndImages";
+import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
+import CoreInputMoney from "@/components/atoms/CoreInputMoney";
+import router from "next/router";
+import { ROUTES } from "@/routes";
+import { TopAction } from "@/components/molecules/TopAction";
+import { deleteProject } from "@/service/constructor/Project/delete";
+import { toastError, toastSuccess } from "@/toast";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
 export default function ConstructionProjectSave() {
   const [value, handle] = useConstructionProjectSave();
   const {
@@ -42,11 +54,39 @@ export default function ConstructionProjectSave() {
     id,
     methodForm,
     fields,
+    watch,
+    setValue,
   } = value;
   const { setPage, setRowsPerPage, onSubmit, append, remove, handleDragEnd } =
     handle;
-  const [date, setDate] = useState<Date | null>(null);
-
+  const { showDialog, hideDialog } = useDialog();
+  // const [date, setDate] = useState<Date | null>(null);
+  const handleDelete = (id: number) => {
+    showDialog(
+      <Dialog open onClose={hideDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn xóa hạng mục này?</DialogContent>
+        <DialogActions>
+          <CoreButton onClick={hideDialog}>Hủy</CoreButton>
+          <CoreButton
+            color="error"
+            onClick={async () => {
+              try {
+                await deleteProject({ id }); // dùng id trực tiếp
+                toastSuccess("Xóa thành công!");
+                hideDialog();
+                router.push(ROUTES.PROJECT);
+              } catch (err: any) {
+                toastError(err?.message || "Xóa thất bại");
+              }
+            }}
+          >
+            Đồng ý
+          </CoreButton>
+        </DialogActions>
+      </Dialog>
+    );
+  };
   const [editorText, setEditorText] = useState("");
   return (
     <Grid
@@ -69,9 +109,21 @@ export default function ConstructionProjectSave() {
           breadcrumbs={[
             {
               title: "Thêm mới",
+              rightAction: isView && (
+                <TopAction
+                  actionList={["delete", "edit"]}
+                  onEditAction={() => {
+                    router.push({
+                      pathname: `${ROUTES.PROJECT}/[id]`,
+                      query: { id: Number(id) },
+                    });
+                  }}
+                  onDeleteAction={() => handleDelete(id)}
+                />
+              ),
               content: (
                 <FormProvider {...methodForm}>
-                  <form className="flex flex-col py-6 ">
+                  <form className="flex flex-col py-6 " onSubmit={onSubmit}>
                     <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
                         <CoreInputCustom
@@ -94,7 +146,7 @@ export default function ConstructionProjectSave() {
                       <Grid item xs={12} sm={12} md={6} lg={4}>
                         <CoreInputCustom
                           control={control}
-                          name="investor"
+                          name="owner"
                           label="Chủ đầu tư"
                           placeholder="Nhập tên chủ đầu tư"
                         />
@@ -108,88 +160,55 @@ export default function ConstructionProjectSave() {
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <CoreInputCustom
+                        <CoreInputMoney
                           control={control}
-                          name="contract"
+                          name="contractValue"
                           label="Giá trị hợp đồng"
-                          placeholder=" "
+                          placeholder="Nhập giá trị hợp đồng"
+                          type="number"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <CoreInputCustom
+                        <CoreInputMoney
                           control={control}
-                          name="advance"
+                          name="contractAdvance"
                           label="Tạm ứng hợp đồng"
-                          placeholder=" "
+                          placeholder="Hợp đồng đã tạm ứng"
+                          type="number"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <CoreInputCustom
+                        <CoreInputMoney
                           control={control}
-                          name="remaining"
+                          name="remainingAmount"
                           label="Số tiền còn lại"
-                          placeholder=" "
+                          placeholder="Số tiền còn lại của hợp đồng"
+                          type="number"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <div style={{ width: "100%" }}>
-                          <DatePicker
-                            selected={date}
-                            onChange={(d) => setDate(d)}
-                            placeholderText=" "
-                            customInput={
-                              <TextField
-                                label="Ngày kí hợp đồng"
-                                variant="standard"
-                                fullWidth
-                                focused
-                                placeholder=" "
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <CalendarMonthIcon
-                                        sx={{ cursor: "pointer" }}
-                                      />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                              />
-                            }
-                            popperPlacement="bottom"
-                            wrapperClassName="w-full"
-                            className="w-full"
-                          />
-                        </div>
+                        <CoreDatePicker
+                          name="signDate"
+                          control={control!}
+                          label={"Ngày kí hợp đồng"}
+                          required={!isView}
+                          placeholder="Chọn ngày ký hợp đồng"
+                          rules={{
+                            required: "Bạn phải chọn ngày kí hợp đồng",
+                          }}
+                        />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
-                        <div style={{ width: "100%" }}>
-                          <DatePicker
-                            selected={date}
-                            onChange={(d) => setDate(d)}
-                            placeholderText=" "
-                            customInput={
-                              <TextField
-                                label="Ngày giao hồ sơ dự kiến"
-                                variant="standard"
-                                fullWidth
-                                focused
-                                placeholder=" "
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <CalendarMonthIcon
-                                        sx={{ cursor: "pointer" }}
-                                      />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                              />
-                            }
-                            popperPlacement="bottom"
-                            wrapperClassName="w-full"
-                            className="w-full"
-                          />
-                        </div>
+                        <CoreDatePicker
+                          name="deliveryDate"
+                          control={control!}
+                          label={"Ngày giao hồ sơ dự kiến"}
+                          required={!isView}
+                          placeholder="Chọn ngày giao hồ sơ dự kiến"
+                          rules={{
+                            required: "Bạn phải chọn giao hồ sơ dự kiến",
+                          }}
+                        />
                       </Grid>
                       <Grid item xs={12} sm={12} md={12} lg={12}>
                         <Typography
@@ -203,9 +222,9 @@ export default function ConstructionProjectSave() {
                       <Grid item xs={12} sm={12} md={6} lg={4}>
                         <CoreAutoCompleteAPI
                           control={control}
-                          name="category"
+                          name="projectCategoryMaps"
                           label="Hạng mục"
-                          placeholder=" "
+                          placeholder="Chọn hạng mục"
                           fetchDataFn={getCategoryList}
                           multiple
                           params={{
@@ -225,31 +244,31 @@ export default function ConstructionProjectSave() {
                       <Grid item xs={12} sm={12} md={6} lg={4}>
                         <CoreAutoCompleteAPI
                           control={control}
-                          name="createPerson"
+                          name="creator"
                           label="Người tạo dự án"
                           placeholder=" "
                           fetchDataFn={getEmployeeList}
-                          multiple
+                          // multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
                         <CoreAutoCompleteAPI
                           control={control}
-                          name="Person"
+                          name="manager"
                           label="Chủ nhiệm dự án"
                           placeholder=" "
                           fetchDataFn={getEmployeeList}
-                          multiple
+                          // multiple
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6} lg={4}>
                         <CoreAutoCompleteAPI
                           control={control}
-                          name="CSKH"
+                          name="supporter"
                           label="Nhân viên chăm sóc"
                           placeholder=" "
                           fetchDataFn={getEmployeeList}
-                          multiple
+                          // multiple
                         />
                       </Grid>
                     </Grid>
@@ -301,37 +320,17 @@ export default function ConstructionProjectSave() {
                                               md={6}
                                               lg={6}
                                             >
-                                              <div style={{ width: "100%" }}>
-                                                <DatePicker
-                                                  selected={date}
-                                                  onChange={(d) => setDate(d)}
-                                                  placeholderText=" "
-                                                  customInput={
-                                                    <TextField
-                                                      label="Ngày giao hồ sơ dự kiến"
-                                                      variant="standard"
-                                                      fullWidth
-                                                      focused
-                                                      placeholder=" "
-                                                      InputProps={{
-                                                        endAdornment: (
-                                                          <InputAdornment position="end">
-                                                            <CalendarMonthIcon
-                                                              sx={{
-                                                                cursor:
-                                                                  "pointer",
-                                                              }}
-                                                            />
-                                                          </InputAdornment>
-                                                        ),
-                                                      }}
-                                                    />
-                                                  }
-                                                  popperPlacement="bottom"
-                                                  wrapperClassName="w-full"
-                                                  className="w-full"
-                                                />
-                                              </div>
+                                              <CoreDatePicker
+                                                name={`projectLines.${index}.paymentDate`}
+                                                control={control}
+                                                label="Ngày thanh toán"
+                                                required={!isView}
+                                                placeholder="Chọn ngày thanh toán"
+                                                rules={{
+                                                  required:
+                                                    "Bạn phải chọn ngày thanh toán",
+                                                }}
+                                              />
                                             </Grid>
 
                                             <Grid
@@ -341,13 +340,14 @@ export default function ConstructionProjectSave() {
                                               md={6}
                                               lg={6}
                                             >
-                                              <CoreInputCustom
+                                              <CoreInputMoney
                                                 control={control}
-                                                name={`projectLines.${index}.value`}
+                                                name={`projectLines.${index}.paymentAmount`}
                                                 label={`Thanh toán lần ${
                                                   index + 1
                                                 }`}
-                                                placeholder=" "
+                                                placeholder="Nhập số tiền thanh toán"
+                                                type="number"
                                               />
                                             </Grid>
                                           </div>
@@ -363,9 +363,10 @@ export default function ConstructionProjectSave() {
                                             }
                                             onAppendAction={() =>
                                               append({
-                                                id: Date.now(),
-                                                value: "",
-                                                value2: "",
+                                                id: 0,
+                                                paymentDate: "",
+                                                paymentNo: fields.length + 1,
+                                                paymentAmount: 0,
                                               })
                                             }
                                             onRemoveAction={() => remove(index)}
@@ -427,7 +428,7 @@ export default function ConstructionProjectSave() {
                         control={control}
                         name="note"
                         label="Ghi chú"
-                        placeholder=" "
+                        placeholder="Nhập ghi chú cho dự án"
                         rows={4}
                         multiline
                       />
@@ -436,13 +437,13 @@ export default function ConstructionProjectSave() {
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
                         control={control}
-                        name="status"
+                        name="state"
                         label="Trạng thái"
                         placeholder=" "
                         options={[
-                          { label: "Chưa bắt đầu", value: "abc" },
-                          { label: "Hoàn thành", value: "adeg" },
-                          { label: "Đã bắt đầu", value: "as" },
+                          { label: "Chưa bắt đầu", value: "NOT_STARTED" },
+                          { label: "Hoàn thành", value: "IN_PROGRESS" },
+                          { label: "Đang thực hiện", value: "COMPLETED" },
                         ]}
                       />
                     </Grid>
@@ -458,7 +459,7 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <UploadFilesAndImages nameDynamic={`file`} />
+                      <UploadFilesAndImages nameDynamic={`contractFiles`} />
                     </Grid>
                     <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -472,7 +473,7 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <UploadFilesAndImages nameDynamic={`image`} />
+                      <UploadFilesAndImages nameDynamic={`sampleImages`} />
                     </Grid>
                     <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -486,13 +487,18 @@ export default function ConstructionProjectSave() {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <UploadFilesAndImages nameDynamic={`image`} />
+                      <UploadFilesAndImages nameDynamic={`projectImages`} />
                     </Grid>
                     <div className="py-4 flex justify-center gap-4 items-center">
-                      <CoreButton onClick={() => {}} theme="cancel">
+                      <CoreButton
+                        onClick={() => {
+                          router.push(ROUTES.PROJECT);
+                        }}
+                        theme="cancel"
+                      >
                         {"Hủy bỏ"}
                       </CoreButton>
-                      <CoreButton onClick={() => {}} theme="submit">
+                      <CoreButton type="submit" theme="submit">
                         {"Lưu"}
                       </CoreButton>
                     </div>

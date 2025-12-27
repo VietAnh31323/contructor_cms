@@ -6,7 +6,7 @@ import { RequestBody } from "./type";
 //   return res.data;
 // };
 
-export const putChangePass = async (body: RequestBody["SAVE"]) => {
+export const putChangePass = async (id: number, body: RequestBody["SAVE"]) => {
   const res = await ConsApi.put(`/api/v1/account/change-password`, body);
   return res.data;
 };

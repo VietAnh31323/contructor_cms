@@ -40,6 +40,7 @@ export type CoreDatePickerProps = {
   rules?: object;
   required?: boolean;
   trigger?: any;
+  palacesholder?: string;
   minDate?: Moment | Date | string | number;
   maxDate?: Moment | Date | string | number;
   views?: DateView[];
@@ -75,6 +76,7 @@ export const CoreDatePicker = (props: CoreDatePickerProps) => {
     isHasMessageError = true,
     minDate,
     maxDate,
+
     onChange,
     onChangeValue,
     ...rest

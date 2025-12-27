@@ -17,14 +17,14 @@ export default function useForgotPass() {
 
   const { reset } = methodForm;
   const accountId = Number(localStorage.getItem("accountId"));
-  console.log("accountId", accountId);
+  console.log("accountIdChangPass", accountId);
   const { data, isLoading, refetch } = useAccountDetailQuery(accountId);
   const methodForms = useFormCustom<RequestBody["SAVE"]>({
     defaultValues,
   });
   const { handleSubmit, control, watch } = methodForms;
   const { mutate } = useMutation({
-    mutationFn: (body: RequestBody["SAVE"]) => putChangePass(body),
+    mutationFn: (body: RequestBody["SAVE"]) => putChangePass(accountId, body),
 
     onSuccess: (res: any) => {
       toastSuccess("Thành công");

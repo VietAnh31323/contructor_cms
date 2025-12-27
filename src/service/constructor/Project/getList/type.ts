@@ -5,15 +5,21 @@ export type ProjectList = {
   code: string;
   name: string;
   owner: string;
-  address: string;
+  manager: Manager;
   contractValue: number;
   contractAdvance: number;
   remainingAmount: number;
   signDate: string;
   deliveryDate: string;
   state: string;
+  paymentStatus: string;
 };
 
+export interface Manager {
+  id: number;
+  code: string;
+  name: string;
+}
 export type Response = {
   GET: PageResponse<ProjectList[]>;
 };

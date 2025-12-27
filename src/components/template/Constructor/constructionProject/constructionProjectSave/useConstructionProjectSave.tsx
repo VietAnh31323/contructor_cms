@@ -12,7 +12,47 @@ import { useMutation } from "@tanstack/react-query";
 import { postProject, putProject } from "@/service/constructor/Project/save";
 import { toastError, toastSuccess } from "@/toast";
 import { ROUTES } from "@/routes";
-const defaultValues = {};
+export const defaultValues = {
+  id: undefined,
+  code: "",
+  name: "",
+  owner: "",
+  address: "",
+  contractValue: undefined,
+  contractAdvance: undefined,
+  remainingAmount: undefined,
+
+  signDate: undefined,
+  deliveryDate: undefined,
+
+  creator: undefined,
+  manager: undefined,
+  supporter: undefined,
+
+  description: "",
+  note: "",
+  state: "NOT_STARTED",
+
+  contractFiles: [],
+  sampleImages: [],
+  projectImages: [],
+
+  projectCategoryMaps: [
+    {
+      id: 0,
+      category: { id: undefined, code: "", name: "" },
+    },
+  ],
+
+  projectLines: [
+    {
+      paymentDate: undefined,
+      paymentNo: undefined,
+      paymentAmount: undefined,
+    },
+  ],
+};
+
 const useConstructionProjectSave = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -65,7 +105,26 @@ const useConstructionProjectSave = () => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    mutate(data);
+    console.log("data", data);
+    const payload = {
+      ...data,
+
+      projectCategoryMaps: data.projectCategoryMaps.map((cat) => ({
+        id: cat?.id,
+        category: {
+          id: cat.id,
+          code: cat?.category?.code,
+          name: cat?.category?.name,
+        },
+      })),
+
+      projectLines: data.projectLines.map((item, index) => ({
+        ...item,
+        paymentNo: index + 1,
+      })),
+    };
+
+    mutate(payload);
   });
 
   useEffect(() => {
@@ -85,9 +144,11 @@ const useConstructionProjectSave = () => {
       id,
       methodForm,
       fields,
+      watch,
+      setValue,
     },
     { setPage, setRowsPerPage, onSubmit, append, remove, handleDragEnd },
-  ];
+  ] as const;
 };
 
 export default useConstructionProjectSave;

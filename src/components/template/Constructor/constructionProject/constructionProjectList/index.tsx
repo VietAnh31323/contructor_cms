@@ -87,6 +87,12 @@ export default function ConstructionProjectList() {
           data={tableData || []}
           page={page}
           isShowColumnStt
+          onRowClick={(id: number) => {
+            router.push({
+              pathname: `${ROUTES.PROJECT}/${id}`,
+              query: { actionType: "VIEW" },
+            });
+          }}
         />
       </PageContainer>
     </Grid>

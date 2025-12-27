@@ -1,3 +1,5 @@
+import { getEnum } from "@/components/atoms/TextColor";
+import { GREEN, RED } from "@/helper/colors";
 import { useProjectListQuery } from "@/service/constructor/Project/getList";
 import { RequestBody } from "@/service/constructor/Project/getList/type";
 import _ from "lodash";
@@ -33,20 +35,48 @@ const useConstructionProjectList = () => {
     () => [
       { header: "Mã hợp đồng", fieldName: "code" },
       { header: "Tên dự án", fieldName: "name" },
-      { header: "Chủ đầu tư", fieldName: "isActive" },
-      { header: "Ngày kí hợp đồng", fieldName: "isActive" },
-      { header: "Giá trị hợp đồng", fieldName: "isActive" },
-      { header: "Chủ nhiệm dự án", fieldName: "isActive" },
-      { header: "Thời gian còn lại", fieldName: "isActive" },
-      { header: "Tình trạng thanh toán", fieldName: "isActive" },
+      { header: "Chủ đầu tư", fieldName: "owner" },
+      { header: "Ngày kí hợp đồng", fieldName: "signDate" },
+      { header: "Giá trị hợp đồng", fieldName: "contractValue" },
+      { header: "Chủ nhiệm dự án", fieldName: "manager.name" },
+      { header: "Giá trị tạm ứng ", fieldName: "contractAdvance" },
+      { header: "Thời gian còn lại", fieldName: "remainingTime" },
+      { header: "Tình trạng thanh toán", fieldName: "paymentStatus" },
     ],
     []
   );
 
   const tableData =
-    data?.data?.content?.map((item) => ({
-      ...item,
-    })) ?? [];
+    data?.data?.content?.map((item) => {
+      const signDate = new Date(item.signDate);
+      const deliveryDate = new Date(item.deliveryDate);
+
+      const remainingDays = Math.ceil(
+        (deliveryDate.getTime() - signDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      return {
+        ...item,
+
+        remainingDays, // số ngày còn lại
+
+        remainingTime:
+          remainingDays > 0
+            ? `${remainingDays} ngày`
+            : remainingDays === 0
+            ? "Hết hạn hôm nay"
+            : `Quá hạn ${Math.abs(remainingDays)} ngày`,
+
+        paymentStatus: getEnum(item.paymentStatus, [
+          { value: "COMPLETED", label: "Hoàn tất thanh toán", color: GREEN },
+          {
+            value: "NOT_COMPLETED",
+            label: "Chưa hoàn tất thanh toán",
+            color: RED,
+          },
+        ]),
+      };
+    }) ?? [];
 
   return [
     { columns, tableData, page, rowsPerPage },
