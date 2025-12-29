@@ -119,7 +119,12 @@ export default function AppSidebar() {
           >
             Dự án thống kê thép
           </MenuItem>
-
+          <MenuItem
+            onClick={() => router.push(ROUTES.STEELCATEGORY)}
+            active={pathname === ROUTES.STEELCATEGORY}
+          >
+            Quản lý kiểu thanh thép
+          </MenuItem>
           <MenuItem
             onClick={() => router.push(ROUTES.STEELSTATISTICSNEW)}
             active={pathname === ROUTES.STEELSTATISTICSNEW}

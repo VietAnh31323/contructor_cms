@@ -19,4 +19,5 @@ export const ROUTES = {
   PROJECT: "/Constructor/Project",
   STEELSTATISTICS: "/Constructor/steelStatistics",
   STEELSTATISTICSNEW: "/Constructor/steelStatistics/addNew",
+  STEELCATEGORY: "/Constructor/SteelCategory",
 };

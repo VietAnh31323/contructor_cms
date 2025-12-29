@@ -78,6 +78,7 @@ export const useResetPass = (): UseResetPassReturn => {
   const sendOtp = handleSubmit((data) => {
     sendOtpMutate({
       username: data.username,
+      eRole: data.eRole,
     });
   });
 
@@ -92,6 +93,7 @@ export const useResetPass = (): UseResetPassReturn => {
   const resetPass = handleSubmit((data) => {
     resetPassMutate({
       newPassword: data.newPassword,
+      // eRole: data.eRole,
     });
   });
   return [

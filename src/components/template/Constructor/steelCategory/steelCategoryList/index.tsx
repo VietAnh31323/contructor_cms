@@ -11,12 +11,12 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
-import useCategoryList from "./useCategoryList";
+import useCategoryList from "./useSteelCategoryList";
 import { ROUTES } from "@/routes";
+import useSteelCategoryList from "./useSteelCategoryList";
 
-export default function CategoryList() {
-  const [value, handle] = useCategoryList();
-
+export default function SteelCategoryList() {
+  const [value, handle] = useSteelCategoryList();
   const { columns, tableData, page, rowsPerPage } = value;
   const { setPage, setRowsPerPage } = handle;
   const { control } = useForm();
@@ -26,13 +26,16 @@ export default function CategoryList() {
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
       <PageContainer
-        title={<CoreBreadcrumbs breadcrumbs={[{ title: "Quản lý nhân sư" }]} />}
+        title={
+          <CoreBreadcrumbs
+            breadcrumbs={[{ title: "Quản lý kiểu thanh thép" }]}
+          />
+        }
       >
         <form className="flex flex-col py-6 ">
           <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -74,7 +77,7 @@ export default function CategoryList() {
         <div className="flex justify-end pb-5">
           <CoreButton
             onClick={() => {
-              router.push(ROUTES.CATEGORY + "/addNew");
+              router.push(ROUTES.STEELCATEGORY + "/addNew");
             }}
             theme="submit"
           >
@@ -89,7 +92,7 @@ export default function CategoryList() {
           isShowColumnStt
           onRowClick={(id: number) => {
             router.push({
-              pathname: `${ROUTES.CATEGORY}/${id}`,
+              pathname: `${ROUTES.STEELCATEGORY}/${id}`,
               query: { actionType: "VIEW" },
             });
           }}
