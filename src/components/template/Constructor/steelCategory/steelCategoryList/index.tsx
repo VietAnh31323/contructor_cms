@@ -44,20 +44,19 @@ export default function SteelCategoryList() {
                 control={control}
                 name="search"
                 label="Tìm kiếm"
-                placeholder="Tìm kiếm theo mã dự án"
+                placeholder="Tìm kiếm theo tên thanh thép, mã thanh thép"
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={4}>
               <CoreAutocomplete
                 options={[
-                  { label: "Quản trị viên", value: "admin" },
-                  { label: "Quản lý", value: "manager" },
-                  { label: "Nhân viên", value: "staff" },
+                  { label: "Đang hoạt động", value: "true" },
+                  { label: "Ngưng hoạt động", value: "false" },
                 ]}
                 control={control}
                 name="role"
-                label="Chức vụ"
-                placeholder="Chọn chức vụ"
+                label="Trạng thái"
+                placeholder="Chọn trạng thái"
                 valuePath="value"
               />
             </Grid>

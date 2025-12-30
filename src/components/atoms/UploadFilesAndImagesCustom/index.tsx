@@ -229,7 +229,7 @@ const UploadFilesAndImagesCustom = ({
           {imageList.map((img) => (
             <Box
               key={img.key}
-              className="relative w-[100px] h-[100px] cursor-pointer"
+              className="relative w-[200px] h-[100px] cursor-pointer"
               onClick={() =>
                 showDialog(
                   <DialogSwiper
@@ -246,7 +246,7 @@ const UploadFilesAndImagesCustom = ({
               <CoreImage
                 src={safeText(img.url)}
                 alt={safeText(img.name)}
-                width={100}
+                width={200}
                 height={100}
               />
 
