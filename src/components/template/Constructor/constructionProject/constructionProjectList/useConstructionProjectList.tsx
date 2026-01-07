@@ -58,7 +58,7 @@ const useConstructionProjectList = () => {
       return {
         ...item,
 
-        remainingDays, // số ngày còn lại
+        remainingDays,
 
         remainingTime:
           remainingDays > 0

@@ -13,6 +13,7 @@ export type ProjectList = {
   deliveryDate: string;
   state: string;
   paymentStatus: string;
+  progressPercent: number;
 };
 
 export interface Manager {

@@ -87,6 +87,12 @@ export default function ProgressManageList() {
           data={tableData || []}
           page={page}
           isShowColumnStt
+          onRowClick={(id: number) => {
+            router.push({
+              pathname: `${ROUTES.PROGRESS_MANAGE}/${id}`,
+              query: { actionType: "VIEW" },
+            });
+          }}
         />
       </PageContainer>
     </Grid>

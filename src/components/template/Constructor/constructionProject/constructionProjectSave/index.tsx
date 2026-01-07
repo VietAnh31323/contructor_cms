@@ -18,7 +18,7 @@ import { CoreButton } from "@/components/atoms/CoreButton";
 import CoreNavbar from "@/components/organism/CoreNavbar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -60,6 +60,27 @@ export default function ConstructionProjectSave() {
   const { setPage, setRowsPerPage, onSubmit, append, remove, handleDragEnd } =
     handle;
   const { showDialog, hideDialog } = useDialog();
+  const contractValue = watch("contractValue") || 0;
+  const contractAdvance = watch("contractAdvance") || 0;
+  const projectLines = watch("projectLines") || [];
+  const totalPaid = projectLines.reduce(
+    (sum: number, item: any) => sum + (Number(item?.paymentAmount) || 0),
+    0
+  );
+  const remainingAmount =
+    Number(contractValue || 0) - Number(contractAdvance || 0) - totalPaid;
+
+  useEffect(() => {
+    const remain = Math.max(remainingAmount, 0);
+
+    // set số tiền còn lại
+    setValue("remainingAmount", remain);
+
+    // nếu đã thanh toán đủ
+    if (remain <= 0) {
+      setValue("state", "COMPLETED");
+    }
+  }, [contractValue, contractAdvance, projectLines, setValue]);
   // const [date, setDate] = useState<Date | null>(null);
   const handleDelete = (id: number) => {
     showDialog(
@@ -324,12 +345,12 @@ export default function ConstructionProjectSave() {
                                                 name={`projectLines.${index}.paymentDate`}
                                                 control={control}
                                                 label="Ngày thanh toán"
-                                                required={!isView}
+                                                // required={!isView}
                                                 placeholder="Chọn ngày thanh toán"
-                                                rules={{
-                                                  required:
-                                                    "Bạn phải chọn ngày thanh toán",
-                                                }}
+                                                // rules={{
+                                                //   required:
+                                                //     "Bạn phải chọn ngày thanh toán",
+                                                // }}
                                               />
                                             </Grid>
 
@@ -386,7 +407,20 @@ export default function ConstructionProjectSave() {
                     </Grid>
                     <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <RowBoxCommon title=" " data={"Đã thanh toán"} />
+                      {remainingAmount <= 0 && (
+                        <RowBoxCommon
+                          title="Trạng thái thanh toán"
+                          data="Đã thanh toán đủ"
+                          className="text-green-500"
+                        />
+                      )}
+                      {remainingAmount > 0 && (
+                        <RowBoxCommon
+                          title="Trạng thái thanh toán"
+                          data="Chưa thanh toán đủ"
+                          className="text-red-500"
+                        />
+                      )}
                     </Grid>
                     <br />
                     <Grid item xs={12} sm={12} md={12} lg={12}>

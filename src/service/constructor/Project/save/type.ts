@@ -20,6 +20,7 @@ export type ProjectSave = {
   projectImages: ProjectImage[];
   projectCategoryMaps: ProjectCategoryMap[];
   projectLines: ProjectLine[];
+  remainingDays: number;
 };
 export interface Creator {
   id: number;

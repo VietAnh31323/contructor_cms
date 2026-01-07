@@ -12,9 +12,15 @@ import { Grid } from "@mui/material";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import { useDialog } from "@/components/hooks/dialog/useDialog";
 import SubTask from "../../Dialog/SubTask";
+import { useParams, useSearchParams } from "next/navigation";
 
 const CollapseRow = ({ row }: { row: any }) => {
   const { showDialog } = useDialog();
+  const searchParams = useSearchParams();
+  const params = useParams();
+
+  const actionType = searchParams.get("actionType");
+  const isView = actionType === "VIEW";
   // const { data, isLoading, refetch } = useQueryQC({ id: row })
   // const tableData = (data?.data ?? []).map((item) => {
   //   return {
@@ -67,6 +73,7 @@ const CollapseRow = ({ row }: { row: any }) => {
                 onClick={() => {
                   showDialog(<SubTask />);
                 }}
+                disabled={isView}
               >
                 Thêm Công việc con
               </CoreButton>

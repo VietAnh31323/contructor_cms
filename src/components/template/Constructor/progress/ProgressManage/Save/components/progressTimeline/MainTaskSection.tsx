@@ -3,27 +3,78 @@ import {
   ColumnProps,
   TableCollapse,
 } from "@/components/organism/TableCollapse";
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
 import CollapseRow from "./CollapseRow";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CategoryList } from "@/service/constructor/Category/getList/type";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import { useDialog } from "@/components/hooks/dialog/useDialog";
 import Task from "../../Dialog/Task";
+import { useParams, useSearchParams } from "next/navigation";
+import { ROUTES } from "@/routes";
+import { deleteCategory } from "@/service/constructor/Category/delete";
+import { toastSuccess, toastError } from "@/toast";
+import router from "next/router";
+import { deleteTask } from "@/service/constructor/Task/delete";
 export type WorkProgressRow = {
   id: number;
-  code: string; // Mã công việc
-  productionRequest: string; // Tên công việc
-  startTime: string; // Thời gian bắt đầu
-  endTime: string; // Thời gian kết thúc
-  remainingTime: string; // Thời gian còn lại
-  createdBy: string; // Người tạo
-  progress: number; // Tiến độ (%)
-  status: "DONE" | "PROCESSING"; // Trạng thái
+  code: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  remainingTime: string;
+  reviewer: string;
+  taskStaffMaps: string;
+  progress: number;
+  priorityLevel: "HIGH" | "MEDIUM" | "LOW";
 };
 
 export default function MainTaskSection() {
-  const { showDialog } = useDialog();
+  const searchParams = useSearchParams();
+  const params = useParams();
+
+  const actionType = searchParams.get("actionType");
+  const isView = actionType === "VIEW";
+
+  const { showDialog, hideDialog } = useDialog();
+  const handleDelete = (id: number) => {
+    showDialog(
+      <Dialog open onClose={hideDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn xóa Công việc này?</DialogContent>
+        <DialogActions>
+          <CoreButton onClick={hideDialog}>Hủy</CoreButton>
+          <CoreButton
+            theme="cancel"
+            onClick={async () => {
+              try {
+                await deleteTask({ id });
+
+                // ⭐ QUAN TRỌNG NHẤT
+                setTableData((prev) => prev.filter((item) => item.id !== id));
+
+                toastSuccess("Xóa thành công!");
+                hideDialog();
+              } catch (err: any) {
+                toastError(err?.message || "Xóa thất bại");
+              }
+            }}
+          >
+            Đồng ý
+          </CoreButton>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+
   const columns = useMemo(
     () =>
       [
@@ -33,7 +84,7 @@ export default function MainTaskSection() {
         },
         {
           header: "Tên công việc",
-          fieldName: "productionRequest",
+          fieldName: "name",
         },
         {
           header: "Thời gian bắt đầu",
@@ -49,44 +100,33 @@ export default function MainTaskSection() {
         },
         {
           header: "Người tạo",
-          fieldName: "createdBy",
+          fieldName: "reviewer",
+        },
+        {
+          header: "Công việc được giao cho",
+          fieldName: "taskStaffMaps",
         },
         {
           header: "Tiến độ (%)",
           fieldName: "progress",
         },
         {
-          header: "Trạng thái",
-          fieldName: "status",
+          header: "Mức độ ưu tiên",
+          fieldName: "priorityLevel",
+        },
+        {
+          header: "",
+          render: (row: WorkProgressRow) => (
+            <CoreButton theme="cancel" onClick={() => handleDelete(row.id)}>
+              Xóa công việc cha
+            </CoreButton>
+          ),
         },
       ] as ColumnProps[],
     []
   );
 
-  const tableData: WorkProgressRow[] = [
-    {
-      id: 1,
-      code: "CV-001",
-      productionRequest: "Thi công móng cọc",
-      startTime: "01/12/2025",
-      endTime: "10/12/2025",
-      remainingTime: "2 ngày",
-      createdBy: "Nguyễn Văn A",
-      progress: 80,
-      status: "PROCESSING",
-    },
-    {
-      id: 2,
-      code: "CV-002",
-      productionRequest: "Đổ bê tông tầng 1",
-      startTime: "05/12/2025",
-      endTime: "15/12/2025",
-      remainingTime: "0 ngày",
-      createdBy: "Trần Thị B",
-      progress: 100,
-      status: "DONE",
-    },
-  ];
+  const [tableData, setTableData] = useState<WorkProgressRow[]>([]);
   return (
     <Box mt={2}>
       <CoreNavbar
@@ -126,8 +166,16 @@ export default function MainTaskSection() {
                 <br />
                 <CoreButton
                   onClick={() => {
-                    showDialog(<Task />);
+                    showDialog(
+                      <Task
+                        onSubmitSuccess={(row) => {
+                          console.log("ROW RECEIVED:", row);
+                          setTableData((prev) => [row, ...prev]);
+                        }}
+                      />
+                    );
                   }}
+                  disabled={isView}
                 >
                   Thêm Công việc mới
                 </CoreButton>

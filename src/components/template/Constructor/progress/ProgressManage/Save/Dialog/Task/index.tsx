@@ -9,13 +9,20 @@ import { CoreDialog } from "@/components/organism/CoreDialog";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
 import { Grid, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
-
-export default function Task() {
+import useTask from "./useTask";
+import TaskSave from "./useTask";
+import { WorkProgressRow } from "../../components/progressTimeline/MainTaskSection";
+type TaskProps = {
+  onSubmitSuccess: (data: WorkProgressRow) => void;
+};
+export default function Task({ onSubmitSuccess }: TaskProps) {
+  const [value, handle] = TaskSave({ onSubmitSuccess });
   const { hideDialog } = useDialog();
-  const { control } = useForm();
+  const { isView, control, id } = value;
+  const { onSubmit } = handle;
   return (
     <CoreDialog title={"Thêm mới công việc"} onClose={hideDialog} width={1200}>
-      <form className="flex flex-col px-10 mt-5  ">
+      <form className="flex flex-col px-10 mt-5  " onSubmit={onSubmit}>
         <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreInputCustom
@@ -35,7 +42,7 @@ export default function Task() {
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreDatePicker
-              name="date"
+              name="startDate"
               control={control!}
               label={"Thời gian bắt đầu"}
               required
@@ -46,7 +53,7 @@ export default function Task() {
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreDatePicker
-              name="date"
+              name="endDate"
               control={control!}
               label={"Thời gian kết thúc"}
               required
@@ -60,10 +67,12 @@ export default function Task() {
             <Typography>Công việc được giao cho</Typography>
 
             <CoreAutoCompleteAPI
-              name="date"
-              control={control!}
+              name="taskStaffMaps"
+              control={control}
               fetchDataFn={getEmployeeList}
               label={" "}
+              labelPath="name"
+              valuePath="id"
               placeholder={"Chọn nhân viên giao việc"}
               required
               multiple
@@ -77,7 +86,7 @@ export default function Task() {
           <Grid item xs={12} sm={12} md={12} lg={12}>
             <CoreInputCustom
               control={control}
-              name="note"
+              name="description"
               label="Ghi chú"
               placeholder="Nhập chi chú"
               rows={5}
@@ -88,7 +97,7 @@ export default function Task() {
             <Typography>Mức độ ưu tiên</Typography>
 
             <CoreAutocomplete
-              name="dhfkjsdh"
+              name="priorityLevel"
               control={control!}
               options={[
                 {
@@ -117,7 +126,7 @@ export default function Task() {
           <CoreButton onClick={() => {}} theme="cancel">
             {"Hủy bỏ"}
           </CoreButton>
-          <CoreButton onClick={() => {}} theme="submit">
+          <CoreButton type="submit" theme="submit">
             {"Lưu"}
           </CoreButton>
         </div>
