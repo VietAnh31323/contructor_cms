@@ -9,10 +9,12 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 
-export default function TaskSave({
+export default function SubTaskSave({
+  taskId,
   onSubmitSuccess,
 }: {
-  onSubmitSuccess?: (data: any) => void;
+  taskId: number;
+  onSubmitSuccess?: (row: any) => void;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -24,7 +26,7 @@ export default function TaskSave({
   const { hideDialog } = useDialog();
   const actionType = searchParams.get("actionType");
   const isView = actionType === "VIEW";
-
+  console.log("taskIdddd", taskId);
   const methodForm = useFormCustom<RequestBody["SAVE"]>({
     defaultValues: {},
   });
@@ -85,7 +87,7 @@ export default function TaskSave({
         reviewer: res.data.reviewer?.name ?? "Bạn",
         taskStaffMaps: staffNames,
         progress: 0,
-        priorityLevel: formData.priorityLevel,
+        state: formData.state,
       };
 
       console.log("ROW CREATED:", row);
@@ -100,10 +102,23 @@ export default function TaskSave({
   });
 
   const onSubmit = handleSubmit((data) => {
-    lastFormData.current = data;
+    lastFormData.current = data; // ✅ BẮT BUỘC
 
     const payload: RequestBody["SAVE"] = {
-      ...data,
+      id: 0,
+      code: data.code,
+      name: data.name,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      description: data.description,
+      state: data.state,
+      priorityLevel: data.priorityLevel ?? "LOW",
+      reviewer: data.reviewer ?? null,
+      parent: {
+        id: taskId,
+        code: "",
+        name: "",
+      },
       taskStaffMaps: Array.isArray(data.taskStaffMaps)
         ? data.taskStaffMaps.map((staff: any) => ({
             id: 0,

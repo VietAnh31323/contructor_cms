@@ -43,6 +43,7 @@ export default function MainTaskSection() {
 
   const actionType = searchParams.get("actionType");
   const isView = actionType === "VIEW";
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
 
   const { showDialog, hideDialog } = useDialog();
   const handleDelete = (id: number) => {
@@ -171,6 +172,7 @@ export default function MainTaskSection() {
                         onSubmitSuccess={(row) => {
                           console.log("ROW RECEIVED:", row);
                           setTableData((prev) => [row, ...prev]);
+                          setSelectedTaskId(row.id);
                         }}
                       />
                     );

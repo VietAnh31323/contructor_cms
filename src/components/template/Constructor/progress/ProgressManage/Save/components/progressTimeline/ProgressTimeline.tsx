@@ -12,10 +12,7 @@ type TimelineItemType = {
 };
 
 export default function ProgressTimeline() {
-  const [items, setItems] = useState<TimelineItemType[]>([
-    { id: 1 },
-    { id: 2 },
-  ]);
+  const [items, setItems] = useState<TimelineItemType[]>([{ id: 1 }]);
 
   const handleAddTimeline = () => {
     setItems((prev) => [...prev, { id: Date.now() }]);

@@ -1,5 +1,5 @@
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import React from "react";
+import React, { useState } from "react";
 // import QCDetail from "../components/QCDetail";
 // import QCCoupon from "../components/QCCoupon";
 // import { useQueryReceiptQCDetail } from "@/service/manufactory/productionSlip/getRecepi";
@@ -18,7 +18,7 @@ const CollapseRow = ({ row }: { row: any }) => {
   const { showDialog } = useDialog();
   const searchParams = useSearchParams();
   const params = useParams();
-
+  console.log("rowww", row);
   const actionType = searchParams.get("actionType");
   const isView = actionType === "VIEW";
   // const { data, isLoading, refetch } = useQueryQC({ id: row })
@@ -35,7 +35,7 @@ const CollapseRow = ({ row }: { row: any }) => {
   //       item?.product?.uomName,
   //   }
   // })
-  const tableData: CategoryList[] = [];
+  const [tableData, setTableData] = useState<any[]>([]);
   return (
     <CoreNavbar
       isFitContent
@@ -48,30 +48,50 @@ const CollapseRow = ({ row }: { row: any }) => {
                 className="mt-15"
                 columns={[
                   {
-                    header: "Mã phiếu",
+                    header: "Mã công việc",
                     fieldName: "code",
                   },
                   {
-                    header: "SKU",
-                    fieldName: "sku",
+                    header: "Người thực hiện",
+                    fieldName: "taskStaffMaps",
                   },
                   {
-                    header: "Số lượng đạt",
-                    fieldName: "passQuantity",
+                    header: "Ngày bắt đầu",
+                    fieldName: "startTime",
                   },
                   {
-                    header: "Kết quả",
+                    header: "Ngày hoàn thành ",
+                    fieldName: "endTime",
+                  },
+                  {
+                    header: "Số ngày hoàn thành dự kiến",
+                    fieldName: "remainingTime",
+                  },
+                  {
+                    header: "Số giờ hoàn thành dự kiến",
                     fieldName: "statusResult",
+                  },
+                  {
+                    header: "Trạng thái",
+                    fieldName: "state",
                   },
                 ]}
                 data={tableData}
                 isShowColumnStt
-                paginationHidden={tableData.length < 1}
+                // paginationHidden={tableData.length < 1}
               />
               <br />
               <CoreButton
                 onClick={() => {
-                  showDialog(<SubTask />);
+                  showDialog(
+                    <SubTask
+                      taskId={row}
+                      onSubmitSuccess={(subTaskRow) => {
+                        console.log("subTaskRow", subTaskRow);
+                        setTableData((prev) => [subTaskRow, ...prev]);
+                      }}
+                    />
+                  );
                 }}
                 disabled={isView}
               >

@@ -10,10 +10,17 @@ import { CoreDialog } from "@/components/organism/CoreDialog";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
 import { Grid, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
-
-export default function SubTask() {
+import SubTaskSave from "./useSubTask";
+type TaskProps = {
+  taskId: number;
+  onSubmitSuccess?: (row: any) => void;
+};
+export default function SubTask({ taskId, onSubmitSuccess }: TaskProps) {
+  const [value, handle] = SubTaskSave({ taskId, onSubmitSuccess });
   const { hideDialog } = useDialog();
-  const { control } = useForm();
+  const { isView, control, id } = value;
+  const { onSubmit } = handle;
+
   const getEmployeeLabel = (option: any) => {
     const positionLabel = getEnum(option.position, [
       { label: "Kiến trúc sư", value: "ARCHITECT" },
@@ -34,7 +41,7 @@ export default function SubTask() {
       onClose={hideDialog}
       width={1200}
     >
-      <form className="flex flex-col px-10 mt-5">
+      <form className="flex flex-col px-10 mt-5" onSubmit={onSubmit}>
         <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreInputCustom
@@ -54,7 +61,7 @@ export default function SubTask() {
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreDatePicker
-              name="date"
+              name="startDate"
               control={control!}
               label={"Thời gian bắt đầu"}
               required
@@ -65,28 +72,30 @@ export default function SubTask() {
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={6}>
             <CoreDatePicker
-              name="date"
+              name="endDate"
               control={control!}
               label={"Thời gian kết thúc"}
               required
               rules={{
-                required: "Bạn phải nchọn ngày kết thúc",
+                required: "Bạn phải chọn ngày kết thúc",
               }}
             />
           </Grid>
           <br />
           <Grid item xs={12} sm={12} md={12} lg={12}>
-            <Typography>Công việc được giao cho</Typography>
+            <Typography>Người tạo công việc con</Typography>
 
             <CoreAutoCompleteAPI
-              name="date"
-              control={control!}
+              name="taskStaffMaps"
+              control={control}
               fetchDataFn={getEmployeeList}
               label={" "}
-              placeholder={"Chọn nhân viên giao việc"}
+              labelPath="name"
+              valuePath="id"
+              // labelPath="name"
+              placeholder={"Chọn nhân viên "}
               required
               multiple
-              labelPathDisplay={["name", "position"]}
               rules={{
                 required: "Bạn phải chọn người được giao task",
               }}
@@ -96,7 +105,7 @@ export default function SubTask() {
           <Grid item xs={12} sm={12} md={12} lg={12}>
             <CoreInputCustom
               control={control}
-              name="note"
+              name="description"
               label="Ghi chú"
               placeholder="Nhập chi chú"
               rows={5}
@@ -104,31 +113,27 @@ export default function SubTask() {
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4}>
-            <Typography>Mức độ ưu tiên</Typography>
+            <Typography>Trạng thái công việc con</Typography>
 
             <CoreAutocomplete
-              name="dhfkjsdh"
+              name="state"
               control={control!}
               options={[
                 {
-                  label: "Cao",
-                  value: "HIGH",
+                  label: "Chưa bắt đầu",
+                  value: "NOT_STARTED",
                 },
                 {
-                  label: "Trung Bình",
-                  value: "MEDIUM",
+                  label: "Đang thực hiện",
+                  value: "IN_PROGRESS",
                 },
                 {
-                  label: "Thấp",
-                  value: "LOW",
+                  label: "Hoàn thành",
+                  value: "COMPLETED",
                 },
               ]}
               label={" "}
-              placeholder={"Chọn mức độ ưu tiên của công việc"}
-              required
-              rules={{
-                required: "Bạn cần chọn mức độ ưu tiên công việc",
-              }}
+              placeholder={"Chọn trạng thái của công việc con"}
             />
           </Grid>
         </Grid>
@@ -136,7 +141,7 @@ export default function SubTask() {
           <CoreButton onClick={() => {}} theme="cancel">
             {"Hủy bỏ"}
           </CoreButton>
-          <CoreButton onClick={() => {}} theme="submit">
+          <CoreButton type="submit" theme="submit">
             {"Lưu"}
           </CoreButton>
         </div>

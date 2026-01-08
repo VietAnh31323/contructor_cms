@@ -36,12 +36,12 @@ export default function ProgressHeader({
         </Grid>
       </Grid>
       <Grid item xs={12} sm={12} md={2} lg={2}>
-        <Typography
+        {/* <Typography
           fontWeight={200}
           color={status === "DONE" ? "success.main" : "info.main"}
         >
           {status === "DONE" ? "Hoàn thành" : "Đang thực hiện"}
-        </Typography>
+        </Typography> */}
       </Grid>
     </Box>
   );
