@@ -31,7 +31,7 @@ const CoreNavbar = (props: Props) => {
                 borderTopRightRadius: "0.375rem",
                 justifyContent: "center",
                 padding: 1,
-                minWidth: "140px",
+                minWidth: "160px",
                 maxWidth: maxWidthTab ?? "10px",
                 height: "40px",
                 display: "flex",

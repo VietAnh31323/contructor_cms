@@ -1,67 +1,57 @@
-import { useState } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import Timeline from "@mui/lab/Timeline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { CoreButton } from "@/components/atoms/CoreButton";
 import { ProgressTimelineItem } from "./ProgressTimelineItem";
 import ProgressHeader from "./ProgressHeader";
 import MainTaskSection from "./MainTaskSection";
-import { CoreButton } from "@/components/atoms/CoreButton";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { ProjectProgress } from "@/service/constructor/Progress/getDetail/type";
 
-type TimelineItemType = {
-  id: number;
+type Props = {
+  value: ProjectProgress[];
+  onChange: (data: ProjectProgress[]) => void;
+  isView?: boolean;
 };
 
-export default function ProgressTimeline() {
-  const [items, setItems] = useState<TimelineItemType[]>([{ id: 1 }]);
-
-  const handleAddTimeline = () => {
-    setItems((prev) => [...prev, { id: Date.now() }]);
+export default function ProgressTimeline({ value, onChange, isView }: Props) {
+  const handleAddProgress = () => {
+    onChange([
+      ...value,
+      {
+        id: 0,
+        progress: { id: Date.now(), code: "", name: "" },
+        tasks: [],
+      },
+    ]);
   };
 
-  const handleRemoveTimeline = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+  const updateProgress = (index: number, data: ProjectProgress) => {
+    onChange(value.map((p, i) => (i === index ? data : p)));
   };
 
   return (
-    <Box>
-      <Timeline
-        sx={{
-          p: 0,
-          [`& .MuiTimelineItem-root:before`]: {
-            flex: 0,
-            padding: 0,
-          },
-        }}
-      >
-        {items.map((item, index) => (
-          <ProgressTimelineItem key={item.id} index={index + 1}>
-            {/* HEADER */}
-            <Box display="flex" alignItems="center">
-              <Box flex={1}>
-                <ProgressHeader status="DONE" />
-              </Box>
+    <>
+      {value.map((item, index) => (
+        <ProgressTimelineItem key={index}>
+          <ProgressHeader
+            value={item.progress}
+            onChange={(progress) =>
+              updateProgress(index, { ...item, progress })
+            }
+            isView={isView}
+          />
 
-              {/* DELETE BUTTON */}
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => handleRemoveTimeline(item.id)}
-              >
-                <DeleteOutlineIcon fontSize="small" />
-              </IconButton>
-            </Box>
+          <MainTaskSection
+            value={item.tasks}
+            onChange={(tasks) => updateProgress(index, { ...item, tasks })}
+            isView={isView}
+          />
+        </ProgressTimelineItem>
+      ))}
 
-            <MainTaskSection />
-          </ProgressTimelineItem>
-        ))}
-      </Timeline>
-
-      {/* ADD BUTTON */}
-      <Box display="flex" justifyContent="start" mt={2}>
-        <CoreButton variant="outlined" onClick={handleAddTimeline}>
-          Thêm tiến trình
-        </CoreButton>
-      </Box>
-    </Box>
+      {!isView && (
+        <CoreButton onClick={handleAddProgress}>Thêm tiến trình</CoreButton>
+      )}
+    </>
   );
 }

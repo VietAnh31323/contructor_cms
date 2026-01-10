@@ -2,7 +2,15 @@ import { useFormCustom } from "@/lib/form";
 import { useProjectDetailQuery } from "@/service/constructor/Project/getDetail";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { RequestBody } from "@/service/constructor/Project/save/type";
+import { RequestBody } from "@/service/constructor/Progress/save/type";
+import { useMutation } from "@tanstack/react-query";
+import {
+  postProjectProgress,
+  putProjectProgress,
+} from "@/service/constructor/Progress/save";
+import { toastError, toastSuccess } from "@/toast";
+import router from "next/router";
+import { ROUTES } from "@/routes";
 export default function ProgressManageSave() {
   const [page, setPage] = useState(0);
   const searchParams = useSearchParams();
@@ -14,66 +22,32 @@ export default function ProgressManageSave() {
   const id = Number(params?.id);
   const isUpdate = !!id;
   const methodForm = useFormCustom<RequestBody["SAVE"]>({
-    defaultValues: {},
+    defaultValues: {
+      projectProgress: [],
+    },
   });
 
   const { handleSubmit, reset, setError, control, watch, setValue } =
     methodForm;
-  // const columns = useMemo(
-  //   () => [
-  //     { header: "Mã nhân sự", fieldName: "code" },
-  //     { header: "Họ và tên", fieldName: "name" },
-  //     { header: "Ngày sinh", fieldName: "date" },
-  //     { header: "Số điện thoại", fieldName: "phone" },
-  //     { header: "Chức vụ", fieldName: "position" },
-  //   ],
-  //   []
-  // );
+  const { mutate } = useMutation({
+    mutationFn: (body: RequestBody["SAVE"]) =>
+      isUpdate ? putProjectProgress(id, body) : postProjectProgress(body),
 
-  // const tableData = [
-  //   {
-  //     code: "NV001",
-  //     name: "Nguyễn Văn A",
-  //     date: "1990-05-12",
-  //     phone: "0987654321",
-  //     position: "Kỹ sư",
-  //   },
-  //   {
-  //     code: "NV002",
-  //     name: "Trần Thị B",
-  //     date: "1988-11-23",
-  //     phone: "0912345678",
-  //     position: "Kế toán",
-  //   },
-  //   {
-  //     code: "NV003",
-  //     name: "Lê Văn C",
-  //     date: "1992-07-08",
-  //     phone: "0978123456",
-  //     position: "Nhân viên thi công",
-  //   },
-  //   {
-  //     code: "NV004",
-  //     name: "Phạm Thị D",
-  //     date: "1995-03-15",
-  //     phone: "0904567891",
-  //     position: "Quản lý dự án",
-  //   },
-  //   {
-  //     code: "NV005",
-  //     name: "Hoàng Văn E",
-  //     date: "1985-09-30",
-  //     phone: "0939876543",
-  //     position: "Kỹ thuật viên",
-  //   },
-  //   {
-  //     code: "NV006",
-  //     name: "Đặng Thị F",
-  //     date: "1993-12-05",
-  //     phone: "0961234567",
-  //     position: "Nhân viên hành chính",
-  //   },
-  // ];
+    onSuccess: (res: any) => {
+      toastSuccess("Thành công");
+      if (res?.data?.id) {
+        router.push(`${ROUTES.PROGRESS_MANAGE}/${res.data.id}?actionType=VIEW`);
+      }
+    },
+
+    onError: (error: any) => {
+      toastError(error?.message || "Có lỗi xảy ra");
+    },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    mutate(data);
+  });
   const { data, isLoading } = useProjectDetailQuery(id, {
     enabled: !!id,
   });
@@ -92,6 +66,7 @@ export default function ProgressManageSave() {
       watch,
       setValue,
       methodForm,
+      onSubmit,
       id,
     },
     { setPage, setRowsPerPage },

@@ -9,8 +9,13 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { Label } from "@mui/icons-material";
 import { values } from "lodash";
 import { CoreButton } from "@/components/atoms/CoreButton";
+import { TableCollapse } from "@/components/organism/TableCollapse";
+import useStep2 from "./useStep2";
+import CollapseRow from "./CollapseRow";
 export default function Step2() {
   const [date, setDate] = useState<Date | null>(null);
+  const [handle, values] = useStep2();
+  const { columns, tableData } = values;
   const { control } = useForm();
   const [editorText, setEditorText] = useState("");
   return (
@@ -96,6 +101,19 @@ export default function Step2() {
           <CoreButton>Chỉnh sửa</CoreButton>
         </Grid>
         <br />
+        <Grid item xs={12} sm={12} md={12} lg={12}>
+          <TableCollapse
+            nameCheck="name"
+            columns={columns}
+            data={tableData}
+            isShowColumnStt
+            tableName="abc"
+            paginationHidden
+            renderCollapse={(row) => {
+              return <CollapseRow row={row.id} />;
+            }}
+          />
+        </Grid>
       </Grid>
     </form>
   );

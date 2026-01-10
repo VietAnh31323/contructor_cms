@@ -23,27 +23,47 @@ import { TopAction } from "@/components/molecules/TopAction";
 import router from "next/router";
 export default function ProgressManageSave() {
   const [value, handle] = useProgressManageSave();
-  const { control, isView, isLoading, watch, setValue, methodForm, id } = value;
+  const {
+    control,
+    isView,
+    isLoading,
+    watch,
+    setValue,
+    methodForm,
+    id,
+    onSubmit,
+  } = value;
 
   const signDate = watch("signDate");
   const deliveryDate = watch("deliveryDate");
-  const calcRemainingDays = (start?: string | Date, end?: string | Date) => {
-    if (!start || !end) return 0;
+  const calcRemainingDays = (delivery?: string | Date) => {
+    if (!delivery) return 0;
 
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const diffTime = endDate.getTime() - startDate.getTime();
+    const deliveryDate = new Date(delivery);
+    deliveryDate.setHours(0, 0, 0, 0);
+
+    const diffTime = deliveryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays > 0 ? diffDays : 0;
   };
 
   useEffect(() => {
-    const remainingDays = calcRemainingDays(signDate, deliveryDate);
+    const updateRemainingDays = () => {
+      const remainingDays = calcRemainingDays(deliveryDate);
+      setValue("remainingDays" as any, remainingDays);
+    };
 
-    setValue("remainingDays", remainingDays);
-  }, [signDate, deliveryDate, setValue]);
+    updateRemainingDays(); // chạy ngay khi mở form
+
+    const interval = setInterval(updateRemainingDays, 60 * 1000);
+    // 1 phút là đủ, không cần 1s
+
+    return () => clearInterval(interval);
+  }, [deliveryDate, setValue]);
 
   return (
     <Grid
@@ -87,126 +107,137 @@ export default function ProgressManageSave() {
               ),
               content: (
                 <FormProvider {...methodForm}>
-                  <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="code"
-                        label="Mã hồ sơ"
-                        placeholder="Nhập mã hồ sơ"
-                        isViewProp={true}
-                      />
+                  <form onSubmit={onSubmit}>
+                    <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputCustom
+                          control={control}
+                          name="code"
+                          label="Mã hồ sơ"
+                          placeholder="Nhập mã hồ sơ"
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputCustom
+                          control={control}
+                          name="name"
+                          label="Tên công trình dự án"
+                          placeholder="Nhập tên công trình dự án"
+                          required
+                          rules={{ required: "Trường này là bắt buộc" }}
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputCustom
+                          control={control}
+                          name="owner"
+                          label="Chủ đầu tư"
+                          placeholder="Nhập tên chủ đầu tư"
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputCustom
+                          control={control}
+                          name="address"
+                          label="Địa chỉ"
+                          placeholder="Nhập địa chỉ"
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputMoney
+                          control={control}
+                          name="contractValue"
+                          label="Giá trị hợp đồng"
+                          placeholder="Nhập giá trị hợp đồng"
+                          type="number"
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputMoney
+                          control={control}
+                          name="contractAdvance"
+                          label="Tạm ứng hợp đồng"
+                          placeholder="Hợp đồng đã tạm ứng"
+                          type="number"
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputMoney
+                          control={control}
+                          name="remainingAmount"
+                          label="Số tiền còn lại"
+                          placeholder="Số tiền còn lại của hợp đồng"
+                          type="number"
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreDatePicker
+                          name="signDate"
+                          control={control!}
+                          label={"Ngày kí hợp đồng"}
+                          required
+                          placeholder="Chọn ngày ký hợp đồng"
+                          rules={{
+                            required: "Bạn phải chọn ngày kí hợp đồng",
+                          }}
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreDatePicker
+                          name="deliveryDate"
+                          control={control!}
+                          label={"Ngày giao hồ sơ dự kiến"}
+                          required
+                          placeholder="Chọn ngày giao hồ sơ dự kiến"
+                          rules={{
+                            required: "Bạn phải chọn giao hồ sơ dự kiến",
+                          }}
+                          isViewProp={true}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} lg={4}>
+                        <CoreInputCustom
+                          control={control}
+                          name="remainingDays"
+                          label="Số ngày còn lại"
+                          placeholder=" "
+                          type="number"
+                          disabled
+                          isViewProp={true}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="name"
-                        label="Tên công trình dự án"
-                        placeholder="Nhập tên công trình dự án"
-                        required
-                        rules={{ required: "Trường này là bắt buộc" }}
-                        isViewProp={true}
-                      />
+                    <Grid container mt={4}>
+                      <Grid item xs={12}>
+                        <ProgressTimeline
+                          value={watch("projectProgress")}
+                          onChange={(data) => {
+                            setValue("projectProgress", data, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                          }}
+                          isView={isView}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="owner"
-                        label="Chủ đầu tư"
-                        placeholder="Nhập tên chủ đầu tư"
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="address"
-                        label="Địa chỉ"
-                        placeholder="Nhập địa chỉ"
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputMoney
-                        control={control}
-                        name="contractValue"
-                        label="Giá trị hợp đồng"
-                        placeholder="Nhập giá trị hợp đồng"
-                        type="number"
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputMoney
-                        control={control}
-                        name="contractAdvance"
-                        label="Tạm ứng hợp đồng"
-                        placeholder="Hợp đồng đã tạm ứng"
-                        type="number"
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputMoney
-                        control={control}
-                        name="remainingAmount"
-                        label="Số tiền còn lại"
-                        placeholder="Số tiền còn lại của hợp đồng"
-                        type="number"
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreDatePicker
-                        name="signDate"
-                        control={control!}
-                        label={"Ngày kí hợp đồng"}
-                        required
-                        placeholder="Chọn ngày ký hợp đồng"
-                        rules={{
-                          required: "Bạn phải chọn ngày kí hợp đồng",
-                        }}
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreDatePicker
-                        name="deliveryDate"
-                        control={control!}
-                        label={"Ngày giao hồ sơ dự kiến"}
-                        required
-                        placeholder="Chọn ngày giao hồ sơ dự kiến"
-                        rules={{
-                          required: "Bạn phải chọn giao hồ sơ dự kiến",
-                        }}
-                        isViewProp={true}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="remainingDays"
-                        label="Số ngày còn lại"
-                        placeholder=" "
-                        type="number"
-                        disabled
-                        isViewProp={true}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container mt={4}>
-                    <Grid item xs={12}>
-                      <ProgressTimeline />
-                    </Grid>
-                  </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton onClick={() => {}} theme="cancel">
+                        {"Hủy bỏ"}
+                      </CoreButton>
+                      <CoreButton type="submit" theme="submit">
+                        {"Lưu"}
+                      </CoreButton>
+                    </div>
+                  </form>
                 </FormProvider>
               ),
             },
