@@ -1,5 +1,6 @@
 import { useFormCustom } from "@/lib/form";
 import { ROUTES } from "@/routes";
+import { deleteAssembly } from "@/service/constructor/Assembly/delete";
 import { postAssembly, putAssembly } from "@/service/constructor/Assembly/save";
 import { RequestBody } from "@/service/constructor/Assembly/save/type";
 import { toastError, toastSuccess } from "@/toast";
@@ -18,11 +19,12 @@ export default function useStep2() {
     defaultValues,
   });
   const queryClient = useQueryClient();
-  const { reset, handleSubmit, control, setValue } = methodForm;
+  const { reset, handleSubmit, control, setValue, watch } = methodForm;
+  const id = watch("id");
+  console.log("iddđ", id);
   const handleSuccess = (res: any) => {
     toastSuccess("Thành công");
   };
-
   const handleError = (error: any) => {
     toastError(error?.message || "Có lỗi xảy ra");
   };
@@ -39,6 +41,16 @@ export default function useStep2() {
       queryClient.invalidateQueries({
         queryKey: ["assembly-list"],
       });
+      setReloadAssemblyKey((prev) => prev + 1);
+      reset();
+    },
+    onError: handleError,
+  });
+
+  const { mutate: removeAssembly } = useMutation({
+    mutationFn: (id: number) => deleteAssembly({ id }),
+    onSuccess: () => {
+      toastSuccess("Xóa cấu kiện thành công");
       setReloadAssemblyKey((prev) => prev + 1);
       reset();
     },
@@ -64,6 +76,17 @@ export default function useStep2() {
       name: data?.name,
     });
   });
+
+  const onSubmitDelete = () => {
+    const assemblyId = methodForm.getValues("id");
+
+    if (!assemblyId) {
+      toastError("Vui lòng chọn cấu kiện cần xóa");
+      return;
+    }
+
+    removeAssembly(assemblyId);
+  };
 
   const columns = useMemo(
     () => [
@@ -105,7 +128,7 @@ export default function useStep2() {
     },
   ];
   return [
-    { onSubmitCreate, onSubmitUpdate, reloadAssemblyKey },
+    { onSubmitCreate, onSubmitUpdate, reloadAssemblyKey, onSubmitDelete },
     { columns, tableData, control, setValue },
   ] as const;
 }

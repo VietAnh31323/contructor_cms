@@ -18,7 +18,8 @@ export default function Step2() {
   const [date, setDate] = useState<Date | null>(null);
   const [handle, values] = useStep2();
   const { columns, tableData, control, setValue } = values;
-  const { onSubmitCreate, onSubmitUpdate, reloadAssemblyKey } = handle;
+  const { onSubmitCreate, onSubmitUpdate, reloadAssemblyKey, onSubmitDelete } =
+    handle;
 
   const [editorText, setEditorText] = useState("");
   return (
@@ -104,7 +105,7 @@ export default function Step2() {
               className=" flex gap-4 items-center justify-center"
             >
               <CoreButton onClick={onSubmitCreate}>Thêm cấu kiện</CoreButton>
-              <CoreButton>Xóa cấu kiện</CoreButton>
+              <CoreButton onClick={onSubmitDelete}>Xóa cấu kiện</CoreButton>
               <CoreButton onClick={onSubmitUpdate}>Chỉnh sửa</CoreButton>
             </Grid>
           </form>
