@@ -15,16 +15,21 @@ import useSteelChoose from "./useSteelChoose";
 import { useState } from "react";
 import { getSteelCategoryListLine } from "@/service/constructor/SteelCategory/getListLine";
 import { SteelCategoryListLine } from "@/service/constructor/SteelCategory/getListLine/type";
+interface SteelChooseProps {
+  assemblyId: number;
+  onSuccess: (steelRow: any) => void;
+}
 
-export default function SteelChoose() {
-  const [value, handle] = useSteelChoose();
+export default function SteelChooseSteelChoose({
+  assemblyId,
+  onSuccess,
+}: SteelChooseProps) {
+  const [value, handle] = useSteelChoose({ assemblyId, onSuccess });
   const { hideDialog } = useDialog();
-  const { isView, control, id, data } = value;
+  const { isView, control, id, data, setValue } = value;
   const { onSubmit } = handle;
-  console.log(
-    "ids",
-    data?.data?.content?.map((item: any) => item.id)
-  );
+  console.log("onSuccess from props:", onSuccess);
+
   const [selectedSteelId, setSelectedSteelId] = useState<number | null>(null);
   const [params, setParams] = useState<SteelCategoryListLine[]>([]);
   const [selectedSteel, setSelectedSteel] = useState<any>(null);
@@ -80,6 +85,7 @@ export default function SteelChoose() {
                         onClick={() => {
                           setSelectedSteelId(item.id);
                           handleSelectSteelType(item.id);
+                          setValue("images", item.images || []);
                         }}
                         sx={{
                           border: isSelected
@@ -123,7 +129,7 @@ export default function SteelChoose() {
                 <Grid item xs={12} sm={6} md={4} key={param.id}>
                   <CoreInputCustom
                     control={control}
-                    name={`params.${param.paramName}`}
+                    name={`steelLines.${param.paramName}`}
                     label={"Thông số " + "(" + param.paramName + ")"}
                     placeholder={`Nhập ${param.paramName}`}
                   />
@@ -145,7 +151,7 @@ export default function SteelChoose() {
             <Grid item xs={12} sm={12} md={3} lg={3}>
               <CoreInputCustom
                 control={control}
-                name="number"
+                name="barCode"
                 label="Số hiệu"
                 placeholder="Nhập số hiệu kiểu thanh thép"
               />
@@ -153,7 +159,7 @@ export default function SteelChoose() {
             <Grid item xs={12} sm={12} md={3} lg={3}>
               <CoreInputCustom
                 control={control}
-                name="quantity"
+                name="barQuantity"
                 label="Số thanh thép"
                 placeholder="Nhập số thanh thép"
               />
@@ -161,7 +167,7 @@ export default function SteelChoose() {
             <Grid item xs={12} sm={12} md={3} lg={3}>
               <CoreAutocomplete
                 control={control}
-                name="connectingLength"
+                name="spliceLength"
                 label="Chiều dài nối"
                 options={[
                   {
@@ -179,7 +185,7 @@ export default function SteelChoose() {
             <Grid item xs={12} sm={12} md={3} lg={3}>
               <CoreInputCustom
                 control={control}
-                name="diameter"
+                name="barDiameter"
                 label="Đường kính"
                 placeholder="Nhập đường kính thanh thép (mm)"
               />

@@ -1,3 +1,4 @@
+import { CoreButton } from "@/components/atoms/CoreButton";
 import { useFormCustom } from "@/lib/form";
 import { ROUTES } from "@/routes";
 import { deleteAssembly } from "@/service/constructor/Assembly/delete";
@@ -7,15 +8,26 @@ import { toastError, toastSuccess } from "@/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import router from "next/router";
 import { useMemo, useState } from "react";
+
+export interface AssemblyTableRow {
+  id: number;
+  assemblyName: string;
+  sameQuantity: number;
+  steels?: any[];
+}
+
 const defaultValues = {
   id: undefined,
   code: "",
   name: "",
+  sameQuantity: "",
 };
 
 export default function useStep2() {
   const [reloadAssemblyKey, setReloadAssemblyKey] = useState(0);
-  const methodForm = useFormCustom<RequestBody["SAVE"]>({
+  const [tableData, setTableData] = useState<AssemblyTableRow[]>([]);
+
+  const methodForm = useFormCustom<any>({
     defaultValues,
   });
   const queryClient = useQueryClient();
@@ -87,48 +99,87 @@ export default function useStep2() {
 
     removeAssembly(assemblyId);
   };
+  const addAssemblyToTable = () => {
+    const { id, name, sameQuantity } = methodForm.getValues();
+    const quantity = Number(sameQuantity);
+
+    if (!id) {
+      toastError("Vui lòng chọn cấu kiện");
+      return;
+    }
+
+    if (!quantity || quantity <= 0) {
+      toastError("Vui lòng nhập số lượng hợp lệ");
+      return;
+    }
+
+    setTableData((prev) => [
+      ...prev,
+      {
+        id,
+        assemblyName: name,
+        sameQuantity: quantity,
+      },
+    ]);
+
+    setValue("id", undefined);
+    setValue("name", "");
+    setValue("sameQuantity", "");
+  };
+  const removeAssemblyFromTable = (rowId: number) => {
+    setTableData((prev) => prev.filter((row) => row.id !== rowId));
+  };
+
+  const addSteelToAssemblyRow = (assemblyId: number, steel: any) => {
+    setTableData((prev) =>
+      prev.map((row) =>
+        row.id === assemblyId
+          ? {
+              ...row,
+              steels: [...(row.steels || []), steel],
+            }
+          : row
+      )
+    );
+  };
 
   const columns = useMemo(
     () => [
       {
         header: "Tên cấu kiện",
-        fieldName: "name",
+        fieldName: "assemblyName",
       },
       {
         header: "Số lượng cấu kiện giống nhau",
-        fieldName: "quantity",
+        fieldName: "sameQuantity",
+      },
+      {
+        header: "",
+        fieldName: "action",
+        render: (row: AssemblyTableRow) => (
+          <CoreButton
+            theme="cancel"
+            size="small"
+            onClick={() => removeAssemblyFromTable(row.id)}
+          >
+            Xóa
+          </CoreButton>
+        ),
       },
     ],
     []
   );
-  const tableData = [
-    {
-      name: "Dầm móng",
-      quantity: 12,
-    },
-    {
-      name: "Cột bê tông cốt thép",
-      quantity: 24,
-    },
-    {
-      name: "Sàn tầng 1",
-      quantity: 1,
-    },
-    {
-      name: "Sàn tầng 2",
-      quantity: 1,
-    },
-    {
-      name: "Dầm biên",
-      quantity: 18,
-    },
-    {
-      name: "Móng đơn",
-      quantity: 30,
-    },
-  ];
+
   return [
-    { onSubmitCreate, onSubmitUpdate, reloadAssemblyKey, onSubmitDelete },
+    {
+      onSubmitCreate,
+      onSubmitUpdate,
+      reloadAssemblyKey,
+      onSubmitDelete,
+      addAssemblyToTable,
+      removeAssemblyFromTable,
+      addSteelToAssemblyRow,
+    },
     { columns, tableData, control, setValue },
   ] as const;
 }

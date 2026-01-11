@@ -1,16 +1,24 @@
 import { useDialog } from "@/components/hooks/dialog/useDialog";
 import { useFormCustom } from "@/lib/form";
 import { ROUTES } from "@/routes";
+import { postSteel } from "@/service/constructor/Steel/save";
 import { useSteelCategoryListQuery } from "@/service/constructor/SteelCategory/getList";
 import { postTask } from "@/service/constructor/Task/save";
-import { RequestBody } from "@/service/constructor/Task/save/type";
+import { RequestBody } from "@/service/constructor/Steel/save/type";
 import { toastError, toastSuccess } from "@/toast";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
+type UseSteelChooseProps = {
+  assemblyId: number;
+  onSuccess: (steelRow: any) => void;
+};
 
-export default function useSteelChoose() {
+export default function useSteelChoose({
+  assemblyId,
+  onSuccess,
+}: UseSteelChooseProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
@@ -24,11 +32,22 @@ export default function useSteelChoose() {
 
   const methodForm = useFormCustom<any>({
     defaultValues: {
-      params: {},
+      steelLines: {},
+      images: [],
+      barCode: "",
+      barQuantity: "",
+      barDiameter: "",
+      spliceLength: "",
     },
   });
-
-  const { reset, handleSubmit, control, getValues } = methodForm;
+  const handleSuccess = (res: any) => {
+    toastSuccess("Thành công");
+    hideDialog();
+  };
+  const handleError = (error: any) => {
+    toastError(error?.message || "Có lỗi xảy ra");
+  };
+  const { reset, handleSubmit, control, getValues, setValue } = methodForm;
 
   const id = Number(params?.id);
   const isUpdate = !!id;
@@ -58,53 +77,65 @@ export default function useSteelChoose() {
     return `${diffDays} ngày`;
   };
   const { data, isLoading } = useSteelCategoryListQuery();
-
-  const { mutate } = useMutation({
-    mutationFn: (body: RequestBody["SAVE"]) => postTask(body),
-    onSuccess: (res) => {
-      toastSuccess("Thành công");
-
-      const formData = lastFormData.current;
-      if (!formData) return;
-
-      const remainingTime = calcRemainingDays(
-        formData.startDate,
-        formData.endDate
-      );
-
-      const staffNames = Array.isArray(formData.taskStaffMaps)
-        ? formData.taskStaffMaps.map((s: any) => s.name).join(", ")
-        : "--";
-
-      const row = {
-        id: res.data.id,
-        code: formData.code,
-        name: formData.name,
-        startTime: formData.startDate,
-        endTime: formData.endDate,
-        remainingTime,
-        reviewer: res.data.reviewer?.name ?? "Bạn",
-        taskStaffMaps: staffNames,
-        progress: 0,
-        state: formData.state,
-      };
-
-      console.log("ROW CREATED:", row);
-
-      hideDialog();
-    },
-
-    onError: (error: any) => {
-      toastError(error?.message || "Có lỗi xảy ra");
-    },
+  const { mutateAsync: createSteel } = useMutation({
+    mutationFn: (body: RequestBody["SAVE"]) => postSteel(body),
   });
 
-  const onSubmit = handleSubmit((data) => {
-    mutate(data);
+  const onSubmit = handleSubmit(async (formData) => {
+    try {
+      const steelLinesArray = Object.entries(formData.steelLines || {}).map(
+        ([paramName, value]) => ({
+          id: 0,
+          paramName,
+          value: Number(value),
+        })
+      );
+
+      const payload: RequestBody["SAVE"] = {
+        ...formData,
+        images: formData.images,
+        barCode: Number(formData.barCode),
+        barQuantity: Number(formData.barQuantity),
+        barDiameter: Number(formData.barDiameter),
+        spliceLength: Number(formData.spliceLength),
+        steelLines: steelLinesArray,
+      };
+
+      const imageUrls = (formData.images || []).map(
+        (img: any) => img.url || img.fileUrl
+      );
+
+      const steelRow = {
+        barCode: payload.barCode,
+        barDiameter: payload.barDiameter,
+        barQuantity: payload.barQuantity,
+        spliceLength: payload.spliceLength,
+        steelLinesText: payload.steelLines.reduce(
+          (sum, item) => sum + (Number(item.value) || 0),
+          0
+        ),
+        images: imageUrls, // ⭐ THÊM ẢNH CHO UI
+      };
+
+      console.log("🚀 FINAL PAYLOAD SEND API:", payload);
+      console.log("🔥 STEEL ROW SEND TO STEP2:", steelRow);
+
+      // ✅ CHỜ API
+      await createSteel(payload);
+
+      // ✅ ĐẨY NGƯỢC DATA VỀ STEP2
+      onSuccess(steelRow);
+      console.log("✅ CALLBACK onSuccess CALLED:", steelRow);
+
+      toastSuccess("Thành công");
+      hideDialog();
+    } catch (error: any) {
+      toastError(error?.message || "Có lỗi xảy ra");
+    }
   });
 
   return [
-    { isView, page, rowsPerPage, control, isUpdate, id, data },
+    { isView, page, rowsPerPage, control, isUpdate, id, data, setValue },
     { setPage, setRowsPerPage, onSubmit },
   ];
 }
