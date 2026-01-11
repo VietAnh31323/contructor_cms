@@ -160,7 +160,7 @@ const CollapseRow = ({
                       <CoreButton
                         theme="cancel"
                         size="small"
-                        onClick={() => remove(steelRow.id)} // ✅ ID THANH THÉP
+                        onClick={() => remove(steelRow.id)}
                       >
                         Xóa
                       </CoreButton>

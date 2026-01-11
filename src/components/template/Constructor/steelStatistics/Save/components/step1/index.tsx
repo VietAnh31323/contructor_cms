@@ -2,15 +2,26 @@ import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
-import { useForm } from "react-hook-form";
+import { useForm, useFormContext } from "react-hook-form";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import EditText from "@/components/atoms/EditText";
-export default function Step1() {
+import { CoreButton } from "@/components/atoms/CoreButton";
+import useStep1 from "./useStep1";
+import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
+type Props = {
+  isLoadingSubmit?: boolean;
+  handleChangeStep?: (val: number) => void;
+  onChange?: (data: any) => void;
+};
+export default function Step1(props: Props) {
+  const [{ control, watch, setValue, isView }, {}] = useStep1();
   const [date, setDate] = useState<Date | null>(null);
-  const { control } = useForm();
+  const { handleChangeStep, isLoadingSubmit, onChange } = props;
+  const { getValues } = useFormContext();
+
   const [editorText, setEditorText] = useState("");
   return (
-    <form className="flex flex-col py-6 ">
+    <>
       <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid item xs={12} sm={12} md={6} lg={4}>
           <CoreInputCustom
@@ -33,7 +44,7 @@ export default function Step1() {
         <Grid item xs={12} sm={12} md={6} lg={4}>
           <CoreInputCustom
             control={control}
-            name="person"
+            name="owner"
             label="Chủ đầu tư"
             placeholder="Nhập chủ đầu tư"
             required
@@ -52,60 +63,28 @@ export default function Step1() {
         </Grid>
 
         <Grid item xs={12} sm={12} md={6} lg={4}>
-          <div style={{ width: "100%" }}>
-            <DatePicker
-              selected={date}
-              onChange={(d) => setDate(d)}
-              placeholderText=" "
-              customInput={
-                <TextField
-                  label="Ngày kí hợp đồng"
-                  variant="standard"
-                  fullWidth
-                  focused
-                  placeholder=" "
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <CalendarMonthIcon sx={{ cursor: "pointer" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              }
-              popperPlacement="bottom"
-              wrapperClassName="w-full"
-              className="w-full"
-            />
-          </div>
+          <CoreDatePicker
+            name="signDate"
+            control={control!}
+            label={"Ngày ký hợp đồng"}
+            required={!isView}
+            placeholder="Chọn ký hợp đồng"
+            // rules={{
+            //   required: "Bạn phải nhập ngày sinh",
+            // }}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={4}>
-          <div style={{ width: "100%" }}>
-            <DatePicker
-              selected={date}
-              onChange={(d) => setDate(d)}
-              placeholderText=" "
-              customInput={
-                <TextField
-                  label="Ngày giao hồ sơ dự kiến"
-                  variant="standard"
-                  fullWidth
-                  focused
-                  placeholder=" "
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <CalendarMonthIcon sx={{ cursor: "pointer" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              }
-              popperPlacement="bottom"
-              wrapperClassName="w-full"
-              className="w-full"
-            />
-          </div>
+          <CoreDatePicker
+            name="deliveryDate"
+            control={control!}
+            label={"Ngày hoàn thành dự kiến"}
+            required={!isView}
+            placeholder="Chọn ngày hoàn thành"
+            // rules={{
+            //   required: "Bạn phải nhập ngày sinh",
+            // }}
+          />
         </Grid>
 
         <br />
@@ -129,6 +108,30 @@ export default function Step1() {
         </Grid>
         <br />
       </Grid>
-    </form>
+      {!isView && (
+        <div className="flex justify-center mt-15">
+          <div className="m-5">
+            <CoreButton theme="cancel" onClick={() => {}}>
+              'Hủy'
+            </CoreButton>
+          </div>
+
+          <div className="m-5">
+            <CoreButton
+              theme="submit"
+              onClick={() => {
+                // lấy toàn bộ giá trị trong form Step1
+                const values = getValues(); // từ useFormContext()
+                onChange?.(values); // gửi dữ liệu lên parent
+
+                handleChangeStep && handleChangeStep(1); // chuyển bước 2
+              }}
+            >
+              Chuyển bước 2
+            </CoreButton>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

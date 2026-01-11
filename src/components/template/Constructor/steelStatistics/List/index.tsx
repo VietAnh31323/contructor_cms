@@ -29,8 +29,7 @@ export default function SteelStatisticsList() {
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -43,7 +42,7 @@ export default function SteelStatisticsList() {
       >
         <form className="flex flex-col py-6 ">
           <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-            <Grid item xs={12} sm={12} md={6} lg={4}>
+            {/* <Grid item xs={12} sm={12} md={6} lg={4}>
               <CoreInputCustom
                 control={control}
                 name="search"
@@ -51,13 +50,13 @@ export default function SteelStatisticsList() {
                 placeholder="Tìm kiếm theo mã dự án"
               />
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={4}></Grid>
+            <Grid item xs={12} sm={12} md={6} lg={4}></Grid> */}
             <Grid
               item
               xs={12}
               sm={12}
-              md={6}
-              lg={4}
+              md={12}
+              lg={12}
               className="flex justify-end items-center"
             >
               <CoreButton
@@ -71,13 +70,26 @@ export default function SteelStatisticsList() {
             </Grid>
           </Grid>
         </form>
-        <CoreNavbar
+        {/* <CoreNavbar
           breadcrumbs={[
             {
               title: "Danh sách",
               content: <ProjectCardList />,
             },
           ]}
+        /> */}
+        <CoreTable
+          tableName="abc"
+          columns={columns || []}
+          data={tableData || []}
+          page={page}
+          isShowColumnStt
+          onRowClick={(id: number) => {
+            router.push({
+              pathname: `${ROUTES.STEELSTATISTICS}/${id}`,
+              query: { actionType: "VIEW" },
+            });
+          }}
         />
       </PageContainer>
     </Grid>

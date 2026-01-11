@@ -6,8 +6,11 @@ import { postAssembly, putAssembly } from "@/service/constructor/Assembly/save";
 import { RequestBody } from "@/service/constructor/Assembly/save/type";
 import { toastError, toastSuccess } from "@/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+export type Step2Data = {
+  steelProjectAssemblyMaps: AssemblyTableRow[];
+};
 
 export interface AssemblyTableRow {
   id: number;
@@ -33,7 +36,9 @@ export default function useStep2() {
   const queryClient = useQueryClient();
   const { reset, handleSubmit, control, setValue, watch } = methodForm;
   const id = watch("id");
-  console.log("iddđ", id);
+  const router = useRouter();
+  const { actionType } = router.query;
+  const isView = actionType === "VIEW";
   const handleSuccess = (res: any) => {
     toastSuccess("Thành công");
   };
@@ -130,15 +135,27 @@ export default function useStep2() {
     setTableData((prev) => prev.filter((row) => row.id !== rowId));
   };
 
-  const addSteelToAssemblyRow = (assemblyId: number, steel: any) => {
+  // const addSteelToAssemblyRow = (assemblyId: number, steel: any) => {
+  //   setTableData((prev) =>
+  //     prev.map((row) =>
+  //       row.id === assemblyId
+  //         ? {
+  //             ...row,
+  //             steels: [...(row.steels || []), steel],
+  //           }
+  //         : row
+  //     )
+  //   );
+  // };
+  const addSteelToAssemblyRow = (assemblyId: number, steelRow: any) => {
     setTableData((prev) =>
-      prev.map((row) =>
-        row.id === assemblyId
+      prev.map((assembly) =>
+        assembly.id === assemblyId
           ? {
-              ...row,
-              steels: [...(row.steels || []), steel],
+              ...assembly,
+              steels: [...(assembly.steels || []), steelRow],
             }
-          : row
+          : assembly
       )
     );
   };
@@ -180,6 +197,6 @@ export default function useStep2() {
       removeAssemblyFromTable,
       addSteelToAssemblyRow,
     },
-    { columns, tableData, control, setValue },
+    { columns, tableData, control, setValue, isView },
   ] as const;
 }

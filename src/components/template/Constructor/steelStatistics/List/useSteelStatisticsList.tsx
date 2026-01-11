@@ -1,59 +1,49 @@
+import { RequestBody } from "@/service/constructor/Steel/getList/type";
+import { useSteelProjectListQuery } from "@/service/constructor/Steel/getList";
+import _ from "lodash";
 import { useMemo, useState } from "react";
-
+import { useForm } from "react-hook-form";
+const defaultValues = {
+  search: "",
+  page: 0,
+  size: 20,
+};
 const useSteelStatisticsList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const methodForm = useForm<RequestBody["GET"]>({
+    defaultValues,
+  });
+  const { handleSubmit } = methodForm;
+
+  const [queryPage, setQueryPage] = useState<any>(
+    _.omitBy(defaultValues, _.isNil)
+  );
+  const onSubmit = handleSubmit(async (input) => {
+    setQueryPage(input);
+  });
+  const onChangePageSize = (val: any) => {
+    const { page, size } = val;
+    const input = { ...queryPage, page, size };
+
+    setQueryPage(input);
+  };
+  const { data, isLoading } = useSteelProjectListQuery();
   const columns = useMemo(
     () => [
-      { header: "Mã hạng mục", fieldName: "code" },
-      { header: "Tên hạng mục", fieldName: "name" },
-      { header: "Trạng thái", fieldName: "isActive" },
+      { header: "Mã dự án", fieldName: "code" },
+      { header: "Tên dự án", fieldName: "name" },
+      { header: "Chủ đầu tư", fieldName: "owner" },
+      { header: "Ngày ký hợp đồng", fieldName: "signDate" },
+      { header: "Ngày ký giao hồ sơ", fieldName: "deliveryDate" },
     ],
     []
   );
 
-  const tableData = [
-    {
-      code: "HM001",
-      name: "Hạng mục A",
-      isActive: "Inactive",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục B",
-      isActive: "Inactive",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục C",
-      isActive: "Active",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục D",
-      isActive: "Active",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục E",
-      isActive: "Inactive",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục F",
-      isActive: "Active",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục G",
-      isActive: "Active",
-    },
-    {
-      code: "HM001",
-      name: "Hạng mục H",
-      isActive: "Active",
-    },
-  ];
+  const tableData =
+    data?.data?.content?.map((item) => ({
+      ...item,
+    })) ?? [];
 
   return [
     { columns, tableData, page, rowsPerPage },
