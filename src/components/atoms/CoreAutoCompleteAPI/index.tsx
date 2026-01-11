@@ -66,6 +66,7 @@ export interface FormControlAutoCompleteProps<
   onChangeValue?: (val: any) => void;
   onAfterChangeValue?: () => void;
   beforeLabelPath?: string;
+  reloadKey?: number;
 }
 
 const CoreAutoCompleteAPI: <
@@ -105,6 +106,7 @@ const CoreAutoCompleteAPI: <
     onChangeValue,
     onAfterChangeValue,
     beforeLabelPath,
+    reloadKey,
     ...restProps
   } = props;
 
@@ -208,7 +210,7 @@ const CoreAutoCompleteAPI: <
       handleFetchData(false).catch(() => {});
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClick, convertParam, convertExceptValues]);
+  }, [isClick, convertParam, convertExceptValues, reloadKey]);
 
   useEffect(() => {
     if (isClick && !disabled && !readOnly) {

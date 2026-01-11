@@ -181,7 +181,7 @@ export default function SteelChoose() {
                 control={control}
                 name="diameter"
                 label="Đường kính"
-                placeholder="Nhập đường kính thanh thép"
+                placeholder="Nhập đường kính thanh thép (mm)"
               />
             </Grid>
           </Grid>

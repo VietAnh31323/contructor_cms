@@ -12,11 +12,14 @@ import { CoreButton } from "@/components/atoms/CoreButton";
 import { TableCollapse } from "@/components/organism/TableCollapse";
 import useStep2 from "./useStep2";
 import CollapseRow from "./CollapseRow";
+import CoreAutoCompleteAPI from "@/components/atoms/CoreAutoCompleteAPI";
+import { getAssemblyList } from "@/service/constructor/Assembly/getList";
 export default function Step2() {
   const [date, setDate] = useState<Date | null>(null);
   const [handle, values] = useStep2();
-  const { columns, tableData } = values;
-  const { control } = useForm();
+  const { columns, tableData, control, setValue } = values;
+  const { onSubmitCreate, onSubmitUpdate, reloadAssemblyKey } = handle;
+
   const [editorText, setEditorText] = useState("");
   return (
     <form className="flex flex-col py-6 ">
@@ -34,8 +37,8 @@ export default function Step2() {
             placeholder=" "
             options={[
               {
-                Label: "BTKT1",
-                values: "BTKT1",
+                label: "BTKT1",
+                value: "BTKT1",
               },
             ]}
           />
@@ -54,52 +57,59 @@ export default function Step2() {
             Thêm cấu kiện
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={2}>
-          <CoreInputCustom
-            control={control}
-            name="name"
-            label="Tên cấu kiện"
-            placeholder=" "
-            required
-            rules={{ required: "Trường này là bắt buộc" }}
-          />
+
+        <Grid item xs={12} sm={12} md={12} lg={12}>
+          <form className="flex gap-10">
+            <Grid item xs={12} sm={12} md={3} lg={3}>
+              <CoreInputCustom
+                control={control}
+                name="name"
+                label="Tên cấu kiện"
+                placeholder="Nhập tên cấu kiện"
+                required
+                rules={{ required: "Trường này là bắt buộc" }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={3} lg={3}>
+              <CoreInputCustom
+                control={control}
+                name="quantity"
+                label="Số lượng bộ phận giống nhau"
+                placeholder=" "
+                // required
+                // rules={{ required: "Trường này là bắt buộc" }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={3} lg={3}>
+              <CoreAutoCompleteAPI
+                control={control}
+                name="assemblylist"
+                label="DS. Cấu kiện"
+                placeholder=" "
+                fetchDataFn={getAssemblyList}
+                reloadKey={reloadAssemblyKey}
+                onChange={(event, value: any) => {
+                  // value là bản ghi được chọn
+                  setValue("id", value?.id);
+                  setValue("name", value?.name || "");
+                }}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={6}
+              lg={6}
+              className=" flex gap-4 items-center justify-center"
+            >
+              <CoreButton onClick={onSubmitCreate}>Thêm cấu kiện</CoreButton>
+              <CoreButton>Xóa cấu kiện</CoreButton>
+              <CoreButton onClick={onSubmitUpdate}>Chỉnh sửa</CoreButton>
+            </Grid>
+          </form>
         </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={2}>
-          <CoreInputCustom
-            control={control}
-            name="qty"
-            label="Số lượng bộ phận giống nhau"
-            placeholder=" "
-            required
-            rules={{ required: "Trường này là bắt buộc" }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={3} lg={2}>
-          <CoreAutocomplete
-            control={control}
-            name="dsck"
-            label="DS. Cấu kiện"
-            placeholder=" "
-            options={[
-              {
-                Label: "BTKT1",
-                values: "BTKT1",
-              },
-            ]}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={12}
-          md={6}
-          lg={6}
-          className=" flex gap-4 items-center justify-center"
-        >
-          <CoreButton>Thêm cấu kiện</CoreButton>
-          <CoreButton>Xóa cấu kiện</CoreButton>
-          <CoreButton>Chỉnh sửa</CoreButton>
-        </Grid>
+
         <br />
         <Grid item xs={12} sm={12} md={12} lg={12}>
           <TableCollapse
