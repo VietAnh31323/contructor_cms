@@ -7,7 +7,7 @@ import { RequestBody } from "@/service/constructor/Assembly/save/type";
 import { toastError, toastSuccess } from "@/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import router, { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 export type Step2Data = {
   steelProjectAssemblyMaps: AssemblyTableRow[];
 };
@@ -23,13 +23,13 @@ const defaultValues = {
   id: undefined,
   code: "",
   name: "",
-  sameQuantity: "",
+  sameQuantity: undefined,
 };
 
-export default function useStep2() {
+export default function useStep2(detailData?: any) {
   const [reloadAssemblyKey, setReloadAssemblyKey] = useState(0);
   const [tableData, setTableData] = useState<AssemblyTableRow[]>([]);
-
+  console.log("tableDataa1", detailData);
   const methodForm = useFormCustom<any>({
     defaultValues,
   });
@@ -104,6 +104,7 @@ export default function useStep2() {
 
     removeAssembly(assemblyId);
   };
+
   const addAssemblyToTable = () => {
     const { id, name, sameQuantity } = methodForm.getValues();
     const quantity = Number(sameQuantity);
@@ -124,6 +125,7 @@ export default function useStep2() {
         id,
         assemblyName: name,
         sameQuantity: quantity,
+        steels: [],
       },
     ]);
 
@@ -131,6 +133,7 @@ export default function useStep2() {
     setValue("name", "");
     setValue("sameQuantity", "");
   };
+
   const removeAssemblyFromTable = (rowId: number) => {
     setTableData((prev) => prev.filter((row) => row.id !== rowId));
   };
@@ -155,13 +158,17 @@ export default function useStep2() {
               ...assembly,
               steels: [...(assembly.steels || []), steelRow],
             }
-          : assembly
-      )
+          : assembly,
+      ),
     );
   };
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const baseColumns: Array<{
+      header: string;
+      fieldName: string;
+      render?: (row: AssemblyTableRow) => JSX.Element;
+    }> = [
       {
         header: "Tên cấu kiện",
         fieldName: "assemblyName",
@@ -170,7 +177,10 @@ export default function useStep2() {
         header: "Số lượng cấu kiện giống nhau",
         fieldName: "sameQuantity",
       },
-      {
+    ];
+
+    if (!isView) {
+      baseColumns.push({
         header: "",
         fieldName: "action",
         render: (row: AssemblyTableRow) => (
@@ -182,11 +192,24 @@ export default function useStep2() {
             Xóa
           </CoreButton>
         ),
-      },
-    ],
-    []
-  );
+      });
+    }
 
+    return baseColumns;
+  }, [isView]);
+
+  useEffect(() => {
+    if (!detailData?.steelProjectAssemblyMaps) return;
+
+    setTableData(
+      detailData.steelProjectAssemblyMaps.map((item: any) => ({
+        id: item.id,
+        assemblyName: item.assemblyName,
+        sameQuantity: item.sameQuantity ?? 1,
+        steels: item.steels ?? [],
+      })),
+    );
+  }, [detailData]);
   return [
     {
       onSubmitCreate,

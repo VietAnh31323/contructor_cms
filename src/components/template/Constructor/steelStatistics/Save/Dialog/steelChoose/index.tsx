@@ -41,8 +41,8 @@ export default function SteelChooseSteelChoose({
 
       const res = await getSteelCategoryListLine({ steelCategoryId });
 
-      console.log("PARAM RESPONSE:", res);
-      console.log("PARAM ARRAY:", res.data);
+      // console.log("PARAM RESPONSE:", res);
+      // console.log("PARAM ARRAY:", res.data);
       //@ts-ignore
       setParams(res.data);
     } catch (error) {
@@ -52,7 +52,7 @@ export default function SteelChooseSteelChoose({
     }
   };
 
-  console.log("params", params);
+  // console.log("params", params);
 
   return (
     <CoreDialog
@@ -83,8 +83,12 @@ export default function SteelChooseSteelChoose({
                     <Grid item key={item.id}>
                       <Box
                         onClick={() => {
+                          console.log("👉 Steel được chọn, id =", item.id);
                           setSelectedSteelId(item.id);
                           handleSelectSteelType(item.id);
+                          // onSuccess({
+                          //   id: item.id,
+                          // });
                           setValue("images", item.images || []);
                         }}
                         sx={{

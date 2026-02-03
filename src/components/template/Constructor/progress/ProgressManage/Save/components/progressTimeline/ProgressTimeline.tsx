@@ -13,7 +13,11 @@ type Props = {
   isView?: boolean;
 };
 
-export default function ProgressTimeline({ value, onChange, isView }: Props) {
+export default function ProgressTimeline({
+  value = [],
+  onChange,
+  isView,
+}: Props) {
   const handleAddProgress = () => {
     onChange([
       ...value,
@@ -32,7 +36,7 @@ export default function ProgressTimeline({ value, onChange, isView }: Props) {
   return (
     <>
       {value.map((item, index) => (
-        <ProgressTimelineItem key={index}>
+        <ProgressTimelineItem key={index} index={index + 1}>
           <ProgressHeader
             value={item.progress}
             onChange={(progress) =>
@@ -42,7 +46,7 @@ export default function ProgressTimeline({ value, onChange, isView }: Props) {
           />
 
           <MainTaskSection
-            value={item.tasks}
+            value={item.tasks ?? []}
             onChange={(tasks) => updateProgress(index, { ...item, tasks })}
             isView={isView}
           />

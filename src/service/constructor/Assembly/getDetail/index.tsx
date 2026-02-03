@@ -2,10 +2,10 @@ import { ConsApi } from "@/config/axios";
 import { Response } from "./type";
 import { useQuery } from "@tanstack/react-query";
 
-export const getCategoryDetail = async (
-  id: number
+export const getAssemblyDetail = async (
+  id: number,
 ): Promise<Response["GET"]> => {
-  const res = await ConsApi.get("/api/v1/category", {
+  const res = await ConsApi.get("/api/v1/steel-project", {
     params: { id },
   });
 
@@ -16,14 +16,14 @@ export const getCategoryDetail = async (
   };
 };
 
-export const useCategoryDetailQuery = (
+export const useAssemblyDetailQuery = (
   id?: number,
   options?: {
     enabled?: boolean;
-  }
+  },
 ) =>
   useQuery({
-    queryKey: ["category-detail", id],
-    queryFn: () => getCategoryDetail(id as number),
+    queryKey: ["assembly-detail", id],
+    queryFn: () => getAssemblyDetail(id as number),
     enabled: !!id && options?.enabled !== false,
   });

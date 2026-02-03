@@ -15,15 +15,17 @@ import CollapseRow from "./CollapseRow";
 import CoreAutoCompleteAPI from "@/components/atoms/CoreAutoCompleteAPI";
 import { getAssemblyList } from "@/service/constructor/Assembly/getList";
 type Props = {
+  detailData?: any;
   onSubmit?: () => void;
   isLoadingSubmit?: boolean;
   onChange?: (data: Step2Data) => void;
   // position: any
 };
 export default function Step2(props: Props) {
-  const { onSubmit, isLoadingSubmit, onChange } = props;
+  const { onSubmit, isLoadingSubmit, onChange, detailData } = props;
   const [date, setDate] = useState<Date | null>(null);
-  const [handle, values] = useStep2();
+  console.log("akjs", detailData);
+  const [handle, values] = useStep2(detailData);
   const { columns, tableData, control, setValue, isView } = values;
   const {
     onSubmitCreate,
@@ -34,7 +36,7 @@ export default function Step2(props: Props) {
     removeAssemblyFromTable,
     addSteelToAssemblyRow,
   } = handle;
-  // console.log("addSteelToAssemblyRow", addSteelToAssemblyRow);
+  // console.log("addSteelToAssemblyRow", detailData);
   useEffect(() => {
     onChange?.({
       steelProjectAssemblyMaps: tableData,
@@ -43,7 +45,7 @@ export default function Step2(props: Props) {
   return (
     <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
       {!isView && (
-        <div>
+        <Grid item xs={12} sm={12} md={12} lg={12}>
           <Grid item xs={12} sm={12} md={12} lg={12}>
             <Typography sx={{ fontWeight: 700 }}>
               Thêm bảng thống kê thép
@@ -64,7 +66,15 @@ export default function Step2(props: Props) {
             />
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={4}></Grid>
-          <Grid item xs={12} sm={12} md={6} lg={4} className="items-center">
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={6}
+            lg={4}
+            className="items-center"
+            sx={{ marginTop: "10px" }}
+          >
             <CoreButton>Thêm bảng thống kê thép</CoreButton>
           </Grid>
           <br />
@@ -78,41 +88,49 @@ export default function Step2(props: Props) {
             </Typography>
           </Grid>
 
-          {/* <Grid item xs={12} sm={12} md={12} lg={12}> */}
-          <Grid item xs={12} sm={12} md={3} lg={2}>
-            <CoreInputCustom
-              control={control}
-              name="name"
-              label="Tên cấu kiện"
-              placeholder="Nhập tên cấu kiện"
-              // required
-              // rules={{ required: "Trường này là bắt buộc" }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={2}>
-            <CoreInputCustom
-              control={control}
-              name="sameQuantity"
-              label="Số lượng bộ phận giống nhau"
-              placeholder="Nhập số lượng giống nhau"
-              // required
-              // rules={{ required: "Trường này là bắt buộc" }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={3} lg={2}>
-            <CoreAutoCompleteAPI
-              control={control}
-              name="assemblylist"
-              label="DS. Cấu kiện"
-              placeholder="Chọn DS. cấu kiện"
-              fetchDataFn={getAssemblyList}
-              reloadKey={reloadAssemblyKey}
-              onChange={(event, value: any) => {
-                // value là bản ghi được chọn
-                setValue("id", value?.id);
-                setValue("name", value?.name || "");
-              }}
-            />
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            sx={{ display: "flex", gap: 2 }}
+          >
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <CoreInputCustom
+                control={control}
+                name="name"
+                label="Tên cấu kiện"
+                placeholder="Nhập tên cấu kiện"
+                // required
+                // rules={{ required: "Trường này là bắt buộc" }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <CoreInputCustom
+                control={control}
+                name="sameQuantity"
+                label="Số lượng bộ phận giống nhau"
+                placeholder="Nhập số lượng giống nhau"
+                // required
+                // rules={{ required: "Trường này là bắt buộc" }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <CoreAutoCompleteAPI
+                control={control}
+                name="assemblylist"
+                label="DS. Cấu kiện"
+                placeholder="Chọn DS. cấu kiện"
+                fetchDataFn={getAssemblyList}
+                reloadKey={reloadAssemblyKey}
+                onChange={(event, value: any) => {
+                  // value là bản ghi được chọn
+                  setValue("id", value?.id);
+                  setValue("name", value?.name || "");
+                }}
+              />
+            </Grid>
           </Grid>
           <Grid
             item
@@ -120,20 +138,24 @@ export default function Step2(props: Props) {
             sm={12}
             md={6}
             lg={6}
-            className=" flex gap-4 items-center justify-center"
+            // className=" flex gap-4 items-center justify-center"
+            sx={{
+              marginTop: "10px",
+              display: "flex",
+              gap: 2,
+            }}
           >
             <CoreButton onClick={onSubmitCreate}>Thêm cấu kiện</CoreButton>
             <CoreButton onClick={onSubmitDelete}>Xóa cấu kiện</CoreButton>
             <CoreButton onClick={onSubmitUpdate}>Chỉnh sửa</CoreButton>
           </Grid>
-          {/* </Grid> */}
           <br />
           <Grid item xs={12} sm={12} md={12} lg={12}>
             <CoreButton onClick={addAssemblyToTable}>
               Thêm cấu kiện vào bảng thống kê thép
             </CoreButton>
           </Grid>
-        </div>
+        </Grid>
       )}
 
       <br />

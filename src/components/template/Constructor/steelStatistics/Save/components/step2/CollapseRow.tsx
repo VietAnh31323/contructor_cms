@@ -1,5 +1,5 @@
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 // import QCDetail from "../components/QCDetail";
 // import QCCoupon from "../components/QCCoupon";
 // import { useQueryReceiptQCDetail } from "@/service/manufactory/productionSlip/getRecepi";
@@ -19,6 +19,7 @@ import { AssemblyTableRow } from "./useStep2";
 import { useMutation } from "@tanstack/react-query";
 import { deleteSteel } from "@/service/constructor/Steel/delete";
 import { toastError, toastSuccess } from "@/toast";
+import { useByAssemblyDetailQuery } from "@/service/constructor/Assembly/getDetailbyAssembly";
 
 const CollapseRow = ({
   row,
@@ -33,8 +34,26 @@ const CollapseRow = ({
   console.log("rowww", row);
   const actionType = searchParams.get("actionType");
   const isView = actionType === "VIEW";
+  const { data, isLoading } = useByAssemblyDetailQuery(row.id, {
+    enabled: isView && !!row.id,
+  });
 
-  const tableData = row.steels || [];
+  const tableData = useMemo(() => {
+    const source = isView ? data?.data : row.steels;
+
+    if (!Array.isArray(source)) return [];
+
+    return source.map((item: any) => ({
+      id: item.id,
+      barCode: item.barCode,
+      images: item.images ?? [],
+      barDiameter: item.barDiameter,
+      barQuantity: item.barQuantity,
+      steelLinesText: isView
+        ? item.length // VIEW → API trả về length
+        : item.steelLinesText, // CREATE → state local// mm
+    }));
+  }, [isView, data, row.steels]);
   console.log("tableData", tableData);
   const { mutate: remove } = useMutation({
     mutationFn: (id: number) => deleteSteel({ id }),
@@ -71,10 +90,25 @@ const CollapseRow = ({
                     fieldName: "images",
                     render: (row: any) => {
                       const images = row.images || [];
-
                       if (!images.length) return "--";
 
-                      return (
+                      return isView ? (
+                        <div style={{ display: "flex", gap: 8 }}>
+                          {images.map((img: any, index: number) => (
+                            <img
+                              key={index}
+                              src={img.url}
+                              alt={img.name}
+                              style={{
+                                width: 200,
+                                height: "auto",
+                                objectFit: "cover",
+                                borderRadius: 6,
+                              }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
                         <div style={{ display: "flex", gap: 8 }}>
                           {images.map((url: string, index: number) => (
                             <img
@@ -83,7 +117,7 @@ const CollapseRow = ({
                               alt="steel"
                               style={{
                                 width: 200,
-                                height: "100%",
+                                height: "auto",
                                 objectFit: "cover",
                                 borderRadius: 6,
                               }}
@@ -156,15 +190,16 @@ const CollapseRow = ({
                   {
                     header: "",
                     fieldName: "action",
-                    render: (steelRow: any) => (
-                      <CoreButton
-                        theme="cancel"
-                        size="small"
-                        onClick={() => remove(steelRow.id)}
-                      >
-                        Xóa
-                      </CoreButton>
-                    ),
+                    render: (steelRow: any) =>
+                      isView ? null : (
+                        <CoreButton
+                          theme="cancel"
+                          size="small"
+                          onClick={() => remove(steelRow.id)}
+                        >
+                          Xóa
+                        </CoreButton>
+                      ),
                   },
                 ]}
                 data={tableData}
@@ -182,7 +217,7 @@ const CollapseRow = ({
                         console.log("🔥 CollapseRow nhận:", steelRow);
                         onAddSteel(row.id, steelRow); // ⭐ ĐẨY NGƯỢC VỀ STEP2
                       }}
-                    />
+                    />,
                   );
                 }}
                 disabled={isView}

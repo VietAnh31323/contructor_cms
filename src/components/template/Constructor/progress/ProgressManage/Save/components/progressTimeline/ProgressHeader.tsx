@@ -5,13 +5,19 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { useForm } from "react-hook-form";
 import { getProgressProjectList } from "@/service/constructor/ProgressProject/getList";
 
-export default function ProgressHeader({
-  status,
-}: {
-  status: "DONE" | "PROCESSING";
-}) {
-  const [progress, setProgress] = useState<any>(null);
-  const { control } = useForm();
+type Props = {
+  value: any;
+  onChange: (value: any) => void;
+  isView?: boolean;
+};
+
+export default function ProgressHeader({ value, onChange, isView }: Props) {
+  const { control } = useForm({
+    defaultValues: {
+      progress: value,
+    },
+  });
+
   return (
     <Box
       display="flex"
@@ -19,29 +25,22 @@ export default function ProgressHeader({
       alignItems="center"
       gap={2}
     >
-      <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-        <Grid item xs={12} sm={12} md={12} lg={12}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
           <CoreAutoCompleteAPI
             variant="standard"
             fetchDataFn={getProgressProjectList}
             control={control}
             name="progress"
-            label=""
             placeholder="Chọn tiến trình"
             valuePath="value"
-            params={{
-              isActive: true,
+            params={{ isActive: true }}
+            disabled={isView}
+            onChangeValue={(option) => {
+              onChange(option);
             }}
           />
         </Grid>
-      </Grid>
-      <Grid item xs={12} sm={12} md={2} lg={2}>
-        {/* <Typography
-          fontWeight={200}
-          color={status === "DONE" ? "success.main" : "info.main"}
-        >
-          {status === "DONE" ? "Hoàn thành" : "Đang thực hiện"}
-        </Typography> */}
       </Grid>
     </Box>
   );

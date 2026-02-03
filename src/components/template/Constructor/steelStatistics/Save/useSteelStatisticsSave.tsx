@@ -52,7 +52,7 @@ const useSteelStatisticsSave = () => {
   const { data, isLoading } = useSteelProjectDetailQuery(id, {
     enabled: !!id,
   });
-
+  // console.log("đậtfhádjh", data);
   const { mutate } = useMutation({
     mutationFn: (body: RequestBody["SAVE"]) =>
       isUpdate ? putSteelProject(id, body) : postSteelProject(body),
@@ -82,7 +82,7 @@ const useSteelStatisticsSave = () => {
       ).map((assembly) => ({
         ...assembly,
         steels: (assembly.steels || []).map((steel) => ({
-          id: steel.id || 0,
+          id: steel.id,
           barCode: steel.barCode,
           assemblyName: steel.assemblyName,
           images: (steel.images || []).map((img: any) => ({
@@ -124,7 +124,7 @@ const useSteelStatisticsSave = () => {
   return [
     {
       methodForm,
-
+      data,
       isView,
       isUpdate,
       stepData,

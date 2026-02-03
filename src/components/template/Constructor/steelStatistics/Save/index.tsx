@@ -16,12 +16,13 @@ import { TopAction } from "@/components/molecules/TopAction";
 
 export default function SteelStatisticsSave() {
   const [value, handle] = useSteelStatisticsSave();
-  const { methodForm, isView, isUpdate, id, step, router, isLoading } = value;
+  const { methodForm, isView, isUpdate, id, step, router, isLoading, data } =
+    value;
   const { onSubmit, handleChangeStep, setStepData } = handle;
   const stepList = ["Thông tin chung", "Chi tiết thống kê"];
 
   // const [step, setStep] = useState(0);
-
+  console.log("Dataaaaa", data?.data);
   return (
     <Grid
       container
@@ -91,6 +92,7 @@ export default function SteelStatisticsSave() {
                         <FormProvider {...methodForm}>
                           <form onSubmit={onSubmit}>
                             <Step2
+                              detailData={data?.data}
                               onSubmit={onSubmit}
                               onChange={(data) =>
                                 setStepData((prev) => ({
@@ -139,6 +141,7 @@ export default function SteelStatisticsSave() {
 
                           {step === 1 && (
                             <Step2
+                              detailData={data?.data}
                               onSubmit={onSubmit}
                               onChange={(data) =>
                                 setStepData((prev) => ({
