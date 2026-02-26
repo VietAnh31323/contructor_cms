@@ -88,7 +88,7 @@ export default function useSteelChoose({
           id: 0,
           paramName,
           value: Number(value),
-        })
+        }),
       );
 
       const payload: RequestBody["SAVE"] = {
@@ -102,20 +102,28 @@ export default function useSteelChoose({
       };
 
       const imageUrls = (formData.images || []).map(
-        (img: any) => img.url || img.fileUrl
+        (img: any) => img.url || img.fileUrl,
       );
 
+      const res = await createSteel(payload);
+
+      const steelId = res?.data?.id;
+      console.log("id của thanh thép", steelId);
       const steelRow = {
+        id: steelId, // ⭐ QUAN TRỌNG NHẤT
         barCode: payload.barCode,
+        assemblyName: res?.data?.assemblyName, // nếu có
         barDiameter: payload.barDiameter,
         barQuantity: payload.barQuantity,
         spliceLength: payload.spliceLength,
         steelLinesText: payload.steelLines.reduce(
           (sum, item) => sum + (Number(item.value) || 0),
-          0
+          0,
         ),
-        images: imageUrls, // ⭐ THÊM ẢNH CHO UI
+        images: imageUrls,
       };
+
+      onSuccess(steelRow);
 
       console.log("🚀 FINAL PAYLOAD SEND API:", payload);
       console.log("🔥 STEEL ROW SEND TO STEP2:", steelRow);

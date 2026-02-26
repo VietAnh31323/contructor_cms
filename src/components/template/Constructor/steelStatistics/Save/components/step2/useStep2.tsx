@@ -8,6 +8,9 @@ import { toastError, toastSuccess } from "@/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import router, { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { getAssemblyDetail } from "@/service/constructor/Assembly/getDetail";
 export type Step2Data = {
   steelProjectAssemblyMaps: AssemblyTableRow[];
 };
@@ -152,17 +155,27 @@ export default function useStep2(detailData?: any) {
   // };
   const addSteelToAssemblyRow = (assemblyId: number, steelRow: any) => {
     setTableData((prev) =>
+      prev.map((assembly) => {
+        if (assembly.id !== assemblyId) return assembly;
+
+        const isExist = assembly.steels?.some((s) => s.id === steelRow.id);
+
+        if (isExist) return assembly; // 👈 KHÔNG ADD NẾU TRÙNG
+
+        return {
+          ...assembly,
+          steels: [...(assembly.steels || []), steelRow],
+        };
+      }),
+    );
+  };
+  const setSteelsForAssembly = (assemblyId: number, steels: any[]) => {
+    setTableData((prev) =>
       prev.map((assembly) =>
-        assembly.id === assemblyId
-          ? {
-              ...assembly,
-              steels: [...(assembly.steels || []), steelRow],
-            }
-          : assembly,
+        assembly.id === assemblyId ? { ...assembly, steels } : assembly,
       ),
     );
   };
-
   const columns = useMemo(() => {
     const baseColumns: Array<{
       header: string;
@@ -198,18 +211,109 @@ export default function useStep2(detailData?: any) {
     return baseColumns;
   }, [isView]);
 
+  // useEffect(() => {
+  //   if (!detailData?.steelProjectAssemblyMaps) return;
+
+  //   setTableData(
+  //     detailData.steelProjectAssemblyMaps.map((item: any) => ({
+  //       id: item.id,
+  //       assemblyName: item.assemblyName,
+  //       sameQuantity: item.sameQuantity ?? 1,
+  //       steels: item.steels ?? [],
+  //     })),
+  //   );
+  // }, [detailData]);
+
   useEffect(() => {
     if (!detailData?.steelProjectAssemblyMaps) return;
 
-    setTableData(
-      detailData.steelProjectAssemblyMaps.map((item: any) => ({
-        id: item.id,
-        assemblyName: item.assemblyName,
-        sameQuantity: item.sameQuantity ?? 1,
-        steels: item.steels ?? [],
-      })),
-    );
+    const loadData = async () => {
+      const assemblies = await Promise.all(
+        detailData.steelProjectAssemblyMaps.map(async (item: any) => {
+          const res = await getAssemblyDetail(item.id); // API lấy steels
+          return {
+            id: item.id,
+            assemblyName: item.assemblyName,
+            sameQuantity: item.sameQuantity ?? 1,
+            steels: res.data || [],
+          };
+        }),
+      );
+
+      setTableData(assemblies);
+    };
+
+    loadData();
   }, [detailData]);
+  const handleExportExcel = () => {
+    if (!tableData.length) {
+      alert("Không có dữ liệu để export");
+      return;
+    }
+
+    let currentRow = 1; // vì sheet bắt đầu từ row 1
+    const merges: any[] = [];
+
+    const exportData = tableData.flatMap((assembly, index) => {
+      const steels = assembly.steels?.length ? assembly.steels : [{}];
+
+      const startRow = currentRow;
+
+      const rows = steels.map((steel: any, steelIndex: number) => {
+        const soLuong1CK = Number(steel.barQuantity) || 0;
+        const soLuongCauKien = Number(assembly.sameQuantity) || 0;
+        const lengthMm = Number(steel.length) || 0;
+        const diameter = Number(steel.barDiameter) || 0;
+
+        const tongSoLuong = soLuong1CK * soLuongCauKien;
+        const tongChieuDai = (lengthMm * soLuong1CK * soLuongCauKien) / 1000;
+
+        const lengthM = lengthMm / 1000;
+        const tongTrongLuong =
+          (lengthM * soLuong1CK * diameter * diameter * soLuongCauKien) / 162.2;
+
+        currentRow++;
+
+        return {
+          STT_CauKien: steelIndex === 0 ? index + 1 : "",
+          Ten_Cau_Kien: steelIndex === 0 ? assembly.assemblyName : "",
+          So_Luong_Cau_Kien: steelIndex === 0 ? soLuongCauKien : "",
+
+          So_Hieu: steel.barCode || "",
+          Duong_Kinh: diameter,
+          So_Luong_1_CK: soLuong1CK,
+          Chieu_Dai_mm: lengthMm,
+
+          Tong_So_Luong: tongSoLuong,
+          Tong_Chieu_Dai_m: tongChieuDai.toFixed(2),
+          Tong_Trong_Luong_kg: tongTrongLuong.toFixed(2),
+        };
+      });
+
+      const endRow = currentRow - 1;
+
+      // 👇 Nếu có nhiều hơn 1 dòng thì merge
+      if (endRow > startRow) {
+        merges.push(
+          { s: { r: startRow, c: 0 }, e: { r: endRow, c: 0 } }, // STT
+          { s: { r: startRow, c: 1 }, e: { r: endRow, c: 1 } }, // Ten_Cau_Kien
+          { s: { r: startRow, c: 2 }, e: { r: endRow, c: 2 } }, // So_Luong_Cau_Kien
+        );
+      }
+
+      return rows;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    // 👇 Gán merge vào sheet
+    worksheet["!merges"] = merges;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "ThongKeThep");
+
+    XLSX.writeFile(workbook, "ThongKeThep.xlsx");
+  };
   return [
     {
       onSubmitCreate,
@@ -219,6 +323,8 @@ export default function useStep2(detailData?: any) {
       addAssemblyToTable,
       removeAssemblyFromTable,
       addSteelToAssemblyRow,
+      handleExportExcel,
+      setSteelsForAssembly,
     },
     { columns, tableData, control, setValue, isView },
   ] as const;

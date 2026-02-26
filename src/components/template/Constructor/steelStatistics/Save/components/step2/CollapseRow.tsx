@@ -1,5 +1,5 @@
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 // import QCDetail from "../components/QCDetail";
 // import QCCoupon from "../components/QCCoupon";
 // import { useQueryReceiptQCDetail } from "@/service/manufactory/productionSlip/getRecepi";
@@ -24,9 +24,11 @@ import { useByAssemblyDetailQuery } from "@/service/constructor/Assembly/getDeta
 const CollapseRow = ({
   row,
   onAddSteel,
+  onSetSteels,
 }: {
   row: AssemblyTableRow;
   onAddSteel: (assemblyId: number, steel: any) => void;
+  onSetSteels: (assemblyId: number, steels: any[]) => void;
 }) => {
   const { showDialog } = useDialog();
   const searchParams = useSearchParams();
@@ -64,7 +66,11 @@ const CollapseRow = ({
       toastError("Lỗi khi xóa cấu kiện");
     },
   });
-
+  useEffect(() => {
+    if (isView && data?.data) {
+      onSetSteels(row.id, data.data);
+    }
+  }, [isView, data]);
   return (
     <CoreNavbar
       isFitContent={true}

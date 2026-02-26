@@ -35,6 +35,8 @@ export default function Step2(props: Props) {
     addAssemblyToTable,
     removeAssemblyFromTable,
     addSteelToAssemblyRow,
+    handleExportExcel,
+    setSteelsForAssembly,
   } = handle;
   // console.log("addSteelToAssemblyRow", detailData);
   useEffect(() => {
@@ -172,11 +174,14 @@ export default function Step2(props: Props) {
               <CollapseRow
                 row={row}
                 onAddSteel={addSteelToAssemblyRow} // ⭐
+                onSetSteels={setSteelsForAssembly} // ⭐
               />
             );
           }}
         />
+        <CoreButton onClick={handleExportExcel}>Export Excel</CoreButton>
       </Grid>
+
       {!isView && (
         <div className="flex justify-center mt-15 m-auto">
           <div className="m-5">
