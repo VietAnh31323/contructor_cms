@@ -1,36 +1,25 @@
 import {
-  Autocomplete,
-  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Grid,
-  TextField,
 } from "@mui/material";
-import Image from "next/image";
-import statistics from "@/assets/svg/statistics.svg";
-import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
 import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
 
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
-import { useForm, useFormContext } from "react-hook-form";
-import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import CoreSwitch from "@/components/atoms/CoreSwitch";
 import { ROUTES } from "@/routes";
 import useProgressProjectSave from "./useProgressProjectSave";
 import CoreLoading from "@/components/molecules/CoreLoading";
 import { TopAction } from "@/components/molecules/TopAction";
 import router from "next/router";
-import { deleteCategory } from "@/service/constructor/Category/delete";
 import { toastError, toastSuccess } from "@/toast";
 import { useDialog } from "@/components/hooks/dialog/useDialog";
-import { deleteProgressProject } from "@/service/constructor/ProgressProject/delete";
+import { deleteProgress } from "@/service/constructor/Progress/delete";
 export default function ProgressProjectSave() {
   const [value, handle] = useProgressProjectSave();
   const { isView, control, isLoading, id } = value;
@@ -47,7 +36,7 @@ export default function ProgressProjectSave() {
             color="error"
             onClick={async () => {
               try {
-                await deleteProgressProject({ id });
+                await deleteProgress({ id });
                 toastSuccess("Xóa thành công!");
                 hideDialog();
                 router.push(ROUTES.PROGRESS_PROJECT);

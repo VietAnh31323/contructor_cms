@@ -1,23 +1,20 @@
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 
 import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
-import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { useForm } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
-import useProgressProjectList from "./useProgressManageList";
 import { ROUTES } from "@/routes";
 import router from "next/router";
 import useProgressManageList from "./useProgressManageList";
 
 export default function ProgressManageList() {
-  const [value, handle] = useProgressManageList();
+  const [value] = useProgressManageList();
 
-  const { columns, tableData, page, rowsPerPage } = value;
-  const { setPage, setRowsPerPage } = handle;
+  const { columns, tableData, page } = value;
   const { control } = useForm();
   return (
     <Grid

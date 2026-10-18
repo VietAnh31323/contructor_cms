@@ -2,7 +2,7 @@ import { ConsApi } from "@/config/axios";
 import { Response } from "./type";
 import { useQuery } from "@tanstack/react-query";
 
-export const getProgressProjectDetail = async (
+export const getProgressDetail = async (
   id: number
 ): Promise<Response["GET"]> => {
   const res = await ConsApi.get("/api/v1/progress", {
@@ -16,14 +16,17 @@ export const getProgressProjectDetail = async (
   };
 };
 
-export const useProgressProjectDetailQuery = (
+export const useProgressDetailQuery = (
   id?: number,
   options?: {
     enabled?: boolean;
   }
 ) =>
   useQuery({
-    queryKey: ["progressProject-detail", id],
-    queryFn: () => getProgressProjectDetail(id as number),
+    queryKey: ["progress-detail", id],
+    queryFn: () => getProgressDetail(id as number),
     enabled: !!id && options?.enabled !== false,
   });
+
+export const getProgressProjectDetail = getProgressDetail;
+export const useProgressProjectDetailQuery = useProgressDetailQuery;

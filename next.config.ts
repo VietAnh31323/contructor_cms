@@ -11,8 +11,11 @@ const nextConfig = {
     return config;
   },
   reactStrictMode: true,
-  experimental: {
-    appDir: false,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 

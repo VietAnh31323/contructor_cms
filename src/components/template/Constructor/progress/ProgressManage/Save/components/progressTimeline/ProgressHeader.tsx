@@ -1,16 +1,13 @@
-import { Box, Chip, Grid, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Grid, Typography } from "@mui/material";
 import CoreAutoCompleteAPI from "@/components/atoms/CoreAutoCompleteAPI";
-import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { useForm } from "react-hook-form";
-import { getProgressProjectList } from "@/service/constructor/ProgressProject/getList";
+import { getProgressList } from "@/service/constructor/Progress/getList";
 
 export default function ProgressHeader({
   status,
 }: {
   status: "DONE" | "PROCESSING";
 }) {
-  const [progress, setProgress] = useState<any>(null);
   const { control } = useForm();
   return (
     <Box
@@ -23,7 +20,7 @@ export default function ProgressHeader({
         <Grid item xs={12} sm={12} md={12} lg={12}>
           <CoreAutoCompleteAPI
             variant="standard"
-            fetchDataFn={getProgressProjectList}
+            fetchDataFn={getProgressList}
             control={control}
             name="progress"
             label=""

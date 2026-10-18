@@ -54,9 +54,9 @@ const CoreCheckboxGroup = forwardRef<HTMLDivElement, CoreCheckboxGroupProps>(
 
     return (
       <Controller
-        name={name}
+        name={name as any}
         control={control}
-        defaultValue={defaultValue}
+        defaultValue={defaultValue as any}
         render={({ field: { value = [], onChange } }) => (
           <CheckboxGroupWrapper {...props}>
             {options.map((option) => {

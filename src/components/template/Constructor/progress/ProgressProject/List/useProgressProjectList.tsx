@@ -1,6 +1,6 @@
 import { GREEN, RED } from "@/helper/colors";
-import { useProgressProjectListQuery } from "@/service/constructor/ProgressProject/getList";
-import { RequestBody } from "@/service/constructor/ProgressProject/getList/type";
+import { useProgressListQuery } from "@/service/constructor/Progress/getList";
+import { RequestBody } from "@/service/constructor/Progress/getList/type";
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,7 +29,7 @@ const useProgressProjectList = () => {
 
     setQueryPage(input);
   };
-  const { data, isLoading } = useProgressProjectListQuery();
+  const { data, isLoading } = useProgressListQuery();
   const columns = useMemo(
     () => [
       { header: "Mã tiến trình", fieldName: "code" },

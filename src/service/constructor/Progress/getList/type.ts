@@ -1,6 +1,6 @@
 import { PageResponse } from "@/service/type";
 
-export type ProgressProjectList = {
+export type ProgressList = {
   id: number;
   code: string;
   name: string;
@@ -8,8 +8,10 @@ export type ProgressProjectList = {
   isActive: boolean;
 };
 
+export type ProgressProjectList = ProgressList;
+
 export type Response = {
-  GET: PageResponse<ProgressProjectList[]>;
+  GET: PageResponse<ProgressList[]>;
 };
 
 export type RequestBody = {
