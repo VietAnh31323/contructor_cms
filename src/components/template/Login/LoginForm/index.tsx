@@ -105,8 +105,15 @@ export default function LoginForm() {
               <CoreAutocomplete
                 options={[
                   { label: "Quản trị viên", value: "ADMIN" },
+                  { label: "Giám đốc", value: "DIRECTOR" },
+                  { label: "Quản lý dự án (PM)", value: "PROJECT_MANAGER" },
+                  { label: "Kỹ sư giám sát / Chỉ huy trưởng", value: "SITE_ENGINEER" },
+                  { label: "Kế toán", value: "ACCOUNTANT" },
+                  { label: "Dự toán", value: "ESTIMATOR" },
+                  { label: "Kho", value: "WAREHOUSE" },
+                  { label: "Chăm sóc khách hàng", value: "CUSTOMER_CARE" },
+                  { label: "Khách hàng", value: "CUSTOMER" },
                   { label: "Nhân viên", value: "STAFF" },
-                  { label: "Nhân viên CSKH", value: "CUSTOMER_CARE" },
                 ]}
                 control={control}
                 name="eRole"

@@ -40,9 +40,16 @@ export default function EmployeeSave() {
   const {} = handle;
 
   const [permissions, setPermissions] = useState([
-    { id: 1, label: "Quản lý", checked: true },
-    { id: 2, label: "Nhân viên", checked: false },
-    { id: 3, label: "CSKH", checked: true },
+    { id: 1, label: "Quản trị viên (ADMIN)", checked: false },
+    { id: 2, label: "Giám đốc (DIRECTOR)", checked: false },
+    { id: 3, label: "Quản lý dự án - PM (PROJECT_MANAGER)", checked: false },
+    { id: 4, label: "Kỹ sư giám sát / Chỉ huy trưởng (SITE_ENGINEER)", checked: false },
+    { id: 5, label: "Kế toán (ACCOUNTANT)", checked: false },
+    { id: 6, label: "Dự toán (ESTIMATOR)", checked: false },
+    { id: 7, label: "Kho (WAREHOUSE)", checked: false },
+    { id: 8, label: "Chăm sóc khách hàng (CUSTOMER_CARE)", checked: false },
+    { id: 9, label: "Khách hàng (CUSTOMER)", checked: false },
+    { id: 10, label: "Nhân viên (STAFF)", checked: false },
   ]);
 
   const [selected, setSelected] = useState<Permission[]>([]);
