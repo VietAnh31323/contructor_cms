@@ -1,7 +1,9 @@
 import { BaseResponse } from "@/service/type";
-import { EmployeeList } from "../getList/type";
+import { EmployeeSave } from "../save/type";
 
-export type EmployeeDetail = EmployeeList;
+export type EmployeeDetail = EmployeeSave & {
+  id: number;
+};
 
 export type Response = {
   GET: BaseResponse<EmployeeDetail>;

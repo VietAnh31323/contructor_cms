@@ -14,6 +14,15 @@ export type AdminResetPasswordResult = {
   mustChangePassword: boolean;
 };
 
+export type UnassignedAccount = {
+  id: number;
+  username: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  status?: string;
+  roles?: Role[];
+};
+
 export const getAccountStaffDetail = async (
   accountId: number
 ): Promise<AccountList> => {
@@ -43,6 +52,18 @@ export const useAllRolesQuery = () =>
     queryKey: ["account-all-roles"],
     queryFn: getAllRoles,
     staleTime: 5 * 60 * 1000,
+  });
+
+export const getUnassignedAccounts = async (): Promise<UnassignedAccount[]> => {
+  const res = await ConsApi.get("/api/v1/account/unassigned");
+  return res.data?.data || [];
+};
+
+export const useUnassignedAccountsQuery = (options?: { enabled?: boolean }) =>
+  useQuery({
+    queryKey: ["account-unassigned"],
+    queryFn: getUnassignedAccounts,
+    enabled: options?.enabled !== false,
   });
 
 export const updateAccountRole = async (body: {

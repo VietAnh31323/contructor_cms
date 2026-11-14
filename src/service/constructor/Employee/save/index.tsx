@@ -7,6 +7,6 @@ export const postEmployee = async (body: RequestBody["SAVE"]) => {
 };
 
 export const putEmployee = async (id: number, body: RequestBody["SAVE"]) => {
-  const res = await ConsApi.put(`/api/v1/staff?id=${id}`, body);
+  const res = await ConsApi.put(`/api/v1/staff?id=${id}`, { ...body, id });
   return res.data;
 };

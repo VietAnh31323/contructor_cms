@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 type Props = {
   isFitContent?: boolean;
@@ -17,6 +17,12 @@ type Props = {
 const CoreNavbar = (props: Props) => {
   const { breadcrumbs, isFitContent, tabNumber, maxWidthTab } = props;
   const [currentTab, setCurrentTab] = useState(tabNumber ?? 0);
+
+  useEffect(() => {
+    if (typeof tabNumber === "number") {
+      setCurrentTab(tabNumber);
+    }
+  }, [tabNumber]);
 
   return (
     <div>

@@ -21,6 +21,7 @@ import { ROUTES } from "@/routes";
 import useAccountSave from "./useAccountSave";
 import CoreLoading from "@/components/molecules/CoreLoading";
 import { TopAction } from "@/components/molecules/TopAction";
+import { POSITION_OPTIONS } from "../../employee/constants";
 import router from "next/router";
 
 export default function AccountSave() {
@@ -176,16 +177,7 @@ export default function AccountSave() {
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreAutocomplete
-                        options={[
-                          { label: "Kiến trúc sư", value: "ARCHITECT" },
-                          { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
-                          {
-                            label: "Kĩ sư kết cấu",
-                            value: "STRUCTURAL_ENGINEER",
-                          },
-                          { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
-                          { label: "Dự toán viên", value: "SUPERVISOR" },
-                        ]}
+                        options={POSITION_OPTIONS}
                         control={control}
                         name="position"
                         label="Chức vụ"
