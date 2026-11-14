@@ -3,12 +3,20 @@ import { PageResponse } from "@/service/type";
 export type AccountList = {
   id: number;
   username: string;
+  firstName?: string;
+  lastName?: string;
+  status?: "ACTIVE" | "LOCKED" | "INACTIVE";
+  mustChangePassword?: boolean;
+  failedLoginAttempts?: number;
+  lockedUntil?: string;
+  createdAt?: string;
   roles: Role[];
-  staff: Staff;
+  staff?: Staff;
 };
 export interface Role {
   id: number;
   name: string;
+  description?: string;
 }
 
 export interface Staff {
@@ -33,6 +41,7 @@ export type Response = {
 export type RequestBody = {
   GET: {
     search?: string;
+    accountStatus?: string | null;
     page?: number;
     size?: number;
   };

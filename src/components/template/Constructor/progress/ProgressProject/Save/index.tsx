@@ -20,11 +20,25 @@ import router from "next/router";
 import { toastError, toastSuccess } from "@/toast";
 import { useDialog } from "@/components/hooks/dialog/useDialog";
 import { deleteProgress } from "@/service/constructor/Progress/delete";
+import { usePermission } from "@/components/hooks/permission/usePermission";
+import { PERMISSIONS } from "@/helper/permissions";
+import { ActionType } from "@/components/molecules/TopAction";
 export default function ProgressProjectSave() {
   const [value, handle] = useProgressProjectSave();
   const { isView, control, isLoading, id } = value;
   const { onSubmit } = handle;
   const { showDialog, hideDialog } = useDialog();
+  const { hasPermission } = usePermission();
+  const canUpdateProgress = hasPermission([
+    PERMISSIONS.PROGRESS_UPDATE,
+    PERMISSIONS.PROJECT_UPDATE,
+  ]);
+  const topActions: ActionType[] = [
+    ...(hasPermission(PERMISSIONS.PROJECT_DELETE)
+      ? (["delete"] as ActionType[])
+      : []),
+    ...(canUpdateProgress ? (["edit"] as ActionType[]) : []),
+  ];
   const handleDelete = (id: number) => {
     showDialog(
       <Dialog open onClose={hideDialog}>
@@ -79,9 +93,9 @@ export default function ProgressProjectSave() {
           breadcrumbs={[
             {
               title: isView ? "Chi tiết" : "Chỉnh sửa",
-              rightAction: isView && (
+              rightAction: isView && topActions.length > 0 && (
                 <TopAction
-                  actionList={["delete", "edit"]}
+                  actionList={topActions}
                   onEditAction={() => {
                     router.push({
                       pathname: `${ROUTES.PROGRESS_PROJECT}/[id]`,
@@ -133,19 +147,25 @@ export default function ProgressProjectSave() {
                       />
                     </Grid>
                   </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton onClick={() => {}} theme="cancel">
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton
-                      onClick={() => {}}
-                      theme="submit"
-                      type="submit"
-                      loading={isLoading}
-                    >
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+                  {!isView && (
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton
+                        onClick={() => router.push(ROUTES.PROGRESS_PROJECT)}
+                        theme="cancel"
+                      >
+                        {"Hủy bỏ"}
+                      </CoreButton>
+                      {canUpdateProgress && (
+                        <CoreButton
+                          theme="submit"
+                          type="submit"
+                          loading={isLoading}
+                        >
+                          {"Lưu"}
+                        </CoreButton>
+                      )}
+                    </div>
+                  )}
                 </form>
               ),
             },

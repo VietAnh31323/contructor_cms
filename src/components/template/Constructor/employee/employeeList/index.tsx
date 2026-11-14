@@ -12,6 +12,8 @@ import { useForm } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
 import { ROUTES } from "@/routes";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function Employee() {
   const [value, handle] = useEmployeeList();
@@ -69,16 +71,18 @@ export default function Employee() {
             </Grid>
           </Grid>
         </form>
-        <div className="flex justify-end py-5">
-          <CoreButton
-            onClick={() => {
-              router.push(ROUTES.EMPLOYEE + "/addNew");
-            }}
-            theme="submit"
-          >
-            {"Thêm mới"}
-          </CoreButton>
-        </div>
+        <Can permission={PERMISSIONS.USER_MANAGE}>
+          <div className="flex justify-end py-5">
+            <CoreButton
+              onClick={() => {
+                router.push(ROUTES.EMPLOYEE + "/addNew");
+              }}
+              theme="submit"
+            >
+              {"Thêm mới"}
+            </CoreButton>
+          </div>
+        </Can>
         <CoreTable
           tableName="abc"
           columns={columns || []}

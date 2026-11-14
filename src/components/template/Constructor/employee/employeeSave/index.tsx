@@ -34,12 +34,16 @@ import { TopAction } from "@/components/molecules/TopAction";
 import CoreLoading from "@/components/molecules/CoreLoading";
 import CoreInput from "@/components/atoms/CoreInput";
 import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
+import { usePermission } from "@/components/hooks/permission/usePermission";
+import { PERMISSIONS } from "@/helper/permissions";
 export default function EmployeeSave() {
   const [value, handle] = useEmployeeSave();
   const [date, setDate] = useState<Date | null>(null);
   const { isView, control, isLoading, id } = value;
   const { onSubmit } = handle;
   const { showDialog, hideDialog } = useDialog();
+  const { hasPermission } = usePermission();
+  const canManageUser = hasPermission(PERMISSIONS.USER_MANAGE);
 
   const handleDelete = (id: number) => {
     showDialog(
@@ -93,7 +97,7 @@ export default function EmployeeSave() {
           breadcrumbs={[
             {
               title: "Thêm mới",
-              rightAction: isView && (
+              rightAction: isView && canManageUser && (
                 <TopAction
                   actionList={["delete", "edit"]}
                   onEditAction={() => {
@@ -258,16 +262,21 @@ export default function EmployeeSave() {
                   </Grid>
                   {!isView && (
                     <div className="py-4 flex justify-center gap-4 items-center">
-                      <CoreButton onClick={() => {}} theme="cancel">
+                      <CoreButton
+                        onClick={() => router.push(ROUTES.EMPLOYEE)}
+                        theme="cancel"
+                      >
                         Hủy bỏ
                       </CoreButton>
-                      <CoreButton
-                        theme="submit"
-                        type="submit"
-                        loading={isLoading}
-                      >
-                        Lưu
-                      </CoreButton>
+                      {canManageUser && (
+                        <CoreButton
+                          theme="submit"
+                          type="submit"
+                          loading={isLoading}
+                        >
+                          Lưu
+                        </CoreButton>
+                      )}
                     </div>
                   )}
                 </form>

@@ -13,6 +13,8 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
 import useCategoryList from "./useCategoryList";
 import { ROUTES } from "@/routes";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function CategoryList() {
   const [value, handle] = useCategoryList();
@@ -71,16 +73,20 @@ export default function CategoryList() {
             </Grid>
           </Grid>
         </form>
-        <div className="flex justify-end pb-5">
-          <CoreButton
-            onClick={() => {
-              router.push(ROUTES.CATEGORY);
-            }}
-            theme="submit"
-          >
-            Thêm mới
-          </CoreButton>
-        </div>
+        <Can
+          permission={[PERMISSIONS.PROJECT_CREATE, PERMISSIONS.PROJECT_UPDATE]}
+        >
+          <div className="flex justify-end pb-5">
+            <CoreButton
+              onClick={() => {
+                router.push(ROUTES.CATEGORY + "/addNew");
+              }}
+              theme="submit"
+            >
+              Thêm mới
+            </CoreButton>
+          </div>
+        </Can>
         <CoreTable
           tableName="abc"
           columns={columns || []}

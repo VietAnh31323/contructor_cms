@@ -13,6 +13,8 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreTable } from "@/components/organism/CoreTable";
 import useConstructionProjectList from "./useConstructionProjectList";
 import { ROUTES } from "@/routes";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function ConstructionProjectList() {
   const [value, handle] = useConstructionProjectList();
@@ -71,16 +73,18 @@ export default function ConstructionProjectList() {
             </Grid>
           </Grid>
         </form>
-        <div className="flex justify-end py-5">
-          <CoreButton
-            onClick={() => {
-              router.push(ROUTES.PROJECT + "/addNew");
-            }}
-            theme="submit"
-          >
-            {"Thêm mới"}
-          </CoreButton>
-        </div>
+        <Can permission={PERMISSIONS.PROJECT_CREATE}>
+          <div className="flex justify-end py-5">
+            <CoreButton
+              onClick={() => {
+                router.push(ROUTES.PROJECT + "/addNew");
+              }}
+              theme="submit"
+            >
+              {"Thêm mới"}
+            </CoreButton>
+          </div>
+        </Can>
         <CoreTable
           tableName="abc"
           columns={columns || []}

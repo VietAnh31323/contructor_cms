@@ -1,6 +1,6 @@
 // src/routes.ts
 export const MENU_URL = {
-  DASHBOARD: "http://localhost:3000/",
+  DASHBOARD: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000/",
 };
 export const ROUTES = {
   HOME: "/",
@@ -12,6 +12,7 @@ export const ROUTES = {
   INFORMATION: "/Dashboard/Information",
   FORGOTPASS: "/Dashboard/ForgotPass",
   ACCOUNT: "/Constructor/Account",
+  AUDIT_LOG: "/Constructor/AuditLog",
   CUSTOMER: "/Constructor/Customer",
   PROGRESS_PROJECT: "/Constructor/Progress/ProgressProject",
   PROGRESS_PROJECT_ADD: "/Constructor/Progress/ProgressProject/addNew",

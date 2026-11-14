@@ -13,6 +13,8 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import router from "next/router";
 import { CoreTable } from "@/components/organism/CoreTable";
 import { ROUTES } from "@/routes";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function CustomerList() {
   const [value, handle] = useCustomerList();
@@ -73,16 +75,18 @@ export default function CustomerList() {
             </Grid>
           </Grid>
         </form>
-        <div className="flex justify-end py-5">
-          <CoreButton
-            onClick={() => {
-              router.push(ROUTES.CUSTOMER + "/addNew");
-            }}
-            theme="submit"
-          >
-            {"Thêm mới"}
-          </CoreButton>
-        </div>
+        <Can permission={PERMISSIONS.CUSTOMER_MANAGE}>
+          <div className="flex justify-end py-5">
+            <CoreButton
+              onClick={() => {
+                router.push(ROUTES.CUSTOMER + "/addNew");
+              }}
+              theme="submit"
+            >
+              {"Thêm mới"}
+            </CoreButton>
+          </div>
+        </Can>
         <CoreTable
           tableName="abc"
           columns={columns || []}

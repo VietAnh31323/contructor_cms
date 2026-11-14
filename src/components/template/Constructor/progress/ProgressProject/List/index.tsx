@@ -10,6 +10,8 @@ import { CoreTable } from "@/components/organism/CoreTable";
 import useProgressProjectList from "./useProgressProjectList";
 import { ROUTES } from "@/routes";
 import router from "next/router";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function ProgressProjectList() {
   const [value] = useProgressProjectList();
@@ -68,16 +70,20 @@ export default function ProgressProjectList() {
             </Grid>
           </Grid>
         </form>
-        <div className="flex justify-end py-5">
-          <CoreButton
-            onClick={() => {
-              router.push(ROUTES.PROGRESS_PROJECT + "/addNew");
-            }}
-            theme="submit"
-          >
-            {"Thêm mới "}
-          </CoreButton>
-        </div>
+        <Can
+          permission={[PERMISSIONS.PROGRESS_UPDATE, PERMISSIONS.PROJECT_UPDATE]}
+        >
+          <div className="flex justify-end py-5">
+            <CoreButton
+              onClick={() => {
+                router.push(ROUTES.PROGRESS_PROJECT + "/addNew");
+              }}
+              theme="submit"
+            >
+              {"Thêm mới "}
+            </CoreButton>
+          </div>
+        </Can>
         <CoreTable
           tableName="abc"
           columns={columns || []}

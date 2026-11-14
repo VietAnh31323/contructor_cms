@@ -17,6 +17,8 @@ import { ROUTES } from "@/routes";
 import useProgressManageSave from "./useProgressManageSave";
 import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
 import ProgressTimeline from "./components/progressTimeline/ProgressTimeline";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 export default function ProgressManageSave() {
   const [value, handle] = useProgressManageSave();
   const { control } = useForm();
@@ -103,9 +105,16 @@ export default function ProgressManageSave() {
                     <CoreButton onClick={() => {}} theme="cancel">
                       {"Hủy bỏ"}
                     </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
+                    <Can
+                      permission={[
+                        PERMISSIONS.PROGRESS_UPDATE,
+                        PERMISSIONS.TASK_UPDATE,
+                      ]}
+                    >
+                      <CoreButton onClick={() => {}} theme="submit">
+                        {"Lưu"}
+                      </CoreButton>
+                    </Can>
                   </div>
                 </div>
               ),

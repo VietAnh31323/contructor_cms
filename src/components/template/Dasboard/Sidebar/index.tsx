@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 
@@ -13,18 +12,59 @@ import {
   AutoGraphOutlined,
   SupportAgentOutlined,
   AnalyticsOutlined,
+  HistoryEduOutlined,
   MenuOpen,
 } from "@mui/icons-material";
 import { ROUTES } from "@/routes";
 import router from "next/router";
+import { usePermission } from "@/components/hooks/permission/usePermission";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function AppSidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const [collapsed, setCollapsed] = useState(false);
+  const { hasPermission } = usePermission();
 
-  // check active
   const isActive = (path: string) =>
     pathname === path || pathname.startsWith(path + "/");
+
+  const canViewProject = hasPermission([
+    PERMISSIONS.PROJECT_VIEW,
+    PERMISSIONS.PROJECT_CREATE,
+    PERMISSIONS.PROJECT_UPDATE,
+    PERMISSIONS.PROJECT_DELETE,
+  ]);
+
+  const canViewUser = hasPermission([
+    PERMISSIONS.USER_VIEW,
+    PERMISSIONS.USER_MANAGE,
+  ]);
+
+  const canViewSteel = hasPermission([
+    PERMISSIONS.MATERIAL_VIEW,
+    PERMISSIONS.MATERIAL_MANAGE,
+    PERMISSIONS.PROJECT_VIEW,
+  ]);
+
+  const canCreateSteel = hasPermission([
+    PERMISSIONS.MATERIAL_MANAGE,
+    PERMISSIONS.PROJECT_CREATE,
+    PERMISSIONS.PROJECT_UPDATE,
+  ]);
+
+  const canViewCustomer = hasPermission([
+    PERMISSIONS.CUSTOMER_VIEW,
+    PERMISSIONS.CUSTOMER_MANAGE,
+  ]);
+
+  const canViewProgress = hasPermission([
+    PERMISSIONS.PROGRESS_VIEW,
+    PERMISSIONS.PROGRESS_UPDATE,
+    PERMISSIONS.TASK_VIEW,
+    PERMISSIONS.TASK_UPDATE,
+  ]);
+
+  const canViewAuditLog = hasPermission([PERMISSIONS.AUDIT_LOG_VIEW]);
 
   return (
     <Sidebar
@@ -64,97 +104,122 @@ export default function AppSidebar() {
         </MenuItem>
 
         {/* --- Dự án xây dựng (Submenu) --- */}
-        <SubMenu
-          icon={<ConstructionOutlined />}
-          label="Dự án xây dựng"
-          defaultOpen={true}
-        >
-          <MenuItem
-            onClick={() => {
-              router.push(ROUTES.PROJECT);
-            }}
-            active={isActive(ROUTES.PROJECT)}
+        {canViewProject && (
+          <SubMenu
+            icon={<ConstructionOutlined />}
+            label="Dự án xây dựng"
+            defaultOpen={true}
           >
-            Danh sách dự án
-          </MenuItem>
+            <MenuItem
+              onClick={() => {
+                router.push(ROUTES.PROJECT);
+              }}
+              active={isActive(ROUTES.PROJECT)}
+            >
+              Danh sách dự án
+            </MenuItem>
 
-          <MenuItem
-            onClick={() => {
-              router.push(ROUTES.CATEGORY);
-            }}
-            active={isActive(ROUTES.CATEGORY)}
-          >
-            Hạng mục dự án
-          </MenuItem>
-        </SubMenu>
+            <MenuItem
+              onClick={() => {
+                router.push(ROUTES.CATEGORY);
+              }}
+              active={isActive(ROUTES.CATEGORY)}
+            >
+              Hạng mục dự án
+            </MenuItem>
+          </SubMenu>
+        )}
 
         {/* --- Nhân sự --- */}
-        <SubMenu icon={<PersonPinOutlined />} label="Nhân sự">
-          <MenuItem
-            onClick={() => {
-              router.push(ROUTES.EMPLOYEE);
-            }}
-            active={isActive(ROUTES.EMPLOYEE)}
-          >
-            Danh sách nhân sự
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              router.push(ROUTES.ACCOUNT);
-            }}
-            active={isActive(ROUTES.ACCOUNT)}
-          >
-            Quản lý tài khoản
-          </MenuItem>
-        </SubMenu>
+        {canViewUser && (
+          <SubMenu icon={<PersonPinOutlined />} label="Nhân sự">
+            <MenuItem
+              onClick={() => {
+                router.push(ROUTES.EMPLOYEE);
+              }}
+              active={isActive(ROUTES.EMPLOYEE)}
+            >
+              Danh sách nhân sự
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                router.push(ROUTES.ACCOUNT);
+              }}
+              active={isActive(ROUTES.ACCOUNT)}
+            >
+              Quản lý tài khoản
+            </MenuItem>
+          </SubMenu>
+        )}
 
         {/* --- Thống kê thép --- */}
-        <SubMenu icon={<AutoGraphOutlined />} label="Thống kê thép">
-          <MenuItem
-            onClick={() => router.push(ROUTES.STEELSTATISTICS)}
-            active={pathname === ROUTES.STEELSTATISTICS}
-          >
-            Dự án thống kê thép
-          </MenuItem>
+        {canViewSteel && (
+          <SubMenu icon={<AutoGraphOutlined />} label="Thống kê thép">
+            <MenuItem
+              onClick={() => router.push(ROUTES.STEELSTATISTICS)}
+              active={pathname === ROUTES.STEELSTATISTICS}
+            >
+              Dự án thống kê thép
+            </MenuItem>
 
-          <MenuItem
-            onClick={() => router.push(ROUTES.STEELSTATISTICSNEW)}
-            active={pathname === ROUTES.STEELSTATISTICSNEW}
-          >
-            Thêm dự án thống kê
-          </MenuItem>
-        </SubMenu>
+            {canCreateSteel && (
+              <MenuItem
+                onClick={() => router.push(ROUTES.STEELSTATISTICSNEW)}
+                active={pathname === ROUTES.STEELSTATISTICSNEW}
+              >
+                Thêm dự án thống kê
+              </MenuItem>
+            )}
+          </SubMenu>
+        )}
 
         {/* --- Khách hàng --- */}
-        <MenuItem
-          icon={<SupportAgentOutlined />}
-          onClick={() => {
-            router.push(ROUTES.CUSTOMER);
-          }}
-          active={isActive(ROUTES.CUSTOMER)}
-        >
-          Khách hàng
-        </MenuItem>
+        {canViewCustomer && (
+          <MenuItem
+            icon={<SupportAgentOutlined />}
+            onClick={() => {
+              router.push(ROUTES.CUSTOMER);
+            }}
+            active={isActive(ROUTES.CUSTOMER)}
+          >
+            Khách hàng
+          </MenuItem>
+        )}
 
         {/* --- Tiến độ dự án --- */}
-        <SubMenu icon={<AnalyticsOutlined />} label="Tiến độ dự án">
+        {canViewProgress && (
+          <SubMenu icon={<AnalyticsOutlined />} label="Tiến độ dự án">
+            <MenuItem
+              onClick={() => {
+                router.push(ROUTES.PROGRESS_MANAGE);
+              }}
+              active={isActive(ROUTES.PROGRESS_MANAGE)}
+            >
+              Danh sách tiến độ dự án
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                router.push(ROUTES.PROGRESS_PROJECT);
+              }}
+              active={isActive(ROUTES.PROGRESS_PROJECT)}
+            >
+              Quản lý tiến trình
+            </MenuItem>
+          </SubMenu>
+        )}
+
+        {/* --- Nhật ký hoạt động (Audit Log) --- */}
+        {canViewAuditLog && (
           <MenuItem
+            icon={<HistoryEduOutlined />}
             onClick={() => {
-              router.push(ROUTES.PROGRESS_MANAGE);
+              router.push(ROUTES.AUDIT_LOG);
             }}
-            active={isActive(ROUTES.PROGRESS_MANAGE)}
+            active={isActive(ROUTES.AUDIT_LOG)}
           >
-            Danh sách tiến độ dự án
+            Nhật ký hoạt động
           </MenuItem>
-          <MenuItem
-            onClick={() => {
-              router.push(ROUTES.PROGRESS_PROJECT);
-            }}
-            active={isActive(ROUTES.PROGRESS_PROJECT)}
-          >
-            Quản lý tiến trình
-          </MenuItem>
-        </SubMenu>
+        )}
       </Menu>
     </Sidebar>
   );

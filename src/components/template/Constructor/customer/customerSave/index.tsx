@@ -35,11 +35,15 @@ import { TopAction } from "@/components/molecules/TopAction";
 import { BLUE, GREEN, ORANGE, RED } from "@/helper/colors";
 import { deleteCustomer } from "@/service/constructor/Customer/delete";
 import CoreCheckbox from "@/components/atoms/CoreCheckbox";
+import { usePermission } from "@/components/hooks/permission/usePermission";
+import { PERMISSIONS } from "@/helper/permissions";
 export default function CustomerSave() {
   const [value, handle] = useCustomerSave();
   const { isView, control, isLoading, id } = value;
   const { onSubmit } = handle;
   const { showDialog, hideDialog } = useDialog();
+  const { hasPermission } = usePermission();
+  const canManageCustomer = hasPermission(PERMISSIONS.CUSTOMER_MANAGE);
 
   const handleDelete = (id: number) => {
     showDialog(
@@ -95,7 +99,7 @@ export default function CustomerSave() {
           breadcrumbs={[
             {
               title: "Chi tiết",
-              rightAction: isView && (
+              rightAction: isView && canManageCustomer && (
                 <TopAction
                   actionList={["delete", "edit"]}
                   onEditAction={() => {
@@ -212,16 +216,21 @@ export default function CustomerSave() {
                   </Grid>
                   {!isView && (
                     <div className="py-4 flex justify-center gap-4 items-center">
-                      <CoreButton onClick={() => {}} theme="cancel">
+                      <CoreButton
+                        onClick={() => router.push(ROUTES.CUSTOMER)}
+                        theme="cancel"
+                      >
                         Hủy bỏ
                       </CoreButton>
-                      <CoreButton
-                        theme="submit"
-                        type="submit"
-                        loading={isLoading}
-                      >
-                        Lưu
-                      </CoreButton>
+                      {canManageCustomer && (
+                        <CoreButton
+                          theme="submit"
+                          type="submit"
+                          loading={isLoading}
+                        >
+                          Lưu
+                        </CoreButton>
+                      )}
                     </div>
                   )}
                 </form>

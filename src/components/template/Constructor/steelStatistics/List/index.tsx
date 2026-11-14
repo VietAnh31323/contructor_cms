@@ -16,6 +16,8 @@ import useSteelStatisticsList from "./useSteelStatisticsList";
 import CoreNavbar from "@/components/organism/CoreNavbar";
 import ProjectCardList from "./components/ProjectCardList";
 import { ROUTES } from "@/routes";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 
 export default function SteelStatisticsList() {
   const [value, handle] = useSteelStatisticsList();
@@ -60,14 +62,22 @@ export default function SteelStatisticsList() {
               lg={4}
               className="flex justify-end items-center"
             >
-              <CoreButton
-                onClick={() => {
-                  router.push(ROUTES.STEELSTATISTICS + "/addNew");
-                }}
-                theme="submit"
+              <Can
+                permission={[
+                  PERMISSIONS.MATERIAL_MANAGE,
+                  PERMISSIONS.PROJECT_CREATE,
+                  PERMISSIONS.PROJECT_UPDATE,
+                ]}
               >
-                Thêm mới
-              </CoreButton>
+                <CoreButton
+                  onClick={() => {
+                    router.push(ROUTES.STEELSTATISTICS + "/addNew");
+                  }}
+                  theme="submit"
+                >
+                  Thêm mới
+                </CoreButton>
+              </Can>
             </Grid>
           </Grid>
         </form>

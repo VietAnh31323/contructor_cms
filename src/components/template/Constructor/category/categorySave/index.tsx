@@ -21,12 +21,29 @@ import {
 import { useState } from "react";
 import { toastSuccess, toastError } from "@/toast";
 import { deleteCategory } from "@/service/constructor/Category/delete";
+import { usePermission } from "@/components/hooks/permission/usePermission";
+import { PERMISSIONS } from "@/helper/permissions";
+import { ActionType } from "@/components/molecules/TopAction";
 
 export default function CategorySave() {
   const [value, handle] = useCategorySave();
   const { isView, control, isLoading, id } = value;
   const { onSubmit } = handle;
   const { showDialog, hideDialog } = useDialog();
+  const { hasPermission } = usePermission();
+
+  const topActions: ActionType[] = [
+    ...(hasPermission(PERMISSIONS.PROJECT_DELETE)
+      ? (["delete"] as ActionType[])
+      : []),
+    ...(hasPermission(PERMISSIONS.PROJECT_UPDATE)
+      ? (["edit"] as ActionType[])
+      : []),
+  ];
+  const canSaveCategory = hasPermission([
+    PERMISSIONS.PROJECT_CREATE,
+    PERMISSIONS.PROJECT_UPDATE,
+  ]);
 
   const handleDelete = (id: number) => {
     showDialog(
@@ -77,9 +94,9 @@ export default function CategorySave() {
           breadcrumbs={[
             {
               title: isView ? "Chi tiết" : "Chỉnh sửa",
-              rightAction: isView && (
+              rightAction: isView && topActions.length > 0 && (
                 <TopAction
-                  actionList={["delete", "edit"]}
+                  actionList={topActions}
                   onEditAction={() => {
                     router.push({
                       pathname: `${ROUTES.CATEGORY}/[id]`,
@@ -132,16 +149,21 @@ export default function CategorySave() {
                   </Grid>
                   {!isView && (
                     <div className="py-4 flex justify-center gap-4 items-center">
-                      <CoreButton onClick={() => {}} theme="cancel">
+                      <CoreButton
+                        onClick={() => router.push(ROUTES.CATEGORY)}
+                        theme="cancel"
+                      >
                         Hủy bỏ
                       </CoreButton>
-                      <CoreButton
-                        theme="submit"
-                        type="submit"
-                        loading={isLoading}
-                      >
-                        Lưu
-                      </CoreButton>
+                      {canSaveCategory && (
+                        <CoreButton
+                          theme="submit"
+                          type="submit"
+                          loading={isLoading}
+                        >
+                          Lưu
+                        </CoreButton>
+                      )}
                     </div>
                   )}
                 </form>

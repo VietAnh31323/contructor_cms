@@ -18,9 +18,10 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import React from "react";
 import router from "next/router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Logout } from "@/service/Login/Logout";
-import { toastError, toastSuccess } from "@/toast";
+import { toastSuccess } from "@/toast";
+import { clearAuthStorage } from "@/config/axios";
 
 export default function Header({
   toggleDark,
@@ -36,19 +37,20 @@ export default function Header({
     setAnchorEl(event.currentTarget);
   };
 
+  const queryClient = useQueryClient();
   const handleClose = () => setAnchorEl(null);
   const { mutate: logoutMutate } = useMutation({
     mutationFn: Logout,
     onSuccess: () => {
       toastSuccess("Đăng xuất thành công");
-
-      // Xóa token ở localStorage hoặc cookie
-      localStorage.removeItem("access_token");
-
+      clearAuthStorage();
+      queryClient.clear();
       router.push(ROUTES.LOGIN);
     },
-    onError: (err: any) => {
-      toastError(err?.message || "Lỗi đăng xuất");
+    onError: () => {
+      clearAuthStorage();
+      queryClient.clear();
+      router.push(ROUTES.LOGIN);
     },
   });
 

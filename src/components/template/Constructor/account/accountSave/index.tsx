@@ -1,76 +1,70 @@
 import {
-  Autocomplete,
   Box,
-  Button,
   Checkbox,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControlLabel,
   Grid,
-  InputAdornment,
-  Paper,
-  TextField,
+  Stack,
   Typography,
 } from "@mui/material";
-import Image from "next/image";
-import statistics from "@/assets/svg/statistics.svg";
-import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
 import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
-import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
-import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { ROUTES } from "@/routes";
 import useAccountSave from "./useAccountSave";
 import CoreLoading from "@/components/molecules/CoreLoading";
+import { TopAction } from "@/components/molecules/TopAction";
 import router from "next/router";
-type Permission = {
-  id: number;
-  label: string;
-};
-export default function EmployeeSave() {
+
+export default function AccountSave() {
   const [value, handle] = useAccountSave();
-  const [date, setDate] = useState<Date | null>(null);
-  const { isView, control, isLoading, id } = value;
-  const {} = handle;
+  const {
+    isView,
+    control,
+    isLoading,
+    id,
+    canManageUser,
+    accountDetail,
+    allRoles,
+    selectedRoles,
+    mustChangePassword,
+    resetResult,
+    isSaving,
+    isMutatingSecurity,
+  } = value;
 
-  const [permissions, setPermissions] = useState([
-    { id: 1, label: "Quản trị viên (ADMIN)", checked: false },
-    { id: 2, label: "Giám đốc (DIRECTOR)", checked: false },
-    { id: 3, label: "Quản lý dự án - PM (PROJECT_MANAGER)", checked: false },
-    { id: 4, label: "Kỹ sư giám sát / Chỉ huy trưởng (SITE_ENGINEER)", checked: false },
-    { id: 5, label: "Kế toán (ACCOUNTANT)", checked: false },
-    { id: 6, label: "Dự toán (ESTIMATOR)", checked: false },
-    { id: 7, label: "Kho (WAREHOUSE)", checked: false },
-    { id: 8, label: "Chăm sóc khách hàng (CUSTOMER_CARE)", checked: false },
-    { id: 9, label: "Khách hàng (CUSTOMER)", checked: false },
-    { id: 10, label: "Nhân viên (STAFF)", checked: false },
-  ]);
+  const {
+    handleToggleRole,
+    setMustChangePassword,
+    setResetResult,
+    getRoleLabel,
+    onSave,
+    onToggleLock,
+    onResetPassword,
+  } = handle;
 
-  const [selected, setSelected] = useState<Permission[]>([]);
+  const isLocked =
+    accountDetail?.status === "LOCKED" ||
+    accountDetail?.status === "INACTIVE" ||
+    Boolean(
+      accountDetail?.lockedUntil &&
+        new Date(accountDetail.lockedUntil) > new Date()
+    );
 
-  const handleToggle = (item: Permission) => {
-    const exists = selected.some((p) => p.id === item.id);
-
-    if (exists) {
-      setSelected(selected.filter((p) => p.id !== item.id));
-    } else {
-      setSelected([...selected, item]);
-    }
-  };
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
@@ -79,7 +73,7 @@ export default function EmployeeSave() {
           <CoreBreadcrumbs
             breadcrumbs={[
               { title: "Quản lý tài khoản", pathname: ROUTES.ACCOUNT },
-              { title: "Thêm mới" },
+              { title: isView ? "Chi tiết tài khoản" : "Phân quyền & Quản trị" },
             ]}
           />
         }
@@ -88,11 +82,79 @@ export default function EmployeeSave() {
         <CoreNavbar
           breadcrumbs={[
             {
-              title: "Phân quyền",
+              title: "Thông tin & Phân quyền",
+              rightAction: isView && canManageUser && (
+                <TopAction
+                  actionList={["edit"]}
+                  onEditAction={() => {
+                    router.push({
+                      pathname: `${ROUTES.ACCOUNT}/[id]`,
+                      query: { id: Number(id) },
+                    });
+                  }}
+                />
+              ),
               content: isLoading ? (
                 <CoreLoading />
               ) : (
-                <form className="flex flex-col py-6 ">
+                <form
+                  className="flex flex-col py-6"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    onSave();
+                  }}
+                >
+                  {/* Trạng thái bảo mật & thao tác nhanh cho Admin */}
+                  <Box
+                    sx={{
+                      mb: 3,
+                      p: 2,
+                      borderRadius: 2,
+                      border: "1px solid #e5e7eb",
+                      bgcolor: "#f9fafb",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
+                      <Typography variant="body2">
+                        Tài khoản:{" "}
+                        <strong>{accountDetail?.username || "—"}</strong>
+                      </Typography>
+                      <Chip
+                        size="small"
+                        label={isLocked ? "Đang khóa" : "Đang hoạt động"}
+                        color={isLocked ? "error" : "success"}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        Số lần đăng nhập sai:{" "}
+                        <strong>{accountDetail?.failedLoginAttempts ?? 0}</strong>
+                      </Typography>
+                    </Stack>
+
+                    {canManageUser && (
+                      <Stack direction="row" spacing={1.5}>
+                        <CoreButton
+                          theme={isLocked ? "submit" : "cancel"}
+                          onClick={onToggleLock}
+                          loading={isMutatingSecurity}
+                        >
+                          {isLocked ? "Mở khóa tài khoản" : "Khóa tài khoản"}
+                        </CoreButton>
+                        <CoreButton
+                          theme="submit"
+                          onClick={onResetPassword}
+                          loading={isMutatingSecurity}
+                        >
+                          Reset mật khẩu
+                        </CoreButton>
+                      </Stack>
+                    )}
+                  </Box>
+
                   <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                     <Grid item xs={12} sm={12} md={4} lg={4}>
                       <CoreInputCustom
@@ -100,7 +162,7 @@ export default function EmployeeSave() {
                         name="code"
                         label="Mã nhân sự"
                         placeholder="Mã nhân sự"
-                        // isViewProp={false}
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={4} lg={4}>
@@ -109,7 +171,7 @@ export default function EmployeeSave() {
                         name="email"
                         label="Email"
                         placeholder="Email nhân sự"
-                        // isViewProp={false}
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -127,26 +189,27 @@ export default function EmployeeSave() {
                         control={control}
                         name="position"
                         label="Chức vụ"
-                        placeholder="Chọn chức vụ"
+                        placeholder="Chức vụ"
                         valuePath="value"
+                        disabled
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
                         name="firstName"
-                        label="First Name"
-                        placeholder="First Name"
-                        // isViewProp={false}
+                        label="Họ đệm"
+                        placeholder="Họ đệm"
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
                       <CoreInputCustom
                         control={control}
                         name="lastName"
-                        label="Last Name"
-                        placeholder="Last Name"
-                        // isViewProp={false}
+                        label="Tên"
+                        placeholder="Tên"
+                        isViewProp={true}
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -154,45 +217,38 @@ export default function EmployeeSave() {
                         control={control}
                         name="phone"
                         label="Số điện thoại"
-                        placeholder="Nhập số điện thoại"
+                        placeholder="Số điện thoại"
+                        isViewProp={true}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreAutocomplete
-                        options={[
-                          { label: "Nam", value: "MALE" },
-                          { label: "Nữ", value: "FEMALE" },
-                        ]}
-                        control={control}
-                        name="gender"
-                        label="Giới tính"
-                        placeholder="Chọn giới tính"
-                        valuePath="value"
+
+                    <Grid item xs={12}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={mustChangePassword}
+                            disabled={isView || !canManageUser}
+                            onChange={(e) =>
+                              setMustChangePassword(e.target.checked)
+                            }
+                          />
+                        }
+                        label="Bắt buộc đổi mật khẩu ở lần đăng nhập kế tiếp"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={4}>
-                      <CoreInputCustom
-                        control={control}
-                        name="address"
-                        label="Địa chỉ"
-                        placeholder="Nhập địa chỉ"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <Typography
-                        style={{
-                          fontWeight: "bold",
-                        }}
-                      >
-                        Phân quyền nhân sự
+
+                    <Grid item xs={12}>
+                      <Typography sx={{ fontWeight: "bold" }}>
+                        Phân quyền vai trò tài khoản
                       </Typography>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <Box display="flex" gap={2}>
+                    <Grid item xs={12}>
+                      <Box display="flex" gap={2} flexWrap="wrap">
                         <Box
                           component="fieldset"
                           sx={{
                             flex: 1,
+                            minWidth: 280,
                             border: "1px solid #ccc",
                             borderRadius: 2,
                             p: 2,
@@ -202,31 +258,32 @@ export default function EmployeeSave() {
                             component="legend"
                             sx={{ px: 1, fontSize: 14, color: "gray" }}
                           >
-                            Danh sách quyền
+                            Danh sách vai trò hệ thống
                           </Box>
 
-                          {permissions.map((item) => (
+                          {allRoles.map((role) => (
                             <FormControlLabel
-                              key={item.id}
+                              key={role.id}
                               control={
                                 <Checkbox
-                                  checked={selected.some(
-                                    (p) => p.id === item.id
+                                  disabled={isView || !canManageUser}
+                                  checked={selectedRoles.some(
+                                    (r) => r.id === role.id
                                   )}
-                                  onChange={() => handleToggle(item)}
+                                  onChange={() => handleToggleRole(role)}
                                 />
                               }
-                              label={item.label}
+                              label={getRoleLabel(role)}
                               sx={{ display: "block", ml: 0 }}
                             />
                           ))}
                         </Box>
 
-                        {/* RIGHT FIELDSET */}
                         <Box
                           component="fieldset"
                           sx={{
                             flex: 1,
+                            minWidth: 280,
                             border: "1px solid #ccc",
                             borderRadius: 2,
                             p: 2,
@@ -236,36 +293,77 @@ export default function EmployeeSave() {
                             component="legend"
                             sx={{ px: 1, fontSize: 14, color: "gray" }}
                           >
-                            Danh sách quyền đã chọn
+                            Vai trò đã gán ({selectedRoles.length})
                           </Box>
 
-                          {selected.map((item) => (
-                            <Box key={item.id} sx={{ py: 0.5 }}>
-                              {item.label}
+                          {selectedRoles.map((role) => (
+                            <Box key={role.id} sx={{ py: 0.5 }}>
+                              • {getRoleLabel(role)}
                             </Box>
                           ))}
                         </Box>
                       </Box>
                     </Grid>
                   </Grid>
-                  <div className="py-4 flex justify-center gap-4 items-center">
-                    <CoreButton
-                      onClick={() => {
-                        router.push(ROUTES.ACCOUNT);
-                      }}
-                      theme="cancel"
-                    >
-                      {"Hủy bỏ"}
-                    </CoreButton>
-                    <CoreButton onClick={() => {}} theme="submit">
-                      {"Lưu"}
-                    </CoreButton>
-                  </div>
+
+                  {!isView && (
+                    <div className="py-4 flex justify-center gap-4 items-center">
+                      <CoreButton
+                        onClick={() => router.push(ROUTES.ACCOUNT)}
+                        theme="cancel"
+                      >
+                        Hủy bỏ
+                      </CoreButton>
+                      {canManageUser && (
+                        <CoreButton
+                          theme="submit"
+                          type="submit"
+                          loading={isSaving}
+                        >
+                          Lưu
+                        </CoreButton>
+                      )}
+                    </div>
+                  )}
                 </form>
               ),
             },
           ]}
         />
+
+        {/* Dialog kết quả Reset mật khẩu */}
+        <Dialog
+          open={Boolean(resetResult)}
+          onClose={() => setResetResult(null)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>Đã cấp mật khẩu tạm thời</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              Tài khoản: <strong>{resetResult?.username}</strong>
+            </Typography>
+            <Box
+              sx={{
+                bgcolor: "#f3f4f6",
+                p: 1.5,
+                borderRadius: 1,
+                fontFamily: "monospace",
+                fontWeight: 700,
+              }}
+            >
+              {resetResult?.temporaryPassword}
+            </Box>
+            <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: "block" }}>
+              * Người dùng bắt buộc phải đổi mật khẩu khi đăng nhập lại.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <CoreButton theme="submit" onClick={() => setResetResult(null)}>
+              Đóng
+            </CoreButton>
+          </DialogActions>
+        </Dialog>
       </PageContainer>
     </Grid>
   );

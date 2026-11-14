@@ -29,6 +29,8 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import NineDot from "@/components/icons/NineDot";
 import { Action } from "@/components/molecules/Action";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
+import Can from "@/components/atoms/Can";
+import { PERMISSIONS } from "@/helper/permissions";
 export default function ConstructionProjectSave() {
   const {
     setPage,
@@ -486,9 +488,16 @@ export default function ConstructionProjectSave() {
                       <CoreButton onClick={() => {}} theme="cancel">
                         {"Hủy bỏ"}
                       </CoreButton>
-                      <CoreButton onClick={() => {}} theme="submit">
-                        {"Lưu"}
-                      </CoreButton>
+                      <Can
+                        permission={[
+                          PERMISSIONS.PROJECT_CREATE,
+                          PERMISSIONS.PROJECT_UPDATE,
+                        ]}
+                      >
+                        <CoreButton onClick={() => {}} theme="submit">
+                          {"Lưu"}
+                        </CoreButton>
+                      </Can>
                     </div>
                   </form>
                 </FormProvider>
