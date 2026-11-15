@@ -4,6 +4,7 @@ export const MENU_URL = {
 };
 export const ROUTES = {
   HOME: "/",
+  LANDING: "/landing",
   LOGIN: "/login",
   RESET_PASSWORD: "/ressetPass",
   DASHBOARD: "/Dashboard",

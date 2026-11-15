@@ -246,7 +246,12 @@ export default function Account() {
                 border: "1px solid #d1d5db",
               }}
             >
-              <Typography sx={{ fontFamily: "monospace", fontWeight: 700 }}>
+              <Typography
+                sx={{
+                  fontFamily: "var(--font-mono), monospace",
+                  fontWeight: 700,
+                }}
+              >
                 {resetResult?.temporaryPassword}
               </Typography>
               <Tooltip title="Sao chép">

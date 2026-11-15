@@ -1,12 +1,71 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Poppins", sans-serif;
-  margin: 0;
+:root {
+  --font-sans: "Be Vietnam Pro", "Inter", "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", Consolas, "Courier New",
+    monospace;
+  --toastify-font-family: var(--font-sans);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    margin: 0;
+    line-height: 1.55;
+    letter-spacing: normal;
+  }
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Đồng bộ font cho Toastify, Rich Text (Quill), Datepicker và Sidebar */
+.Toastify__toast,
+.Toastify__toast-body {
+  font-family: var(--font-sans) !important;
+}
+
+.ql-container,
+.ql-editor,
+.ql-toolbar {
+  font-family: var(--font-sans) !important;
+}
+
+.react-datepicker,
+.react-datepicker__header,
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day {
+  font-family: var(--font-sans) !important;
+}
+
+.pro-sidebar {
+  font-family: var(--font-sans) !important;
 }
 
 .Login {

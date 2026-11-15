@@ -8,7 +8,29 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
+        sans: [
+          '"Be Vietnam Pro"',
+          '"Inter"',
+          '"Segoe UI"',
+          "Roboto",
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif",
+        ],
+        poppins: [
+          '"Be Vietnam Pro"',
+          '"Inter"',
+          '"Segoe UI"',
+          "Roboto",
+          "sans-serif",
+        ],
+        mono: [
+          '"JetBrains Mono"',
+          '"Cascadia Mono"',
+          "Consolas",
+          '"Courier New"',
+          "monospace",
+        ],
       },
     },
   },

@@ -132,10 +132,24 @@ export const POSITION_DEFAULT_ROLES: Record<string, string[]> = {
 
 export const PROJECT_STATE_META: Record<
   string,
-  { label: string; color: "default" | "info" | "success" | "warning" | "error" }
+  {
+    label: string;
+    color: "default" | "primary" | "secondary" | "info" | "success" | "warning" | "error";
+  }
 > = {
-  NOT_STARTED: { label: "Chưa bắt đầu", color: "default" },
-  IN_PROGRESS: { label: "Đang thi công", color: "info" },
+  RECEIVED: { label: "Tiếp nhận", color: "default" },
+  SURVEYING: { label: "Khảo sát", color: "info" },
+  QUOTED: { label: "Báo giá", color: "warning" },
+  CONTRACT_SIGNED: { label: "Ký HĐ", color: "primary" },
+  IN_CONSTRUCTION: { label: "Thi công", color: "warning" },
+  ACCEPTANCE: { label: "Nghiệm thu", color: "secondary" },
+  HANDOVER: { label: "Bàn giao", color: "success" },
+  WARRANTY: { label: "Bảo hành", color: "success" },
+  CLOSED: { label: "Đóng", color: "default" },
+  PAUSED: { label: "Tạm dừng", color: "warning" },
+  CANCELLED: { label: "Hủy", color: "error" },
+  NOT_STARTED: { label: "Tiếp nhận", color: "default" },
+  IN_PROGRESS: { label: "Thi công", color: "info" },
   COMPLETED: { label: "Đã hoàn thành", color: "success" },
 };
 

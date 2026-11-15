@@ -1,9 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { ConsApi } from "@/config/axios";
-import { Response } from "./type";
+import { RequestBody, Response } from "./type";
 
-export const getCustomerList = async (): Promise<Response["GET"]> => {
-  const res = await ConsApi.get("/api/v1/customer/list");
+export const getCustomerList = async (
+  params?: RequestBody["GET"]
+): Promise<Response["GET"]> => {
+  const cleanParams: Record<string, any> = {};
+  if (params) {
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val !== "") {
+        cleanParams[key] = val;
+      }
+    });
+  }
+  const res = await ConsApi.get("/api/v1/customer/list", {
+    params: cleanParams,
+  });
   return {
     message: res.data.message,
     traceId: res.data.traceId,
@@ -11,8 +23,8 @@ export const getCustomerList = async (): Promise<Response["GET"]> => {
   };
 };
 
-export const useCustomerListQuery = () =>
+export const useCustomerListQuery = (params?: RequestBody["GET"]) =>
   useQuery({
-    queryKey: ["customer-list"],
-    queryFn: getCustomerList,
+    queryKey: ["customer-list", params],
+    queryFn: () => getCustomerList(params),
   });

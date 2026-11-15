@@ -1,10 +1,12 @@
+import { ProjectState } from "../../Project/getList/type";
+
 export type StaffProjectItem = {
   id: number;
   code: string;
   name: string;
   owner?: string | null;
   address?: string | null;
-  state: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+  state: ProjectState;
   progressPercent?: number | null;
   signDate?: string | null;
   deliveryDate?: string | null;

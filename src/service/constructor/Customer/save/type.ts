@@ -1,7 +1,9 @@
-import { CustomerList } from "../getList/type";
+import { CustomerItem } from "../getList/type";
 
-export type CustomerSave = CustomerList;
+export type CustomerSavePayload = Partial<CustomerItem> & {
+  name: string;
+};
 
 export type RequestBody = {
-  SAVE: CustomerSave;
+  SAVE: CustomerSavePayload;
 };

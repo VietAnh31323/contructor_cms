@@ -340,7 +340,7 @@ export default function AccountSave() {
                 bgcolor: "#f3f4f6",
                 p: 1.5,
                 borderRadius: 1,
-                fontFamily: "monospace",
+                fontFamily: "var(--font-mono), monospace",
                 fontWeight: 700,
               }}
             >

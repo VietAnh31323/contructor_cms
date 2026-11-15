@@ -1,5 +1,4 @@
 import "@/styles/global.css";
-import { Poppins } from "next/font/google";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import AdminLayout from "@/components/layouts/AdminLayout";
@@ -7,8 +6,8 @@ import AuthLayout from "@/components/layouts/AuthLayout";
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
 import { RecoilRoot } from "recoil";
-import { theme } from "@/components/layouts/theme";
-import { ThemeProvider } from "@emotion/react";
+import { APP_FONT_FAMILY, theme } from "@/components/layouts/theme";
+import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -23,6 +22,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   const [queryClient] = useState(() => new QueryClient());
 
+  const isPublicStandalonePage = router.pathname.startsWith("/landing");
   const isAuthPage =
     router.pathname.startsWith("/login") ||
     router.pathname.startsWith("/ressetPass");
@@ -36,25 +36,30 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <DialogProvider>
-              <Layout>
+              {isPublicStandalonePage ? (
                 <Component {...pageProps} />
-              </Layout>
+              ) : (
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              )}
             </DialogProvider>
+
+            <ToastContainer
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              toastStyle={{ fontFamily: APP_FONT_FAMILY }}
+            />
           </ThemeProvider>
         </RecoilRoot>
       </Provider>
-
-      <ToastContainer
-        position="top-center"
-        autoClose={0}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
     </QueryClientProvider>
   );
 }

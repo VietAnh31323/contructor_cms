@@ -14,50 +14,50 @@ const themeColorDefaultConfig: ThemeColorConfig = {
 }
 
 const fontDefaultConfig: FontConfig = {
-  typeFont: 'Open Sans',
+  typeFont: 'Be Vietnam Pro',
 
   h1Color: '#242424',
-  h1Font: 'Open Sans',
+  h1Font: 'Be Vietnam Pro',
   h1Size: 2.4,
 
   h2Color: '#242424',
-  h2Font: 'Open Sans',
+  h2Font: 'Be Vietnam Pro',
   h2Size: 2,
 
   h3Color: '#242424',
-  h3Font: 'Open Sans',
+  h3Font: 'Be Vietnam Pro',
   h3Size: 1.8,
 
   h4Color: '#242424',
-  h4Font: 'Open Sans',
+  h4Font: 'Be Vietnam Pro',
   h4Size: 1.4,
 
   h5Color: '#242424',
-  h5Font: 'Open Sans',
+  h5Font: 'Be Vietnam Pro',
   h5Size: 1.2,
 
   h6Color: '#242424',
-  h6Font: 'Open Sans',
+  h6Font: 'Be Vietnam Pro',
   h6Size: 1,
 
   subtitle1Color: '#242424',
-  subtitle1Font: 'Open Sans',
+  subtitle1Font: 'Be Vietnam Pro',
   subtitle1Size: 0.8,
 
   subtitle2Color: '#242424',
-  subtitle2Font: 'Open Sans',
+  subtitle2Font: 'Be Vietnam Pro',
   subtitle2Size: 0.75,
 
   body1Color: '#242424',
-  body1Font: 'Open Sans',
+  body1Font: 'Be Vietnam Pro',
   body1Size: 0.8,
 
   body2Color: '#242424',
-  body2Font: 'Open Sans',
+  body2Font: 'Be Vietnam Pro',
   body2Size: 0.75,
 
   captionColor: '#242424',
-  captionFont: 'Open Sans',
+  captionFont: 'Be Vietnam Pro',
   captionSize: 0.5,
 }
 

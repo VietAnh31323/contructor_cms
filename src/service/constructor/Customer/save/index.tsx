@@ -7,6 +7,6 @@ export const postCustomer = async (body: RequestBody["SAVE"]) => {
 };
 
 export const putCustomer = async (id: number, body: RequestBody["SAVE"]) => {
-  const res = await ConsApi.put(`/api/v1/customer?id=${id}`, body);
+  const res = await ConsApi.put("/api/v1/customer", { ...body, id });
   return res.data;
 };

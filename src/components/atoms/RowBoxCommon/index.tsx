@@ -25,8 +25,8 @@ export const RowBoxCommon = ({
       <div className={className}>
         <Typography
           sx={{
-            fontSize: "10px",
-            fontFamily: "Open Sans",
+            fontSize: "11px",
+            fontFamily: "inherit",
             color: "rgba(0, 0, 0, 0.6)",
             // marginBottom: "5px",
             ...titleStyle,

@@ -255,7 +255,9 @@ export default function AuditLogList() {
                                 bgcolor: changed ? "#fffbeb" : "inherit",
                               }}
                             >
-                              <TableCell sx={{ fontFamily: "monospace" }}>
+                              <TableCell
+                                sx={{ fontFamily: "var(--font-mono), monospace" }}
+                              >
                                 {key}{" "}
                                 {changed && (
                                   <Chip
@@ -268,7 +270,7 @@ export default function AuditLogList() {
                               </TableCell>
                               <TableCell
                                 sx={{
-                                  fontFamily: "monospace",
+                                  fontFamily: "var(--font-mono), monospace",
                                   fontSize: 12,
                                   wordBreak: "break-all",
                                   color: changed ? "#b91c1c" : "text.secondary",
@@ -278,7 +280,7 @@ export default function AuditLogList() {
                               </TableCell>
                               <TableCell
                                 sx={{
-                                  fontFamily: "monospace",
+                                  fontFamily: "var(--font-mono), monospace",
                                   fontSize: 12,
                                   wordBreak: "break-all",
                                   color: changed ? "#15803d" : "text.secondary",
