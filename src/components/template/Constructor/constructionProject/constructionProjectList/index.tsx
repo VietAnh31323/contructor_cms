@@ -13,13 +13,18 @@ import { getCustomerList } from "@/service/constructor/Customer/getList";
 import { ProjectState } from "@/service/constructor/Project/getList/type";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import ViewKanbanOutlinedIcon from "@mui/icons-material/ViewKanbanOutlined";
 import ViewListOutlinedIcon from "@mui/icons-material/ViewListOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
   Box,
   Chip,
   Grid,
+  IconButton,
   LinearProgress,
   MenuItem,
   Paper,
@@ -27,6 +32,7 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import router from "next/router";
@@ -55,6 +61,7 @@ export default function ConstructionProjectList() {
     activeStateFilter,
     viewMode,
     canUpdateProject,
+    canDeleteProject,
     isLoading,
     page,
     size,
@@ -75,6 +82,7 @@ export default function ConstructionProjectList() {
     openTransitionForItem,
     closeTransitionModal,
     confirmTransition,
+    handleDeleteProject,
   } = handle;
 
   return (
@@ -597,6 +605,87 @@ export default function ConstructionProjectList() {
                                           </Select>
                                         </Box>
                                       )}
+
+                                    <Stack
+                                      direction="row"
+                                      justifyContent="flex-end"
+                                      alignItems="center"
+                                      spacing={0.5}
+                                      sx={{
+                                        mt: 1,
+                                        pt: 0.75,
+                                        borderTop: "1px dashed #e2e8f0",
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <Tooltip title="Xem biểu đồ Gantt tiến độ">
+                                        <IconButton
+                                          size="small"
+                                          color="primary"
+                                          onClick={() =>
+                                            router.push({
+                                              pathname: `${ROUTES.PROJECT}/${proj.id}`,
+                                              query: {
+                                                actionType: "VIEW",
+                                                tab: "gantt",
+                                              },
+                                            })
+                                          }
+                                        >
+                                          <TimelineOutlinedIcon
+                                            sx={{ fontSize: 18 }}
+                                          />
+                                        </IconButton>
+                                      </Tooltip>
+                                      <Tooltip title="Xem chi tiết dự án">
+                                        <IconButton
+                                          size="small"
+                                          onClick={() =>
+                                            router.push({
+                                              pathname: `${ROUTES.PROJECT}/${proj.id}`,
+                                              query: { actionType: "VIEW" },
+                                            })
+                                          }
+                                        >
+                                          <VisibilityOutlinedIcon
+                                            sx={{ fontSize: 18 }}
+                                          />
+                                        </IconButton>
+                                      </Tooltip>
+                                      {canUpdateProject && (
+                                        <Tooltip title="Chỉnh sửa thông tin">
+                                          <IconButton
+                                            size="small"
+                                            color="warning"
+                                            onClick={() =>
+                                              router.push({
+                                                pathname: `${ROUTES.PROJECT}/${proj.id}`,
+                                                query: { actionType: "EDIT" },
+                                              })
+                                            }
+                                          >
+                                            <EditOutlinedIcon
+                                              sx={{ fontSize: 18 }}
+                                            />
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
+                                      {canDeleteProject && (
+                                        <Tooltip title="Xóa dự án">
+                                          <IconButton
+                                            size="small"
+                                            color="error"
+                                            onClick={() =>
+                                              handleDeleteProject(proj)
+                                            }
+                                          >
+                                            <DeleteOutlineIcon
+                                              sx={{ fontSize: 18 }}
+                                            />
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
+                                    </Stack>
                                   </Paper>
                                 )}
                               </Draggable>

@@ -1,4 +1,7 @@
+import { CoreButton } from "@/components/atoms/CoreButton";
+import { useDialog } from "@/components/hooks/dialog/useDialog";
 import { usePermission } from "@/components/hooks/permission/usePermission";
+import { Action } from "@/components/molecules/Action";
 import { ColumnProps } from "@/components/organism/CoreTable";
 import { PERMISSIONS } from "@/helper/permissions";
 import { useFormCustom } from "@/lib/form";
@@ -14,11 +17,22 @@ import {
   useProjectLifecycleSummaryQuery,
 } from "@/service/constructor/Project/lifecycle";
 import { ProjectStateTransitionRequest } from "@/service/constructor/Project/lifecycle/type";
+import { deleteProject } from "@/service/constructor/Project/save";
 import { toastError, toastSuccess } from "@/toast";
 import { DropResult } from "@hello-pangea/dnd";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { Chip, LinearProgress, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  LinearProgress,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import router from "next/router";
@@ -48,7 +62,9 @@ const defaultValues: FilterForm = {
 const useConstructionProjectList = () => {
   const queryClient = useQueryClient();
   const { hasPermission } = usePermission();
+  const { showDialog, hideDialog } = useDialog();
   const canUpdateProject = hasPermission(PERMISSIONS.PROJECT_UPDATE);
+  const canDeleteProject = hasPermission(PERMISSIONS.PROJECT_DELETE);
 
   const methodForm = useFormCustom<FilterForm>({ defaultValues });
   const { control, handleSubmit, reset, setValue } = methodForm;
@@ -262,9 +278,9 @@ const useConstructionProjectList = () => {
           styleCell: { style: { minWidth: 215 } },
         },
         {
-          header: "Chủ nhiệm dự án",
+          header: "Ban điều hành (2.10)",
           fieldName: "managerDisplay",
-          styleCell: { style: { minWidth: 145 } },
+          styleCell: { style: { minWidth: 160 } },
         },
         {
           header: "Ngày ký HĐ",
@@ -296,9 +312,52 @@ const useConstructionProjectList = () => {
           fieldName: "stateDisplay",
           styleCell: { style: { minWidth: 155 } },
         },
+        {
+          header: "Hành động",
+          fieldName: "action",
+          styleCell: { style: { minWidth: 120, textAlign: "center" } },
+        },
       ] as ColumnProps[],
-    []
+    [canUpdateProject, canDeleteProject]
   );
+
+  const handleDeleteProject = (item: ProjectListItem) => {
+    showDialog(
+      <Dialog open onClose={hideDialog}>
+        <DialogTitle>Xác nhận xóa dự án</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa dự án <strong>{item.code || item.name}</strong> không?
+          Toàn bộ thành viên, hợp đồng và tiến độ liên quan sẽ bị xóa. Thao tác này không thể hoàn tác.
+        </DialogContent>
+        <DialogActions>
+          <CoreButton theme="cancel" onClick={hideDialog}>
+            Hủy
+          </CoreButton>
+          <CoreButton
+            theme="submit"
+            onClick={async () => {
+              try {
+                await deleteProject({ id: item.id });
+                toastSuccess(`Đã xóa dự án ${item.code || item.name} thành công`);
+                hideDialog();
+                await Promise.all([
+                  queryClient.invalidateQueries({ queryKey: ["project-list"] }),
+                  queryClient.invalidateQueries({
+                    queryKey: ["project-lifecycle-summary"],
+                  }),
+                  queryClient.invalidateQueries({ queryKey: ["customer-list"] }),
+                ]);
+              } catch (err) {
+                toastError(err);
+              }
+            }}
+          >
+            Xóa dự án
+          </CoreButton>
+        </DialogActions>
+      </Dialog>
+    );
+  };
 
   const tableData = useMemo(() => {
     return rawProjects.map((item) => {
@@ -371,7 +430,55 @@ const useConstructionProjectList = () => {
             )}
           </Stack>
         ),
-        managerDisplay: item.manager?.name || "—",
+        managerDisplay: (
+          <Stack spacing={0.25} alignItems="flex-start">
+            <Typography variant="body2" fontWeight={600}>
+              {item.manager?.name || "Chưa gán PM"}
+            </Typography>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <Chip
+                size="small"
+                label={`${item.memberCount ?? 0} thành viên`}
+                color="info"
+                variant="outlined"
+                sx={{
+                  height: 19,
+                  fontSize: "0.68rem",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "info.light" },
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push({
+                    pathname: `${ROUTES.PROJECT}/${item.id}`,
+                    query: { actionType: "VIEW", tab: "members" },
+                  });
+                }}
+              />
+              {(item.contractCount ?? 0) > 0 && (
+                <Chip
+                  size="small"
+                  label={`${item.contractCount} HĐ`}
+                  color="success"
+                  variant="outlined"
+                  sx={{
+                    height: 19,
+                    fontSize: "0.68rem",
+                    cursor: "pointer",
+                    "&:hover": { bgcolor: "success.light" },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push({
+                      pathname: `${ROUTES.PROJECT}/${item.id}`,
+                      query: { actionType: "VIEW", tab: "contracts" },
+                    });
+                  }}
+                />
+              )}
+            </Stack>
+          </Stack>
+        ),
         signDateDisplay: item.signDate
           ? moment(item.signDate).format("DD/MM/YYYY")
           : "—",
@@ -462,9 +569,33 @@ const useConstructionProjectList = () => {
             sx={{ fontWeight: 600 }}
           />
         ),
+        action: (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Action
+              actionList={[
+                "watch",
+                ...(canUpdateProject ? (["edit"] as const) : []),
+                ...(canDeleteProject ? (["delete"] as const) : []),
+              ]}
+              onWatchAction={() => {
+                router.push({
+                  pathname: `${ROUTES.PROJECT}/${item.id}`,
+                  query: { actionType: "VIEW" },
+                });
+              }}
+              onEditAction={() => {
+                router.push({
+                  pathname: `${ROUTES.PROJECT}/${item.id}`,
+                  query: { actionType: "EDIT" },
+                });
+              }}
+              onDeleteAction={() => handleDeleteProject(item)}
+            />
+          </div>
+        ),
       };
     });
-  }, [rawProjects]);
+  }, [rawProjects, canUpdateProject, canDeleteProject]);
 
   const onSubmit = handleSubmit((formData) => {
     setQueryPage((prev) => ({
@@ -509,6 +640,7 @@ const useConstructionProjectList = () => {
       activeStateFilter: queryPage.state || "",
       viewMode,
       canUpdateProject,
+      canDeleteProject,
       isLoading,
       page: data?.data?.page ?? queryPage.page,
       size: data?.data?.size ?? queryPage.size,
@@ -529,6 +661,7 @@ const useConstructionProjectList = () => {
       openTransitionForItem,
       closeTransitionModal,
       confirmTransition,
+      handleDeleteProject,
     },
   ] as const;
 };

@@ -1,4 +1,3 @@
-import { PageResponse } from "@/service/type";
 import { CodeNameRef, CustomerType } from "../../Customer/getList/type";
 
 export type ProjectState =
@@ -43,18 +42,32 @@ export type ProjectListItem = {
   allowedNextStates?: ProjectState[];
   paymentStatus?: PaymentStatus;
   progressPercent?: number;
+  memberCount?: number;
+  contractCount?: number;
+};
+
+export type ProjectPageData = {
+  content: ProjectListItem[];
+  page?: number;
+  size?: number;
+  totalPages?: number;
+  totalElements?: number;
 };
 
 export type Response = {
-  GET: PageResponse<ProjectListItem[]>;
+  GET: {
+    message?: string;
+    traceId?: string;
+    data: ProjectPageData;
+  };
 };
 
 export type RequestBody = {
   GET: {
     search?: string;
-    categoryId?: number | "";
     customerId?: number | "";
     state?: ProjectState | "";
+    categoryId?: number | "";
     page?: number;
     size?: number;
   };

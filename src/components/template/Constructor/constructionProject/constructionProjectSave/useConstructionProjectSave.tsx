@@ -115,7 +115,7 @@ const useConstructionProjectSave = () => {
     useState<ProjectState | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const { data: detailResp, isLoading } = useProjectDetailQuery(id, {
+  const { data: detailResp, isLoading, refetch } = useProjectDetailQuery(id, {
     enabled: isUpdate,
   });
 
@@ -579,6 +579,7 @@ const useConstructionProjectSave = () => {
     closeTransitionDialog,
     confirmTransition,
     onSubmit,
+    refetchDetail: refetch,
   };
 };
 

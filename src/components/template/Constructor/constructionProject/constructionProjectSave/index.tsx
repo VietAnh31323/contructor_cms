@@ -68,6 +68,8 @@ import {
 import ProjectTransitionDialog from "../ProjectTransitionDialog";
 import ProjectGanttTab from "./ProjectGanttTab";
 import ProjectStateHistoryTab from "./ProjectStateHistoryTab";
+import ProjectMembersTab from "./ProjectMembersTab";
+import ProjectContractsTab from "./ProjectContractsTab";
 import useConstructionProjectSave from "./useConstructionProjectSave";
 
 export default function ConstructionProjectSave() {
@@ -97,6 +99,7 @@ export default function ConstructionProjectSave() {
     closeTransitionDialog,
     confirmTransition,
     onSubmit,
+    refetchDetail,
   } = useConstructionProjectSave();
 
   const nextRouter = useRouter();
@@ -944,6 +947,28 @@ export default function ConstructionProjectSave() {
     ...(isUpdate && id
       ? [
           {
+            title: `Thành viên & Ban điều hành (${projectDetail?.members?.length ?? 0})`,
+            content: (
+              <ProjectMembersTab
+                projectId={id}
+                members={projectDetail?.members || []}
+                isView={isView}
+                onRefresh={() => refetchDetail && refetchDetail()}
+              />
+            ),
+          },
+          {
+            title: `Hợp đồng & Phụ lục (${projectDetail?.contracts?.length ?? 0})`,
+            content: (
+              <ProjectContractsTab
+                projectId={id}
+                contracts={projectDetail?.contracts || []}
+                isView={isView}
+                onRefresh={() => refetchDetail && refetchDetail()}
+              />
+            ),
+          },
+          {
             title: "Biểu đồ Gantt & Tiến độ",
             content: (
               <ProjectGanttTab
@@ -966,10 +991,14 @@ export default function ConstructionProjectSave() {
   ];
 
   const initialTab =
-    isUpdate && nextRouter.query?.tab === "gantt"
+    isUpdate && nextRouter.query?.tab === "members"
       ? 1
-      : isUpdate && nextRouter.query?.tab === "history"
+      : isUpdate && nextRouter.query?.tab === "contracts"
       ? 2
+      : isUpdate && nextRouter.query?.tab === "gantt"
+      ? 3
+      : isUpdate && nextRouter.query?.tab === "history"
+      ? 4
       : undefined;
 
   return (

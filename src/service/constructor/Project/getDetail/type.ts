@@ -1,6 +1,6 @@
-import { BaseResponse } from "@/service/type";
 import { CodeNameRef, CustomerType } from "../../Customer/getList/type";
 import { ProjectState } from "../getList/type";
+import { ContractItem, ProjectMemberItem } from "../memberContract/type";
 
 export type ProjectCategoryMapDto = {
   id?: number;
@@ -46,8 +46,14 @@ export type ProjectDetail = {
   stateLogCount?: number;
   projectCategoryMaps: ProjectCategoryMapDto[];
   projectLines?: ProjectLineDto[];
+  members?: ProjectMemberItem[];
+  contracts?: ContractItem[];
 };
 
 export type Response = {
-  GET: BaseResponse<ProjectDetail>;
+  GET: {
+    message?: string;
+    traceId?: string;
+    data: ProjectDetail;
+  };
 };
