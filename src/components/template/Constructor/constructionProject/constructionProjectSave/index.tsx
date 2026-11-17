@@ -19,6 +19,7 @@ import { ROUTES } from "@/routes";
 import { getCategoryList } from "@/service/constructor/Category/getList";
 import { getCustomerList } from "@/service/constructor/Customer/getList";
 import { getEmployeeList } from "@/service/constructor/Employee/getList";
+import { BUILDING_TYPE_OPTIONS } from "@/service/constructor/Project/getDetail/type";
 import { deleteProject } from "@/service/constructor/Project/save";
 import { toastError, toastSuccess } from "@/toast";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
@@ -70,6 +71,9 @@ import ProjectGanttTab from "./ProjectGanttTab";
 import ProjectStateHistoryTab from "./ProjectStateHistoryTab";
 import ProjectMembersTab from "./ProjectMembersTab";
 import ProjectContractsTab from "./ProjectContractsTab";
+import ProjectPaymentsTab from "./ProjectPaymentsTab";
+import ProjectDocumentsTab from "./ProjectDocumentsTab";
+import ProjectMaterialsTab from "./ProjectMaterialsTab";
 import useConstructionProjectSave from "./useConstructionProjectSave";
 
 export default function ConstructionProjectSave() {
@@ -185,7 +189,7 @@ export default function ConstructionProjectSave() {
 
   const tabs = [
     {
-      title: "Thông tin dự án & Hợp đồng",
+      title: isUpdate ? "Tổng quan" : "Thông tin dự án",
       rightAction:
         isUpdate && isView ? (
           <TopAction
@@ -792,10 +796,16 @@ export default function ConstructionProjectSave() {
                 <Chip
                   size="small"
                   color={
-                    financialSummary.remaining > 0 ? "warning" : "success"
+                    (isUpdate && projectDetail?.remainingAmount !== undefined && projectDetail?.remainingAmount !== null
+                      ? Number(projectDetail.remainingAmount)
+                      : financialSummary.remaining) > 0
+                      ? "warning"
+                      : "success"
                   }
-                  label={`Còn phải thu: ${formatVnd(
-                    financialSummary.remaining
+                  label={`Còn phải thu (tự tính): ${formatVnd(
+                    isUpdate && projectDetail?.remainingAmount !== undefined && projectDetail?.remainingAmount !== null
+                      ? projectDetail.remainingAmount
+                      : financialSummary.remaining
                   )}`}
                 />
               </Stack>
@@ -837,22 +847,41 @@ export default function ConstructionProjectSave() {
                                   spacing={2}
                                   className="flex-1"
                                 >
-                                  <Grid item xs={12} sm={6}>
-                                    <CoreDatePicker
+                                  <Grid item xs={12} sm={6} md={2}>
+                                    <CoreInputCustom
                                       control={control}
-                                      name={`projectLines.${index}.paymentDate`}
-                                      label={`Ngày thanh toán đợt ${index + 1}`}
-                                      placeholder="Chọn ngày thanh toán"
+                                      name={`projectLines.${index}.percentage`}
+                                      type="number"
+                                      label={`% HĐ đợt ${index + 1}`}
+                                      placeholder="VD: 30"
                                     />
                                   </Grid>
 
-                                  <Grid item xs={12} sm={6}>
+                                  <Grid item xs={12} sm={6} md={3}>
                                     <CoreInputCustom
                                       control={control}
                                       name={`projectLines.${index}.paymentAmount`}
                                       type="number"
                                       label={`Số tiền đợt ${index + 1} (VNĐ)`}
-                                      placeholder="Nhập số tiền thanh toán"
+                                      placeholder="Tự tính nếu nhập %"
+                                    />
+                                  </Grid>
+
+                                  <Grid item xs={12} sm={6} md={4}>
+                                    <CoreInputCustom
+                                      control={control}
+                                      name={`projectLines.${index}.conditionMilestone`}
+                                      label="Mốc điều kiện thanh toán"
+                                      placeholder="VD: Sau khi đổ mái tầng 2"
+                                    />
+                                  </Grid>
+
+                                  <Grid item xs={12} sm={6} md={3}>
+                                    <CoreDatePicker
+                                      control={control}
+                                      name={`projectLines.${index}.paymentDate`}
+                                      label={`Ngày dự kiến đợt ${index + 1}`}
+                                      placeholder="Chọn ngày dự kiến"
                                     />
                                   </Grid>
                                 </Grid>
@@ -869,6 +898,9 @@ export default function ConstructionProjectSave() {
                                     append({
                                       paymentDate: null,
                                       paymentAmount: "",
+                                      percentage: "",
+                                      conditionMilestone: "",
+                                      note: "",
                                     })
                                   }
                                   onRemoveAction={() => remove(index)}
@@ -889,7 +921,94 @@ export default function ConstructionProjectSave() {
             <Divider sx={{ my: 3 }} />
 
             <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
-              4. Mô tả chi tiết & Ghi chú dự án
+              4. Thông tin kỹ thuật công trình (2.16)
+            </Typography>
+
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} md={4}>
+                <CoreAutocomplete
+                  options={BUILDING_TYPE_OPTIONS}
+                  control={control}
+                  name="buildingType"
+                  label="Loại công trình"
+                  placeholder="Chọn loại công trình"
+                  valuePath="value"
+                  labelPath="label"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <CoreInputCustom
+                  control={control}
+                  name="landArea"
+                  type="number"
+                  label="Diện tích đất (m²)"
+                  placeholder="VD: 150"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <CoreInputCustom
+                  control={control}
+                  name="constructionArea"
+                  type="number"
+                  label="Diện tích xây dựng (m²)"
+                  placeholder="VD: 110"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <CoreInputCustom
+                  control={control}
+                  name="totalFloorArea"
+                  type="number"
+                  label="Tổng diện tích sàn (m²)"
+                  placeholder="VD: 420"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <CoreInputCustom
+                  control={control}
+                  name="numberOfFloors"
+                  type="number"
+                  label="Số tầng"
+                  placeholder="VD: 4"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <CoreInputCustom
+                  control={control}
+                  name="designUnit"
+                  label="Đơn vị thiết kế"
+                  placeholder="Nhập tên đơn vị tư vấn thiết kế"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <CoreInputCustom
+                  control={control}
+                  name="constructionPermitNo"
+                  label="Số giấy phép xây dựng"
+                  placeholder="VD: 123/GPXD-UBND"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <CoreDatePicker
+                  control={control}
+                  name="constructionPermitDate"
+                  label="Ngày cấp giấy phép xây dựng"
+                  placeholder="Chọn ngày cấp GPXD"
+                />
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+              5. Mô tả chi tiết & Ghi chú dự án
             </Typography>
 
             <Box sx={{ mb: 5 }}>
@@ -947,18 +1066,7 @@ export default function ConstructionProjectSave() {
     ...(isUpdate && id
       ? [
           {
-            title: `Thành viên & Ban điều hành (${projectDetail?.members?.length ?? 0})`,
-            content: (
-              <ProjectMembersTab
-                projectId={id}
-                members={projectDetail?.members || []}
-                isView={isView}
-                onRefresh={() => refetchDetail && refetchDetail()}
-              />
-            ),
-          },
-          {
-            title: `Hợp đồng & Phụ lục (${projectDetail?.contracts?.length ?? 0})`,
+            title: `Hợp đồng (${projectDetail?.contracts?.length ?? 0})`,
             content: (
               <ProjectContractsTab
                 projectId={id}
@@ -969,7 +1077,7 @@ export default function ConstructionProjectSave() {
             ),
           },
           {
-            title: "Biểu đồ Gantt & Tiến độ",
+            title: "Tiến độ (Gantt)",
             content: (
               <ProjectGanttTab
                 projectId={id}
@@ -978,11 +1086,52 @@ export default function ConstructionProjectSave() {
             ),
           },
           {
-            title: `Lịch sử vòng đời (${projectDetail?.stateLogCount ?? 0})`,
+            title: "Thanh toán",
+            content: (
+              <ProjectPaymentsTab
+                projectId={id}
+                projectLines={projectDetail?.projectLines || []}
+                contractValue={projectDetail?.contractValue}
+                onRefreshProject={() => refetchDetail && refetchDetail()}
+              />
+            ),
+          },
+          {
+            title: "Vật tư",
+            content: (
+              <ProjectMaterialsTab
+                projectId={id}
+                projectDetail={projectDetail}
+                onRefreshProject={() => refetchDetail && refetchDetail()}
+              />
+            ),
+          },
+          {
+            title: `Thành viên (${projectDetail?.members?.length ?? 0})`,
+            content: (
+              <ProjectMembersTab
+                projectId={id}
+                members={projectDetail?.members || []}
+                isView={isView}
+                onRefresh={() => refetchDetail && refetchDetail()}
+              />
+            ),
+          },
+          {
+            title: `Nhật ký (${projectDetail?.stateLogCount ?? 0})`,
             content: (
               <ProjectStateHistoryTab
                 projectId={id}
                 projectDetail={projectDetail}
+              />
+            ),
+          },
+          {
+            title: `Tài liệu (${projectDetail?.documentCount ?? 0})`,
+            content: (
+              <ProjectDocumentsTab
+                projectId={id}
+                onRefreshProject={() => refetchDetail && refetchDetail()}
               />
             ),
           },
@@ -991,14 +1140,20 @@ export default function ConstructionProjectSave() {
   ];
 
   const initialTab =
-    isUpdate && nextRouter.query?.tab === "members"
+    isUpdate && nextRouter.query?.tab === "contracts"
       ? 1
-      : isUpdate && nextRouter.query?.tab === "contracts"
-      ? 2
       : isUpdate && nextRouter.query?.tab === "gantt"
+      ? 2
+      : isUpdate && nextRouter.query?.tab === "payments"
       ? 3
-      : isUpdate && nextRouter.query?.tab === "history"
+      : isUpdate && nextRouter.query?.tab === "materials"
       ? 4
+      : isUpdate && nextRouter.query?.tab === "members"
+      ? 5
+      : isUpdate && nextRouter.query?.tab === "history"
+      ? 6
+      : isUpdate && nextRouter.query?.tab === "documents"
+      ? 7
       : undefined;
 
   return (

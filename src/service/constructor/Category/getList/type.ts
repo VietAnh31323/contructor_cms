@@ -6,6 +6,12 @@ export type CategoryList = {
   name: string;
   description: string;
   isActive: boolean;
+  parentId?: number | null;
+  parentName?: string | null;
+  unit?: string | null;
+  defaultUnitPrice?: number | null;
+  sortOrder?: number | null;
+  children?: CategoryList[];
 };
 
 export type Response = {

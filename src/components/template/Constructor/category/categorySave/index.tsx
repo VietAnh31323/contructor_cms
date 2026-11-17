@@ -1,5 +1,6 @@
 import { Grid } from "@mui/material";
 import router from "next/router";
+import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import CoreNavbar from "@/components/organism/CoreNavbar";
@@ -27,7 +28,7 @@ import { ActionType } from "@/components/molecules/TopAction";
 
 export default function CategorySave() {
   const [value, handle] = useCategorySave();
-  const { isView, control, isLoading, id } = value;
+  const { isView, control, isLoading, id, parentOptions } = value;
   const { onSubmit } = handle;
   const { showDialog, hideDialog } = useDialog();
   const { hasPermission } = usePermission();
@@ -125,6 +126,43 @@ export default function CategorySave() {
                         name="name"
                         label="Tên hạng mục"
                         placeholder="Nhập tên hạng mục"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={6} lg={4}>
+                      <CoreAutocomplete
+                        options={parentOptions}
+                        control={control}
+                        name="parentId"
+                        label="Hạng mục cha (Cây hạng mục 2.18)"
+                        placeholder="Để trống nếu là hạng mục gốc"
+                        valuePath="value"
+                        labelPath="label"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="unit"
+                        label="Đơn vị tính mặc định"
+                        placeholder="VD: m³, m², tấn, cái, gói..."
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="defaultUnitPrice"
+                        type="number"
+                        label="Đơn giá tham khảo (VNĐ)"
+                        placeholder="Nhập đơn giá mặc định"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4} lg={4}>
+                      <CoreInputCustom
+                        control={control}
+                        name="sortOrder"
+                        type="number"
+                        label="Thứ tự hiển thị"
+                        placeholder="0"
                       />
                     </Grid>
                     <Grid item xs={12} sm={12} md={12} lg={12}>

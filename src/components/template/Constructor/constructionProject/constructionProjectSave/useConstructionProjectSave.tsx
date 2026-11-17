@@ -7,6 +7,7 @@ import { CustomerDetail } from "@/service/constructor/Customer/getDetail/type";
 import { CodeNameRef } from "@/service/constructor/Customer/getList/type";
 import { useProjectDetailQuery } from "@/service/constructor/Project/getDetail";
 import {
+  BuildingType,
   ProjectDetail,
   ProjectLineDto,
 } from "@/service/constructor/Project/getDetail/type";
@@ -49,10 +50,21 @@ export type ProjectFormValues = {
     lineId?: number;
     paymentDate: string | null;
     paymentAmount: number | string;
+    percentage?: number | string;
+    conditionMilestone?: string;
+    note?: string;
   }[];
   note: string;
   state: ProjectState;
   stateReason: string;
+  buildingType: BuildingType | "";
+  landArea: number | string;
+  constructionArea: number | string;
+  totalFloorArea: number | string;
+  numberOfFloors: number | string;
+  constructionPermitNo: string;
+  constructionPermitDate: string | null;
+  designUnit: string;
 };
 
 const defaultValues: ProjectFormValues = {
@@ -74,11 +86,22 @@ const defaultValues: ProjectFormValues = {
     {
       paymentDate: null,
       paymentAmount: "",
+      percentage: "",
+      conditionMilestone: "",
+      note: "",
     },
   ],
   note: "",
   state: "RECEIVED",
   stateReason: "",
+  buildingType: "",
+  landArea: "",
+  constructionArea: "",
+  totalFloorArea: "",
+  numberOfFloors: "",
+  constructionPermitNo: "",
+  constructionPermitDate: null,
+  designUnit: "",
 };
 
 const useConstructionProjectSave = () => {
@@ -134,8 +157,22 @@ const useConstructionProjectSave = () => {
               line.paymentAmount !== null && line.paymentAmount !== undefined
                 ? line.paymentAmount
                 : "",
+            percentage:
+              line.percentage !== null && line.percentage !== undefined
+                ? line.percentage
+                : "",
+            conditionMilestone: line.conditionMilestone || "",
+            note: line.note || "",
           }))
-        : [{ paymentDate: null, paymentAmount: "" }];
+        : [
+            {
+              paymentDate: null,
+              paymentAmount: "",
+              percentage: "",
+              conditionMilestone: "",
+              note: "",
+            },
+          ];
 
     const resolvedCustomer: CodeNameRef | null = detail.customer
       ? detail.customer
@@ -174,6 +211,26 @@ const useConstructionProjectSave = () => {
       note: detail.note || "",
       state: normalizeProjectState(detail.state),
       stateReason: detail.stateReason || "",
+      buildingType: detail.buildingType || "",
+      landArea:
+        detail.landArea !== null && detail.landArea !== undefined
+          ? detail.landArea
+          : "",
+      constructionArea:
+        detail.constructionArea !== null && detail.constructionArea !== undefined
+          ? detail.constructionArea
+          : "",
+      totalFloorArea:
+        detail.totalFloorArea !== null && detail.totalFloorArea !== undefined
+          ? detail.totalFloorArea
+          : "",
+      numberOfFloors:
+        detail.numberOfFloors !== null && detail.numberOfFloors !== undefined
+          ? detail.numberOfFloors
+          : "",
+      constructionPermitNo: detail.constructionPermitNo || "",
+      constructionPermitDate: detail.constructionPermitDate || null,
+      designUnit: detail.designUnit || "",
     });
     setEditorText(detail.description || "");
   }, [detailResp, reset]);
@@ -445,22 +502,35 @@ const useConstructionProjectSave = () => {
         line.paymentAmount !== "" &&
         line.paymentAmount !== null &&
         line.paymentAmount !== undefined;
-      if (!hasDate && !hasAmount) {
+      const hasPct =
+        line.percentage !== "" &&
+        line.percentage !== null &&
+        line.percentage !== undefined;
+      if (!hasDate && !hasAmount && !hasPct && !line.conditionMilestone?.trim()) {
         continue;
       }
-      if (!hasDate || !hasAmount || Number.isNaN(Number(line.paymentAmount))) {
+      if (!hasDate || (!hasAmount && !hasPct)) {
         toastError(
           `Đợt thanh toán lần ${
             i + 1
-          }: Vui lòng nhập đầy đủ ngày và số tiền hợp lệ`
+          }: Vui lòng nhập đầy đủ ngày dự kiến và % hoặc số tiền hợp lệ`
         );
         return;
       }
+      const pctVal = hasPct ? Number(line.percentage) : undefined;
+      const amtVal = hasAmount
+        ? Number(line.paymentAmount)
+        : pctVal !== undefined && parsedContractValue > 0
+        ? Math.round((parsedContractValue * pctVal) / 100)
+        : 0;
       normalizedLines.push({
         id: line.lineId,
         paymentNo: normalizedLines.length + 1,
         paymentDate: line.paymentDate,
-        paymentAmount: Number(line.paymentAmount),
+        paymentAmount: amtVal,
+        percentage: pctVal,
+        conditionMilestone: line.conditionMilestone?.trim() || undefined,
+        note: line.note?.trim() || undefined,
       });
     }
 
@@ -502,6 +572,19 @@ const useConstructionProjectSave = () => {
         },
       })),
       projectLines: normalizedLines,
+      buildingType: formData.buildingType || null,
+      landArea: formData.landArea !== "" ? Number(formData.landArea) : null,
+      constructionArea:
+        formData.constructionArea !== ""
+          ? Number(formData.constructionArea)
+          : null,
+      totalFloorArea:
+        formData.totalFloorArea !== "" ? Number(formData.totalFloorArea) : null,
+      numberOfFloors:
+        formData.numberOfFloors !== "" ? Number(formData.numberOfFloors) : null,
+      constructionPermitNo: formData.constructionPermitNo?.trim() || null,
+      constructionPermitDate: formData.constructionPermitDate || null,
+      designUnit: formData.designUnit?.trim() || null,
     };
 
     try {

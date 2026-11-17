@@ -22,6 +22,7 @@ import {
 import { toastError, toastSuccess } from "@/toast";
 import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import AddIcon from "@mui/icons-material/Add";
+import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -62,6 +63,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import moment, { Moment } from "moment";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatVnd } from "../../customer/constants";
+import ProcessTemplateDialog from "./ProcessTemplateDialog";
 
 type ZoomScale = "DAY" | "WEEK" | "MONTH";
 type DisplayMode = "GANTT" | "MILESTONE_LIST";
@@ -128,7 +130,7 @@ type Props = {
   projectDetail?: ProjectDetail | null;
 };
 
-export default function ProjectGanttTab({ projectId }: Props) {
+export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
   const queryClient = useQueryClient();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const { hasPermission } = usePermission();
@@ -195,6 +197,7 @@ export default function ProjectGanttTab({ projectId }: Props) {
   // Task Detail & Quick Update Dialog
   const [selectedTask, setSelectedTask] = useState<GanttTaskItem | null>(null);
   const [updatingTaskState, setUpdatingTaskState] = useState(false);
+  const [openTemplateDialog, setOpenTemplateDialog] = useState(false);
 
   const dayPx = SCALE_DAY_PX[zoomScale];
 
@@ -769,6 +772,16 @@ export default function ProjectGanttTab({ projectId }: Props) {
 
           {canManageSchedule && (
             <Stack direction="row" spacing={1} flexWrap="wrap">
+              <Button
+                size="small"
+                variant="outlined"
+                color="secondary"
+                startIcon={<AutoFixHighOutlinedIcon fontSize="small" />}
+                onClick={() => setOpenTemplateDialog(true)}
+                sx={{ textTransform: "none", fontWeight: 700 }}
+              >
+                Áp dụng Template quy trình
+              </Button>
               <Button
                 size="small"
                 variant="outlined"
@@ -2302,6 +2315,21 @@ export default function ProjectGanttTab({ projectId }: Props) {
           </>
         )}
       </Dialog>
+
+      <ProcessTemplateDialog
+        open={openTemplateDialog}
+        projectId={projectId}
+        defaultBuildingType={projectDetail?.buildingType}
+        onClose={() => setOpenTemplateDialog(false)}
+        onApplied={() => {
+          queryClient.invalidateQueries({
+            queryKey: ["project-gantt", projectId],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["project-detail", projectId],
+          });
+        }}
+      />
     </Box>
   );
 }

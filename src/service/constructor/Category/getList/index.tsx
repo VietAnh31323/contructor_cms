@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ConsApi } from "@/config/axios";
-import { Response } from "./type";
+import { CategoryList, Response } from "./type";
 
 export const getCategoryList = async (
   params?: Record<string, any>
@@ -27,4 +27,20 @@ export const useCategoryListQuery = (params?: Record<string, any>) =>
   useQuery({
     queryKey: ["category-list", params],
     queryFn: () => getCategoryList(params),
+  });
+
+export const getCategoryTree = async (): Promise<{
+  message?: string;
+  traceId?: string;
+  data: CategoryList[];
+}> => {
+  const res = await ConsApi.get("/api/v1/category/tree");
+  return res.data;
+};
+
+export const useCategoryTreeQuery = (options?: { enabled?: boolean }) =>
+  useQuery({
+    queryKey: ["category-tree"],
+    queryFn: getCategoryTree,
+    enabled: options?.enabled !== false,
   });
