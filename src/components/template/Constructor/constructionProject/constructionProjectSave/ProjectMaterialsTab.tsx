@@ -70,14 +70,12 @@ export default function ProjectMaterialsTab({
   const { hasPermission } = usePermission();
   const canUpdateProject = hasPermission(PERMISSIONS.PROJECT_UPDATE);
 
-  const searchKey = projectDetail?.code || projectDetail?.name || "";
-
   const { data: steelResp, isLoading } = useQuery({
-    queryKey: ["project-steel-materials", projectId, searchKey],
+    queryKey: ["project-steel-materials", projectId],
     queryFn: async () => {
       const res = await ConsApi.get("/api/v1/steel-project/list", {
         params: {
-          search: searchKey || undefined,
+          projectId,
           page: 0,
           size: 20,
         },
@@ -353,7 +351,12 @@ export default function ProjectMaterialsTab({
             <Button
               size="small"
               variant="contained"
-              onClick={() => router.push(ROUTES.STEELSTATISTICSNEW)}
+              onClick={() =>
+                router.push({
+                  pathname: ROUTES.STEELSTATISTICSNEW,
+                  query: { projectId },
+                })
+              }
             >
               + Tạo bảng thống kê thép
             </Button>

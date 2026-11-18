@@ -9,7 +9,6 @@ import {
   deleteProjectGanttPhase,
   postProjectGanttPhase,
   postProjectGanttTask,
-  putUpdateTaskState,
   useProjectGanttQuery,
 } from "@/service/constructor/Project/gantt";
 import {
@@ -64,10 +63,24 @@ import moment, { Moment } from "moment";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatVnd } from "../../customer/constants";
 import ProcessTemplateDialog from "./ProcessTemplateDialog";
+import {
+  SCHEDULE_STATUS_META,
+  TASK_STATE_META,
+} from "../../progress/shared/constants";
+import TaskDetailDialog from "../../progress/shared/TaskDetailDialog";
+import { useRouter } from "next/router";
 
 type ZoomScale = "DAY" | "WEEK" | "MONTH";
 type DisplayMode = "GANTT" | "MILESTONE_LIST";
-type StatusFilter = "ALL" | "IN_PROGRESS" | "NOT_STARTED" | "COMPLETED" | "OVERDUE";
+type StatusFilter =
+  | "ALL"
+  | "IN_PROGRESS"
+  | "NOT_STARTED"
+  | "PENDING_REVIEW"
+  | "RETURNED"
+  | "COMPLETED"
+  | "OVERDUE"
+  | "AT_RISK";
 
 const WBS_COL_WIDTH = 340;
 const ROW_HEIGHT = 44;
@@ -76,35 +89,6 @@ const SCALE_DAY_PX: Record<ZoomScale, number> = {
   DAY: 34,
   WEEK: 16,
   MONTH: 6,
-};
-
-const TASK_STATE_META: Record<
-  TaskState,
-  {
-    label: string;
-    barBg: string;
-    barFill: string;
-    chipColor: "default" | "info" | "success";
-  }
-> = {
-  NOT_STARTED: {
-    label: "Chưa bắt đầu",
-    barBg: "#cbd5e1",
-    barFill: "#64748b",
-    chipColor: "default",
-  },
-  IN_PROGRESS: {
-    label: "Đang thực hiện",
-    barBg: "#93c5fd",
-    barFill: "#2563eb",
-    chipColor: "info",
-  },
-  COMPLETED: {
-    label: "Hoàn thành",
-    barBg: "#86efac",
-    barFill: "#16a34a",
-    chipColor: "success",
-  },
 };
 
 const PRIORITY_META: Record<
@@ -132,6 +116,7 @@ type Props = {
 
 export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
   const queryClient = useQueryClient();
+  const nextRouter = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const { hasPermission } = usePermission();
 
@@ -362,6 +347,7 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
   const matchesTaskFilter = (task: GanttTaskItem): boolean => {
     if (statusFilter === "ALL") return true;
     if (statusFilter === "OVERDUE") return task.overdue;
+    if (statusFilter === "AT_RISK") return task.scheduleStatus === "AT_RISK";
     return task.state === statusFilter;
   };
 
@@ -392,6 +378,38 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gantt?.phases, showPhasesTasks, statusFilter]);
 
+  // 2.23: Giữ dialog chi tiết đồng bộ với dữ liệu mới sau khi chuyển trạng thái / bình luận
+  const findTaskInGantt = (taskId: number): GanttTaskItem | null => {
+    for (const phase of gantt?.phases ?? []) {
+      for (const t of phase.tasks) {
+        if (t.id === taskId) return t;
+        const sub = (t.subTasks || []).find((s) => s.id === taskId);
+        if (sub) return sub;
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    if (!selectedTask || !gantt) return;
+    const fresh = findTaskInGantt(selectedTask.id);
+    if (fresh && fresh !== selectedTask) setSelectedTask(fresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gantt]);
+
+  // 2.26 / 2.27: mở thẳng công việc từ thông báo (…&taskId=123)
+  const openedFromQueryRef = useRef<string | null>(null);
+  useEffect(() => {
+    const qTaskId = nextRouter.query?.taskId;
+    if (!gantt || !qTaskId || openedFromQueryRef.current === String(qTaskId)) return;
+    const found = findTaskInGantt(Number(qTaskId));
+    if (found) {
+      openedFromQueryRef.current = String(qTaskId);
+      setSelectedTask(found);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gantt, nextRouter.query?.taskId]);
+
   const refreshAllProjectData = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["project-gantt", projectId] }),
@@ -400,6 +418,8 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
       }),
       queryClient.invalidateQueries({ queryKey: ["project-list"] }),
       queryClient.invalidateQueries({ queryKey: ["progress-list"] }),
+      queryClient.invalidateQueries({ queryKey: ["project-phases", projectId] }),
+      queryClient.invalidateQueries({ queryKey: ["project-progress-summary"] }),
     ]);
   };
 
@@ -440,10 +460,13 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
   };
 
   const handleDeletePhase = async (phase: GanttPhaseItem) => {
-    if (phase.tasks && phase.tasks.length > 0) {
-      toastError(
-        "Chỉ có thể gỡ giai đoạn khi chưa có công việc nào bên trong"
-      );
+    if (
+      phase.tasks &&
+      phase.tasks.length > 0 &&
+      !window.confirm(
+        `Giai đoạn "${phase.progressName}" có ${phase.tasks.length} công việc. Gỡ giai đoạn sẽ xóa toàn bộ công việc bên trong. Tiếp tục?`
+      )
+    ) {
       return;
     }
     try {
@@ -520,38 +543,6 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
       toastError(err);
     } finally {
       setSavingTask(false);
-    }
-  };
-
-  const handleQuickChangeTaskState = async (
-    taskId: number,
-    newState: TaskState
-  ) => {
-    try {
-      setUpdatingTaskState(true);
-      await putUpdateTaskState({ id: taskId, state: newState });
-      toastSuccess(
-        `Đã cập nhật trạng thái công việc: "${TASK_STATE_META[newState].label}"`
-      );
-      setSelectedTask((prev) =>
-        prev && prev.id === taskId
-          ? {
-              ...prev,
-              state: newState,
-              progressPercent:
-                newState === "COMPLETED"
-                  ? 100
-                  : newState === "IN_PROGRESS"
-                  ? Math.max(50, Number(prev.progressPercent || 0))
-                  : 0,
-            }
-          : prev
-      );
-      await refreshAllProjectData();
-    } catch (err) {
-      toastError(err);
-    } finally {
-      setUpdatingTaskState(false);
     }
   };
 
@@ -650,8 +641,22 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
               />
               <Chip
                 size="small"
+                color="secondary"
+                label={`Chờ duyệt: ${gantt.pendingReviewTasks ?? 0}`}
+                onClick={() => setStatusFilter("PENDING_REVIEW")}
+              />
+              {(gantt.returnedTasks ?? 0) > 0 && (
+                <Chip
+                  size="small"
+                  color="warning"
+                  label={`Trả lại: ${gantt.returnedTasks}`}
+                  onClick={() => setStatusFilter("RETURNED")}
+                />
+              )}
+              <Chip
+                size="small"
                 variant="outlined"
-                label={`Chờ: ${gantt.notStartedTasks}`}
+                label={`Chưa làm: ${gantt.notStartedTasks}`}
               />
             </Stack>
           </Paper>
@@ -684,9 +689,21 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
               >
                 {gantt.overdueTasks > 0
                   ? `${gantt.overdueTasks} việc trễ hạn`
+                  : (gantt.atRiskTasks ?? 0) > 0
+                  ? `${gantt.atRiskTasks} việc nguy cơ trễ`
                   : "Đúng tiến độ"}
               </Typography>
             </Stack>
+            {gantt.scheduleStatus && (
+              <Chip
+                size="small"
+                sx={{ mt: 0.5, mb: 0.5, fontWeight: 700 }}
+                color={SCHEDULE_STATUS_META[gantt.scheduleStatus].color}
+                label={`Dự án: ${SCHEDULE_STATUS_META[gantt.scheduleStatus].label}${
+                  (gantt.delayDays ?? 0) > 0 ? ` (${gantt.delayDays} ngày)` : ""
+                }`}
+              />
+            )}
             <Typography variant="caption" color="text.secondary">
               {gantt.deliveryDate
                 ? `Mốc bàn giao HĐ: ${moment(gantt.deliveryDate).format(
@@ -750,10 +767,13 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                 }
               >
                 <MenuItem value="ALL">Tất cả công việc</MenuItem>
-                <MenuItem value="IN_PROGRESS">Đang thực hiện</MenuItem>
-                <MenuItem value="NOT_STARTED">Chưa bắt đầu</MenuItem>
+                <MenuItem value="NOT_STARTED">Chưa làm</MenuItem>
+                <MenuItem value="IN_PROGRESS">Đang làm</MenuItem>
+                <MenuItem value="PENDING_REVIEW">Chờ duyệt</MenuItem>
+                <MenuItem value="RETURNED">Bị trả lại</MenuItem>
                 <MenuItem value="COMPLETED">Đã hoàn thành</MenuItem>
                 <MenuItem value="OVERDUE">Đang trễ hạn</MenuItem>
+                <MenuItem value="AT_RISK">Nguy cơ trễ</MenuItem>
               </Select>
             </FormControl>
 
@@ -1515,12 +1535,32 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                               100,
                               Math.max(0, Number(t.progressPercent ?? 0))
                             );
+                            const isAtRisk = t.scheduleStatus === "AT_RISK";
                             const barBgColor = t.overdue
                               ? "#fecaca"
+                              : isAtRisk
+                              ? "#fde68a"
                               : stMeta.barBg;
                             const barFillColor = t.overdue
                               ? "#dc2626"
+                              : isAtRisk
+                              ? "#d97706"
                               : stMeta.barFill;
+                            // 2.26: thanh thực tế (bắt đầu thực tế → hoàn thành thực tế / hôm nay)
+                            const actualEndForBar =
+                              t.actualEndDate ||
+                              (t.actualStartDate && t.state !== "COMPLETED"
+                                ? moment().format("YYYY-MM-DD")
+                                : null);
+                            const actualGeo = t.actualStartDate
+                              ? getBarGeometry(t.actualStartDate, actualEndForBar)
+                              : null;
+                            const actualColor =
+                              t.scheduleStatus === "COMPLETED_LATE" || t.overdue
+                                ? "#dc2626"
+                                : t.state === "COMPLETED"
+                                ? "#16a34a"
+                                : "#0f172a";
                             const assigneeText =
                               t.assignees && t.assignees.length > 0
                                 ? t.assignees.map((a) => a.name).join(", ")
@@ -1596,7 +1636,12 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                                         ? "filled"
                                         : "outlined"
                                     }
-                                    label={`${pct.toFixed(0)}%`}
+                                    label={
+                                      t.state === "PENDING_REVIEW" ||
+                                      t.state === "RETURNED"
+                                        ? `${stMeta.label} • ${pct.toFixed(0)}%`
+                                        : `${pct.toFixed(0)}%`
+                                    }
                                     sx={{
                                       height: 20,
                                       fontSize: "0.68rem",
@@ -1631,9 +1676,28 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                                             variant="caption"
                                             sx={{ display: "block" }}
                                           >
-                                            Thời gian: {geo.startFormatted} →{" "}
+                                            Kế hoạch: {geo.startFormatted} →{" "}
                                             {geo.endFormatted} ({geo.spanDays}{" "}
                                             ngày)
+                                          </Typography>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{ display: "block" }}
+                                          >
+                                            Thực tế:{" "}
+                                            {t.actualStartDate
+                                              ? moment(t.actualStartDate).format("DD/MM/YYYY")
+                                              : "chưa bắt đầu"}
+                                            {t.actualStartDate
+                                              ? ` → ${
+                                                  t.actualEndDate
+                                                    ? moment(t.actualEndDate).format("DD/MM/YYYY")
+                                                    : "đang thực hiện"
+                                                }`
+                                              : ""}
+                                            {(t.delayDays ?? 0) > 0
+                                              ? ` • Trễ ${t.delayDays} ngày`
+                                              : ""}
                                           </Typography>
                                           <Typography
                                             variant="caption"
@@ -1662,8 +1726,8 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                                           position: "absolute",
                                           left: geo.left,
                                           width: geo.width,
-                                          top: isSubTask ? 12 : 10,
-                                          height: isSubTask ? 20 : 24,
+                                          top: isSubTask ? 8 : 6,
+                                          height: isSubTask ? 18 : 22,
                                           borderRadius: 1.25,
                                           bgcolor: barBgColor,
                                           border: `1px solid ${barFillColor}`,
@@ -1707,6 +1771,31 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                                           {t.name} ({pct.toFixed(0)}%)
                                         </Typography>
                                       </Box>
+                                    </Tooltip>
+                                  )}
+                                  {actualGeo && (
+                                    <Tooltip
+                                      arrow
+                                      title={`Thực tế: ${actualGeo.startFormatted} → ${
+                                        t.actualEndDate ? actualGeo.endFormatted : "hôm nay"
+                                      }`}
+                                    >
+                                      <Box
+                                        sx={{
+                                          position: "absolute",
+                                          left: actualGeo.left,
+                                          width: actualGeo.width,
+                                          top: isSubTask ? 30 : 32,
+                                          height: 5,
+                                          borderRadius: 3,
+                                          bgcolor: actualColor,
+                                          opacity: 0.85,
+                                          backgroundImage:
+                                            t.actualEndDate
+                                              ? "none"
+                                              : "repeating-linear-gradient(45deg, rgba(255,255,255,0.35) 0 4px, transparent 4px 8px)",
+                                        }}
+                                      />
                                     </Tooltip>
                                   )}
                                 </Box>
@@ -2070,12 +2159,12 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
                       setTaskInitialState(e.target.value as TaskState)
                     }
                   >
-                    <MenuItem value="NOT_STARTED">Chưa bắt đầu (0%)</MenuItem>
-                    <MenuItem value="IN_PROGRESS">
-                      Đang thực hiện (50%)
-                    </MenuItem>
-                    <MenuItem value="COMPLETED">Hoàn thành (100%)</MenuItem>
+                    <MenuItem value="NOT_STARTED">Chưa làm (0%)</MenuItem>
+                    <MenuItem value="IN_PROGRESS">Đang làm (50%)</MenuItem>
                   </Select>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                    % tiến độ được hệ thống tự tính; hoàn thành phải qua bước duyệt.
+                  </Typography>
                 </FormControl>
               </Grid>
             </Grid>
@@ -2127,194 +2216,21 @@ export default function ProjectGanttTab({ projectId, projectDetail }: Props) {
         </DialogActions>
       </Dialog>
 
-      {/* ================= DIALOG 3: CHI TIẾT & CẬP NHẬT NHANH CÔNG VIỆC TRÊN GANTT ================= */}
-      <Dialog
+      {/* ================= DIALOG 3: CHI TIẾT CÔNG VIỆC – WORKFLOW DUYỆT, BÁO CÁO HIỆN TRƯỜNG, BÌNH LUẬN ================= */}
+      <TaskDetailDialog
         open={Boolean(selectedTask)}
+        task={selectedTask}
         onClose={() => setSelectedTask(null)}
-        maxWidth="sm"
-        fullWidth
-      >
-        {selectedTask && (
-          <>
-            <DialogTitle sx={{ fontWeight: 700, pb: 1 }}>
-              {selectedTask.code} — {selectedTask.name}
-            </DialogTitle>
-            <DialogContent dividers>
-              <Stack spacing={2}>
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                  <Chip
-                    size="small"
-                    color={
-                      selectedTask.overdue
-                        ? "error"
-                        : TASK_STATE_META[selectedTask.state]?.chipColor ||
-                          "default"
-                    }
-                    label={
-                      selectedTask.overdue
-                        ? "Đang quá hạn"
-                        : TASK_STATE_META[selectedTask.state]?.label
-                    }
-                  />
-                  {selectedTask.priorityLevel && (
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      color={
-                        PRIORITY_META[selectedTask.priorityLevel]?.color ||
-                        "default"
-                      }
-                      label={`Mức độ: ${
-                        PRIORITY_META[selectedTask.priorityLevel]?.label ||
-                        selectedTask.priorityLevel
-                      }`}
-                    />
-                  )}
-                  <Chip
-                    size="small"
-                    variant="outlined"
-                    label={`Tiến độ: ${Number(
-                      selectedTask.progressPercent ?? 0
-                    ).toFixed(0)}%`}
-                  />
-                </Stack>
-
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
-                      Ngày bắt đầu
-                    </Typography>
-                    <Typography variant="body2" fontWeight={700}>
-                      {selectedTask.startDate
-                        ? moment(selectedTask.startDate).format("DD/MM/YYYY")
-                        : "—"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
-                      Ngày kết thúc ({selectedTask.durationDays} ngày)
-                    </Typography>
-                    <Typography variant="body2" fontWeight={700}>
-                      {selectedTask.endDate
-                        ? moment(selectedTask.endDate).format("DD/MM/YYYY")
-                        : "—"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
-                      Người duyệt / Giám sát
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {selectedTask.reviewer?.name || "—"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary">
-                      Nhân sự thực hiện
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {selectedTask.assignees &&
-                      selectedTask.assignees.length > 0
-                        ? selectedTask.assignees.map((a) => a.name).join(", ")
-                        : "Chưa phân công"}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                {selectedTask.description && (
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Mô tả / Yêu cầu kỹ thuật
-                    </Typography>
-                    <Typography variant="body2">
-                      {selectedTask.description}
-                    </Typography>
-                  </Box>
-                )}
-
-                {canManageSchedule && (
-                  <>
-                    <Divider />
-                    <Box>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight={700}
-                        sx={{ mb: 1 }}
-                      >
-                        Cập nhật nhanh trạng thái công việc
-                      </Typography>
-                      <Stack direction="row" spacing={1} flexWrap="wrap">
-                        {(
-                          [
-                            "NOT_STARTED",
-                            "IN_PROGRESS",
-                            "COMPLETED",
-                          ] as TaskState[]
-                        ).map((st) => (
-                          <Button
-                            key={st}
-                            size="small"
-                            disabled={
-                              updatingTaskState || selectedTask.state === st
-                            }
-                            variant={
-                              selectedTask.state === st
-                                ? "contained"
-                                : "outlined"
-                            }
-                            color={
-                              st === "COMPLETED"
-                                ? "success"
-                                : st === "IN_PROGRESS"
-                                ? "primary"
-                                : "inherit"
-                            }
-                            onClick={() =>
-                              handleQuickChangeTaskState(selectedTask.id, st)
-                            }
-                            sx={{ textTransform: "none", fontWeight: 600 }}
-                          >
-                            {TASK_STATE_META[st].label}
-                          </Button>
-                        ))}
-                      </Stack>
-                    </Box>
-
-                    {!selectedTask.parentId && (
-                      <Box>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          startIcon={<AddIcon fontSize="small" />}
-                          onClick={() => {
-                            const parentRef = selectedTask;
-                            setSelectedTask(null);
-                            handleOpenAddTask(
-                              parentRef.projectProgressId ?? undefined,
-                              parentRef
-                            );
-                          }}
-                          sx={{ textTransform: "none", fontWeight: 600 }}
-                        >
-                          Thêm công việc con (Sub-task) cho hạng mục này
-                        </Button>
-                      </Box>
-                    )}
-                  </>
-                )}
-              </Stack>
-            </DialogContent>
-            <DialogActions sx={{ px: 3, py: 1.5 }}>
-              <CoreButton
-                theme="cancel"
-                onClick={() => setSelectedTask(null)}
-              >
-                Đóng
-              </CoreButton>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
+        onChanged={refreshAllProjectData}
+        onAddSubTask={
+          canManageSchedule
+            ? (t) => {
+                setSelectedTask(null);
+                handleOpenAddTask(undefined, t);
+              }
+            : undefined
+        }
+      />
 
       <ProcessTemplateDialog
         open={openTemplateDialog}

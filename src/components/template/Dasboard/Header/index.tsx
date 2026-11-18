@@ -22,6 +22,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Logout } from "@/service/Login/Logout";
 import { toastSuccess } from "@/toast";
 import { clearAuthStorage } from "@/config/axios";
+import NotificationBell from "./NotificationBell";
 
 export default function Header({
   toggleDark,
@@ -74,6 +75,8 @@ export default function Header({
         `}
       </style>
 
+      <div className="flex items-center gap-2">
+      <NotificationBell />
       <div
         className="relative flex items-center gap-3 cursor-pointer"
         onClick={handleClick}
@@ -88,6 +91,7 @@ export default function Header({
         />
 
         <span className="absolute bottom-0 right-7 w-3 h-3 bg-green-500 rounded-full ring-2 "></span>
+      </div>
       </div>
 
       {/* --- MENU --- */}

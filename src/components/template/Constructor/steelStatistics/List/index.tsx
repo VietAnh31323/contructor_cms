@@ -1,65 +1,92 @@
-import { Button, Grid, TextField } from "@mui/material";
-import Image from "next/image";
-import statistics from "@/assets/svg/statistics.svg";
-import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
-import PageContainer from "@/components/organism/PageContainer";
+import Can from "@/components/atoms/Can";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
-import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
-import router from "next/router";
-import CoreInputCustom from "@/components/atoms/CoreInputCustom";
-import { useForm } from "react-hook-form";
-import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
-import { CoreTable } from "@/components/organism/CoreTable";
-import useCategoryList from "./useSteelStatisticsList";
-import useSteelStatisticsList from "./useSteelStatisticsList";
 import CoreNavbar from "@/components/organism/CoreNavbar";
-import ProjectCardList from "./components/ProjectCardList";
-import { ROUTES } from "@/routes";
-import Can from "@/components/atoms/Can";
+import PageContainer from "@/components/organism/PageContainer";
 import { PERMISSIONS } from "@/helper/permissions";
+import { ROUTES } from "@/routes";
+import {
+  Autocomplete,
+  Box,
+  Grid,
+  TablePagination,
+  TextField,
+} from "@mui/material";
+import router from "next/router";
+import ProjectCardList from "./components/ProjectCardList";
+import useSteelStatisticsList from "./useSteelStatisticsList";
 
 export default function SteelStatisticsList() {
   const [value, handle] = useSteelStatisticsList();
+  const {
+    items,
+    totalElements,
+    page,
+    rowsPerPage,
+    search,
+    projectId,
+    projects,
+    isLoading,
+  } = value;
+  const { setSearch, setProjectId, setPage, setRowsPerPage, onDelete } = handle;
 
-  const { columns, tableData, page, rowsPerPage } = value;
-  const { setPage, setRowsPerPage } = handle;
-  const { control } = useForm();
+  const selectedProject =
+    projects.find((p) => p.id === projectId) ?? null;
+
   return (
     <Grid
       container
       justifyContent="center"
-      alignItems="center"
+      alignItems="flex-start"
       sx={{
-        height: "100vh",
-        overflowY: "hidden",
+        minHeight: "100vh",
+        overflowY: "auto",
         overflowX: "hidden",
       }}
     >
       <PageContainer
         title={
           <CoreBreadcrumbs
-            breadcrumbs={[{ title: "Danh sách dự án thông kê thép" }]}
+            breadcrumbs={[{ title: "Danh sách dự án thống kê thép" }]}
           />
         }
       >
-        <form className="flex flex-col py-6 ">
-          <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-            <Grid item xs={12} sm={12} md={6} lg={4}>
-              <CoreInputCustom
-                control={control}
-                name="search"
+        <div className="flex flex-col py-6">
+          <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} alignItems="center">
+            <Grid item xs={12} sm={6} md={4}>
+              <TextField
+                fullWidth
+                size="small"
                 label="Tìm kiếm"
-                placeholder="Tìm kiếm theo mã dự án"
+                placeholder="Tìm theo mã hoặc tên công trình"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={4}></Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Autocomplete
+                size="small"
+                options={projects}
+                value={selectedProject}
+                getOptionLabel={(opt) =>
+                  opt.code ? `${opt.code} - ${opt.name}` : opt.name
+                }
+                isOptionEqualToValue={(opt, val) => opt.id === val.id}
+                onChange={(_, val) => setProjectId(val ? val.id : null)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Lọc theo dự án chính"
+                    placeholder="Tất cả dự án"
+                  />
+                )}
+              />
+            </Grid>
             <Grid
               item
               xs={12}
               sm={12}
-              md={6}
-              lg={4}
+              md={4}
               className="flex justify-end items-center"
             >
               <Can
@@ -71,7 +98,14 @@ export default function SteelStatisticsList() {
               >
                 <CoreButton
                   onClick={() => {
-                    router.push(ROUTES.STEELSTATISTICS + "/addNew");
+                    router.push(
+                      projectId
+                        ? {
+                            pathname: ROUTES.STEELSTATISTICSNEW,
+                            query: { projectId },
+                          }
+                        : ROUTES.STEELSTATISTICSNEW
+                    );
                   }}
                   theme="submit"
                 >
@@ -80,12 +114,35 @@ export default function SteelStatisticsList() {
               </Can>
             </Grid>
           </Grid>
-        </form>
+        </div>
+
         <CoreNavbar
           breadcrumbs={[
             {
-              title: "Danh sách",
-              content: <ProjectCardList />,
+              title: `Danh sách (${totalElements})`,
+              content: (
+                <Box>
+                  <ProjectCardList
+                    items={items}
+                    isLoading={isLoading}
+                    onDelete={onDelete}
+                  />
+                  {totalElements > 0 && (
+                    <TablePagination
+                      component="div"
+                      count={totalElements}
+                      page={page}
+                      onPageChange={(_, newPage) => setPage(newPage)}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={(e) =>
+                        setRowsPerPage(parseInt(e.target.value, 10))
+                      }
+                      rowsPerPageOptions={[8, 12, 24, 48]}
+                      labelRowsPerPage="Số mục mỗi trang:"
+                    />
+                  )}
+                </Box>
+              ),
             },
           ]}
         />

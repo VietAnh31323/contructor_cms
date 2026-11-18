@@ -1,134 +1,177 @@
-import CoreInputCustom from "@/components/atoms/CoreInputCustom";
-import { Grid, InputAdornment, TextField, Typography } from "@mui/material";
-import { useState } from "react";
-import DatePicker from "react-datepicker";
-import { useForm } from "react-hook-form";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import EditText from "@/components/atoms/EditText";
-export default function Step1() {
-  const [date, setDate] = useState<Date | null>(null);
-  const { control } = useForm();
-  const [editorText, setEditorText] = useState("");
+import { ProjectListItem } from "@/service/constructor/Project/getList/type";
+import { SteelProjectDto } from "@/service/constructor/SteelProject/type";
+import { Autocomplete, Grid, TextField } from "@mui/material";
+import { Controller, UseFormReturn } from "react-hook-form";
+
+interface Step1Props {
+  form: UseFormReturn<SteelProjectDto>;
+  projects: ProjectListItem[];
+  isView?: boolean;
+  onSelectProject: (projectId: number | null) => void;
+}
+
+export default function Step1({
+  form,
+  projects,
+  isView,
+  onSelectProject,
+}: Step1Props) {
+  const { control, watch } = form;
+  const projectId = watch("projectId");
+  const selectedProject = projects.find((p) => p.id === projectId) ?? null;
+
   return (
-    <form className="flex flex-col py-6 ">
-      <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <CoreInputCustom
+    <div className="px-4 py-2">
+      <Grid container spacing={2.5}>
+        <Grid item xs={12} md={6}>
+          <Autocomplete
+            disabled={isView}
+            options={projects}
+            value={selectedProject}
+            getOptionLabel={(opt) =>
+              opt.code ? `${opt.code} - ${opt.name}` : opt.name
+            }
+            isOptionEqualToValue={(opt, val) => opt.id === val.id}
+            onChange={(_, val) => onSelectProject(val ? val.id : null)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                label="Gắn với dự án chính"
+                placeholder="Chọn dự án xây dựng (tùy chọn)"
+                helperText="Chọn dự án chính để tự động điền thông tin công trình & chủ đầu tư"
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Controller
             control={control}
             name="code"
-            label="Mã hồ sơ"
-            placeholder="Nhập mã hồ sơ"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                disabled={isView}
+                label="Mã bảng thống kê thép"
+                placeholder="Để trống để tự động sinh mã (DATKT...)"
+              />
+            )}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <CoreInputCustom
+
+        <Grid item xs={12} md={6}>
+          <Controller
             control={control}
             name="name"
-            label="Tên công trình dự án"
-            placeholder="Nhập tên công trình dự án"
-            required
-            rules={{ required: "Trường này là bắt buộc" }}
+            rules={{ required: "Vui lòng nhập tên bảng thống kê" }}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                fullWidth
+                required
+                size="small"
+                disabled={isView}
+                label="Tên bảng thống kê thép / Công trình"
+                placeholder="VD: Thống kê thép sàn tầng 1 - Nhà phố Anh Minh"
+                error={Boolean(fieldState.error)}
+                helperText={fieldState.error?.message}
+              />
+            )}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <CoreInputCustom
+
+        <Grid item xs={12} md={6}>
+          <Controller
             control={control}
-            name="person"
-            label="Chủ đầu tư"
-            placeholder="Nhập chủ đầu tư"
-            required
-            rules={{ required: "Trường này là bắt buộc" }}
+            name="owner"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                disabled={isView}
+                label="Chủ đầu tư"
+                placeholder="Nhập tên chủ đầu tư"
+              />
+            )}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <CoreInputCustom
+
+        <Grid item xs={12} md={6}>
+          <Controller
             control={control}
             name="address"
-            label="Địa chỉ"
-            placeholder="Nhập tên đỉa chỉ"
-            required
-            rules={{ required: "Trường này là bắt buộc" }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                disabled={isView}
+                label="Địa điểm công trình"
+                placeholder="Nhập địa điểm thi công"
+              />
+            )}
           />
         </Grid>
 
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <div style={{ width: "100%" }}>
-            <DatePicker
-              selected={date}
-              onChange={(d) => setDate(d)}
-              placeholderText=" "
-              customInput={
-                <TextField
-                  label="Ngày kí hợp đồng"
-                  variant="standard"
-                  fullWidth
-                  focused
-                  placeholder=" "
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <CalendarMonthIcon sx={{ cursor: "pointer" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              }
-              popperPlacement="bottom"
-              wrapperClassName="w-full"
-              className="w-full"
-            />
-          </div>
-        </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <div style={{ width: "100%" }}>
-            <DatePicker
-              selected={date}
-              onChange={(d) => setDate(d)}
-              placeholderText=" "
-              customInput={
-                <TextField
-                  label="Ngày giao hồ sơ dự kiến"
-                  variant="standard"
-                  fullWidth
-                  focused
-                  placeholder=" "
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <CalendarMonthIcon sx={{ cursor: "pointer" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              }
-              popperPlacement="bottom"
-              wrapperClassName="w-full"
-              className="w-full"
-            />
-          </div>
-        </Grid>
-
-        <br />
-        <Grid item xs={12} sm={12} md={12} lg={12}>
-          <Typography
-            sx={{
-              fontWeight: 700,
-            }}
-          >
-            Mô tả dự án
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12}>
-          <EditText
-            editorText={editorText}
-            setEditorText={setEditorText}
-            disabled={false}
-            error={editorText.length === 0 ? "Vui lòng nhập nội dung" : ""}
-            height={300}
+        <Grid item xs={12} sm={6} md={3}>
+          <Controller
+            control={control}
+            name="signDate"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                type="date"
+                disabled={isView}
+                label="Ngày ký"
+                InputLabelProps={{ shrink: true }}
+              />
+            )}
           />
         </Grid>
-        <br />
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Controller
+            control={control}
+            name="deliveryDate"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                type="date"
+                disabled={isView}
+                label="Ngày giao dự kiến"
+                InputLabelProps={{ shrink: true }}
+              />
+            )}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                multiline
+                rows={3}
+                disabled={isView}
+                label="Ghi chú / Mô tả"
+                placeholder="Nhập ghi chú kỹ thuật hoặc mô tả phạm vi thống kê thép"
+              />
+            )}
+          />
+        </Grid>
       </Grid>
-    </form>
+    </div>
   );
 }

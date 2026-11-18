@@ -63,6 +63,8 @@ export const postProjectGanttTask = async (
 export const putUpdateTaskState = async (body: {
   id: number;
   state: TaskState;
+  /** 2.23: bắt buộc khi Trả lại */
+  reason?: string;
 }) => {
   const { data } = await ConsApi.put("/api/v1/task/update-state", body);
   return data;
