@@ -33,6 +33,8 @@ import router from "next/router";
 import React, { useState } from "react";
 
 const TYPE_META: Record<NotificationType, { icon: React.ReactNode; color: string }> = {
+  TASK_ASSIGNED: { icon: <AssignmentTurnedInOutlinedIcon fontSize="small" />, color: "#0284c7" },
+  TASK_DUE_SOON: { icon: <ScheduleSendOutlinedIcon fontSize="small" />, color: "#d97706" },
   TASK_OVERDUE: { icon: <WarningAmberRoundedIcon fontSize="small" />, color: "#dc2626" },
   TASK_SUBMITTED: { icon: <ScheduleSendOutlinedIcon fontSize="small" />, color: "#7c3aed" },
   TASK_APPROVED: { icon: <AssignmentTurnedInOutlinedIcon fontSize="small" />, color: "#16a34a" },
@@ -40,6 +42,7 @@ const TYPE_META: Record<NotificationType, { icon: React.ReactNode; color: string
   TASK_MENTION: { icon: <AlternateEmailIcon fontSize="small" />, color: "#2563eb" },
   TASK_COMMENT: { icon: <ChatBubbleOutlineIcon fontSize="small" />, color: "#0891b2" },
   TASK_SITE_REPORT: { icon: <PhotoCameraOutlinedIcon fontSize="small" />, color: "#b45309" },
+  PAYMENT_DUE: { icon: <WarningAmberRoundedIcon fontSize="small" />, color: "#be123c" },
 };
 
 /**
@@ -84,9 +87,16 @@ export default function NotificationBell() {
   return (
     <>
       <Tooltip title="Thông báo">
-        <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ color: "white" }}>
+        <IconButton
+          onClick={(e) => setAnchorEl(e.currentTarget)}
+          sx={{
+            bgcolor: "rgba(15, 23, 42, 0.04)",
+            color: "text.primary",
+            "&:hover": { bgcolor: "rgba(15, 23, 42, 0.08)" },
+          }}
+        >
           <Badge badgeContent={unread} color="error" max={99}>
-            <NotificationsNoneIcon />
+            <NotificationsNoneIcon fontSize="small" />
           </Badge>
         </IconButton>
       </Tooltip>

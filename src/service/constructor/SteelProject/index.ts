@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   SteelCategoryLineDto,
   SteelCategoryOutput,
+  SteelImportResultDto,
   SteelProjectDto,
   SteelProjectListParams,
   SteelProjectOutput,
@@ -55,6 +56,47 @@ export const updateSteelProject = async (
 
 export const deleteSteelProject = async (id: number): Promise<void> => {
   await ConsApi.delete("/api/v1/steel-project", { params: { id } });
+};
+
+export const exportSteelProjectExcel = async (id: number): Promise<Blob> => {
+  const { data } = await ConsApi.get(
+    `/api/v1/steel-project/${id}/export-excel`,
+    { responseType: "blob" }
+  );
+  return data;
+};
+
+export const exportSteelProjectPdf = async (id: number): Promise<Blob> => {
+  const { data } = await ConsApi.get(
+    `/api/v1/steel-project/${id}/export-pdf`,
+    { responseType: "blob" }
+  );
+  return data;
+};
+
+export const downloadSteelImportTemplate = async (): Promise<Blob> => {
+  const { data } = await ConsApi.get("/api/v1/steel-project/import-template", {
+    responseType: "blob",
+  });
+  return data;
+};
+
+export const importSteelProjectExcel = async (
+  id: number,
+  file: File,
+  replaceExisting: boolean
+): Promise<SteelImportResultDto> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const { data } = await ConsApi.post(
+    `/api/v1/steel-project/${id}/import-excel`,
+    formData,
+    {
+      params: { replaceExisting },
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  return data?.data ?? data;
 };
 
 export const getSteelCategoryList = async (): Promise<

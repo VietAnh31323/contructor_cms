@@ -1,3 +1,4 @@
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import {
   Box,
   Chip,
@@ -120,6 +121,10 @@ export default function AuditLogList() {
 
             <Grid item xs={12}>
               <div className="pt-2 flex justify-end gap-3 items-center">
+                <ExportExcelButton
+                  endpoint="/api/v1/export/audit-logs"
+                  filename="nhat-ky-he-thong.xlsx"
+                />
                 <CoreButton onClick={onReset} theme="cancel">
                   Làm mới
                 </CoreButton>

@@ -2,6 +2,7 @@ import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
 import CoreAutoCompleteAPI from "@/components/atoms/CoreAutoCompleteAPI";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import Can from "@/components/atoms/Can";
 import CoreLoading from "@/components/molecules/CoreLoading";
@@ -268,17 +269,24 @@ export default function ConstructionProjectList() {
           </Typography>
         </Stack>
 
-        <Can permission={PERMISSIONS.PROJECT_CREATE}>
-          <CoreButton
-            startIcon={<AddIcon />}
-            onClick={() => {
-              router.push(ROUTES.PROJECT + "/addNew");
-            }}
-            theme="submit"
-          >
-            Tiếp nhận / Thêm dự án mới
-          </CoreButton>
-        </Can>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <ExportExcelButton
+            endpoint="/api/v1/export/projects"
+            filename="danh-sach-du-an.xlsx"
+            params={{ state: activeStateFilter || undefined }}
+          />
+          <Can permission={PERMISSIONS.PROJECT_CREATE}>
+            <CoreButton
+              startIcon={<AddIcon />}
+              onClick={() => {
+                router.push(ROUTES.PROJECT + "/addNew");
+              }}
+              theme="submit"
+            >
+              Tiếp nhận / Thêm dự án mới
+            </CoreButton>
+          </Can>
+        </Stack>
       </Stack>
 
       {/* ================= HIỂN THỊ BẢNG HOẶC KANBAN VÒNG ĐỜI ================= */}

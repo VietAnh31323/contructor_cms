@@ -1,11 +1,11 @@
 "use client";
 
-import Sidebar from "../template/Dasboard/Sidebar";
-import Header from "../template/Dasboard/Header";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { ROUTES } from "@/routes";
 import { extractAuthFromToken } from "@/helper/permissions";
+import { ROUTES } from "@/routes";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import Header from "../template/Dasboard/Header";
+import Sidebar from "../template/Dasboard/Sidebar";
 
 export default function AdminLayout({
   children,
@@ -41,17 +41,24 @@ export default function AdminLayout({
   }, [router.pathname]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <header className="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md z-30">
-        <Header toggleDark={() => setDark((prev) => !prev)} isDark={dark} />
-      </header>
+    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <aside className="flex-shrink-0 z-20">
+        <Sidebar />
+      </aside>
 
-      <div className="flex flex-1 pt-[56px] h-full overflow-hidden">
-        <aside className="flex-shrink-0 bg-gray-100 dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700 shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
-          <Sidebar />
-        </aside>
+      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
+        <header className="flex-shrink-0 z-10">
+          <Header toggleDark={() => setDark((prev) => !prev)} isDark={dark} />
+        </header>
 
-        <main className="flex-1 overflow-y-auto p-5 bg-gray-50 dark:bg-gray-900">
+        <main
+          className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100 dark:bg-slate-950"
+          style={{
+            backgroundImage: dark
+              ? undefined
+              : "radial-gradient(at 0% 0%, rgba(59,130,246,0.07) 0, transparent 50%), radial-gradient(at 100% 0%, rgba(6,182,212,0.06) 0, transparent 45%)",
+          }}
+        >
           {children}
         </main>
       </div>

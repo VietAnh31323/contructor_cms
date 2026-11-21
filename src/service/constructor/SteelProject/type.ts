@@ -113,3 +113,21 @@ export interface SteelCategoryLineDto {
   id: number;
   paramName: string;
 }
+
+export interface SteelImportErrorDto {
+  rowNumber: number;
+  column: string;
+  rawValue?: string;
+  message: string;
+}
+
+export interface SteelImportResultDto {
+  success: boolean;
+  totalRows: number;
+  validRows: number;
+  errorCount: number;
+  importedAssemblyCount: number;
+  importedBarCount: number;
+  errors: SteelImportErrorDto[];
+  steelProject?: SteelProjectDto;
+}

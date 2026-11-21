@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import PageContainer from "@/components/organism/PageContainer";
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import router from "next/router";
@@ -98,13 +99,17 @@ export default function Account() {
             </Grid>
 
             <Grid item xs={12} sm={12} md={6} lg={4}>
-              <div className="py-4 flex justify-center gap-4 items-center">
+              <div className="py-4 flex justify-center gap-3 items-center">
                 <CoreButton onClick={onReset} theme="cancel">
                   Làm mới
                 </CoreButton>
                 <CoreButton theme="submit" type="submit">
                   Tìm kiếm
                 </CoreButton>
+                <ExportExcelButton
+                  endpoint="/api/v1/export/accounts"
+                  filename="danh-sach-tai-khoan.xlsx"
+                />
               </div>
             </Grid>
           </Grid>

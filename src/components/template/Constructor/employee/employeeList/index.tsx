@@ -1,5 +1,6 @@
 import { Grid } from "@mui/material";
 import PageContainer from "@/components/organism/PageContainer";
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import useEmployeeList from "@/components/template/Constructor/employee/employeeList/useEmployeeList";
@@ -92,8 +93,12 @@ export default function Employee() {
           </Grid>
         </form>
 
-        <Can permission={PERMISSIONS.USER_MANAGE}>
-          <div className="flex justify-end pb-4">
+        <div className="flex justify-end items-center gap-3 pb-4">
+          <ExportExcelButton
+            endpoint="/api/v1/export/staffs"
+            filename="danh-sach-nhan-su.xlsx"
+          />
+          <Can permission={PERMISSIONS.USER_MANAGE}>
             <CoreButton
               onClick={() => {
                 router.push(ROUTES.EMPLOYEE + "/addNew");
@@ -102,8 +107,8 @@ export default function Employee() {
             >
               Thêm mới
             </CoreButton>
-          </div>
-        </Can>
+          </Can>
+        </div>
 
         <CoreTable
           tableName="employee-table"

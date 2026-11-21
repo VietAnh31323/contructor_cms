@@ -2,13 +2,16 @@ import { ConsApi } from "@/config/axios";
 import { useQuery } from "@tanstack/react-query";
 
 export type NotificationType =
+  | "TASK_ASSIGNED"
+  | "TASK_DUE_SOON"
   | "TASK_OVERDUE"
   | "TASK_SUBMITTED"
   | "TASK_APPROVED"
   | "TASK_RETURNED"
   | "TASK_MENTION"
   | "TASK_COMMENT"
-  | "TASK_SITE_REPORT";
+  | "TASK_SITE_REPORT"
+  | "PAYMENT_DUE";
 
 export type NotificationItem = {
   id: number;

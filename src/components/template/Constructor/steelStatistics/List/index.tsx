@@ -1,4 +1,5 @@
 import Can from "@/components/atoms/Can";
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import CoreNavbar from "@/components/organism/CoreNavbar";
@@ -87,8 +88,16 @@ export default function SteelStatisticsList() {
               xs={12}
               sm={12}
               md={4}
-              className="flex justify-end items-center"
+              className="flex justify-end items-center gap-2"
             >
+              <ExportExcelButton
+                endpoint="/api/v1/export/steel-projects"
+                filename="danh-sach-thong-ke-thep.xlsx"
+                params={{
+                  search: search || undefined,
+                  projectId: projectId || undefined,
+                }}
+              />
               <Can
                 permission={[
                   PERMISSIONS.MATERIAL_MANAGE,

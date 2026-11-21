@@ -10,6 +10,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import ViewListOutlinedIcon from "@mui/icons-material/ViewListOutlined";
 import ViewKanbanOutlinedIcon from "@mui/icons-material/ViewKanbanOutlined";
@@ -253,6 +254,10 @@ export default function CustomerList() {
               Mở Landing Page (Form Web)
             </CoreButton>
 
+            <ExportExcelButton
+              endpoint="/api/v1/export/customers"
+              filename="danh-sach-khach-hang.xlsx"
+            />
             <Can permission={PERMISSIONS.CUSTOMER_MANAGE}>
               <CoreButton
                 onClick={() => {

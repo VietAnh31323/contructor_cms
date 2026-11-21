@@ -1,4 +1,5 @@
 import Can from "@/components/atoms/Can";
+import ExportExcelButton from "@/components/atoms/ExportExcelButton";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
 import { CoreButton } from "@/components/atoms/CoreButton";
 import CoreLoading from "@/components/molecules/CoreLoading";
@@ -298,19 +299,26 @@ export default function CategoryList() {
           )}
         </Stack>
 
-        <Can
-          permission={[PERMISSIONS.PROJECT_CREATE, PERMISSIONS.PROJECT_UPDATE]}
-        >
-          <CoreButton
-            startIcon={<AddIcon />}
-            onClick={() => {
-              router.push(ROUTES.CATEGORY + "/addNew");
-            }}
-            theme="submit"
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <ExportExcelButton
+            endpoint="/api/v1/export/categories"
+            filename="danh-muc-hang-muc.xlsx"
+            params={{ search: search || undefined }}
+          />
+          <Can
+            permission={[PERMISSIONS.PROJECT_CREATE, PERMISSIONS.PROJECT_UPDATE]}
           >
-            Thêm mới hạng mục
-          </CoreButton>
-        </Can>
+            <CoreButton
+              startIcon={<AddIcon />}
+              onClick={() => {
+                router.push(ROUTES.CATEGORY + "/addNew");
+              }}
+              theme="submit"
+            >
+              Thêm mới hạng mục
+            </CoreButton>
+          </Can>
+        </Stack>
       </Stack>
 
       {viewMode === "TREE" ? (
