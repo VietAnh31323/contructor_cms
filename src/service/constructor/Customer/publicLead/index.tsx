@@ -1,5 +1,10 @@
 import { ConsApi } from "@/config/axios";
-import { PublicCustomerLeadPayload, Response } from "./type";
+import {
+  AiHouseDesignRequest,
+  AiHouseDesignResponse,
+  PublicCustomerLeadPayload,
+  Response,
+} from "./type";
 
 export const submitPublicCustomerLead = async (
   body: PublicCustomerLeadPayload
@@ -10,4 +15,11 @@ export const submitPublicCustomerLead = async (
     traceId: res.data?.traceId || "",
     data: res.data?.data ?? res.data,
   };
+};
+
+export const generateAiHouseDesign = async (
+  body: AiHouseDesignRequest
+): Promise<AiHouseDesignResponse> => {
+  const res = await ConsApi.post("/public/customer-lead/ai-design", body);
+  return res.data?.data ?? res.data;
 };

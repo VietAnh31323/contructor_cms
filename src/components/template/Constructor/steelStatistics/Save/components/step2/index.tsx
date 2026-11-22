@@ -5,14 +5,20 @@ import {
   SteelProjectAssemblyMapDto,
 } from "@/service/constructor/SteelProject/type";
 import AddIcon from "@mui/icons-material/Add";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
+  Avatar,
   Box,
   Button,
   Chip,
+  Collapse,
   Divider,
   Grid,
   IconButton,
+  LinearProgress,
   MenuItem,
   Paper,
   Stack,
@@ -26,7 +32,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { computeBarMetrics } from "../../useSteelStatisticsSave";
 
 const COMMON_DIAMETERS = [6, 8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32];
@@ -59,6 +65,12 @@ export default function Step2({
   isView,
   onSelectCategoryForBar,
 }: Step2Props) {
+  const [collapsedMap, setCollapsedMap] = useState<Record<number, boolean>>({});
+
+  const toggleCollapse = (idx: number) => {
+    setCollapsedMap((prev) => ({ ...prev, [idx]: !prev[idx] }));
+  };
+
   const addAssembly = () => {
     setAssemblies((prev) => [
       ...prev,
@@ -77,6 +89,26 @@ export default function Step2({
         ],
       },
     ]);
+  };
+
+  const duplicateAssembly = (idx: number) => {
+    setAssemblies((prev) => {
+      const target = prev[idx];
+      if (!target) return prev;
+      const copy: SteelProjectAssemblyMapDto = {
+        ...target,
+        id: undefined,
+        assemblyName: `${target.assemblyName} (Bản sao)`,
+        steels: (target.steels ?? []).map((b) => ({
+          ...b,
+          id: undefined,
+          steelLines: (b.steelLines ?? []).map((l) => ({ ...l, id: undefined })),
+        })),
+      };
+      const next = [...prev];
+      next.splice(idx + 1, 0, copy);
+      return next;
+    });
   };
 
   const removeAssembly = (idx: number) => {
@@ -173,10 +205,12 @@ export default function Step2({
               steels: (a.steels ?? []).map((b, bi) => {
                 if (bi !== barIdx) return b;
                 const lines = b.steelLines ?? [];
-                const nextName = `L${lines.length + 1}`;
                 return {
                   ...b,
-                  steelLines: [...lines, { paramName: nextName, value: 0 }],
+                  steelLines: [
+                    ...lines,
+                    { paramName: `L${lines.length + 1}`, value: 0 },
+                  ],
                 };
               }),
             }
@@ -195,103 +229,89 @@ export default function Step2({
           ? a
           : {
               ...a,
-              steels: (a.steels ?? []).map((b, bi) => {
-                if (bi !== barIdx) return b;
-                return {
-                  ...b,
-                  steelLines: (b.steelLines ?? []).filter(
-                    (_, li) => li !== lineIdx
-                  ),
-                };
-              }),
+              steels: (a.steels ?? []).map((b, bi) =>
+                bi !== barIdx
+                  ? b
+                  : {
+                      ...b,
+                      steelLines: (b.steelLines ?? []).filter(
+                        (_, li) => li !== lineIdx
+                      ),
+                    }
+              ),
             }
       )
     );
   };
 
   return (
-    <Box className="px-2 py-2">
-      {/* KPI Tổng quan */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: "#f8fafc" }}>
-            <Typography variant="caption" color="text.secondary">
-              Tổng số cấu kiện
-            </Typography>
-            <Typography variant="h6" fontWeight={800}>
-              {assemblies.length} cấu kiện
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: "#f0fdf4" }}>
-            <Typography variant="caption" color="text.secondary">
-              Tổng chiều dài cắt
-            </Typography>
-            <Typography variant="h6" fontWeight={800} color="success.dark">
-              {summary.totalLength.toLocaleString("vi-VN", {
-                maximumFractionDigits: 2,
-              })}{" "}
-              m
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: "#fffbeb" }}>
-            <Typography variant="caption" color="text.secondary">
-              Tổng khối lượng thép (Ø² × 0.00617 × L)
-            </Typography>
-            <Typography variant="h6" fontWeight={800} color="warning.dark">
-              {summary.totalWeight.toLocaleString("vi-VN", {
-                maximumFractionDigits: 2,
-              })}{" "}
-              kg (
-              {(summary.totalWeight / 1000).toLocaleString("vi-VN", {
-                maximumFractionDigits: 3,
-              })}{" "}
-              tấn)
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+    <Stack spacing={3}>
+      {/* Danh sách Cấu kiện */}
+      {assemblies.map((assembly, aIdx) => {
+        const sameQty = Math.max(1, Number(assembly.sameQuantity || 1));
+        const aTotal = summary.assemblyTotals[aIdx] ?? {
+          totalLength: 0,
+          totalWeight: 0,
+        };
+        const isCollapsed = Boolean(collapsedMap[aIdx]);
 
-      {/* Danh sách Cấu kiện & Thanh thép */}
-      <Stack spacing={3}>
-        {assemblies.map((assembly, aIdx) => {
-          const sameQty = Math.max(1, Number(assembly.sameQuantity || 1));
-          const aTotal = summary.assemblyTotals[aIdx] ?? {
-            totalLength: 0,
-            totalWeight: 0,
-          };
-
-          return (
-            <Paper
-              key={aIdx}
-              variant="outlined"
-              sx={{ p: 2.5, borderRadius: 2, borderColor: "#cbd5e1" }}
+        return (
+          <Paper
+            key={aIdx}
+            elevation={0}
+            sx={{
+              borderRadius: 2.5,
+              border: "1px solid #cbd5e1",
+              overflow: "hidden",
+              bgcolor: "#ffffff",
+            }}
+          >
+            {/* Assembly Header Bar */}
+            <Box
+              sx={{
+                px: 2.5,
+                py: 1.8,
+                bgcolor: "#f8fafc",
+                borderBottom: isCollapsed ? "none" : "1px solid #e2e8f0",
+              }}
             >
-              <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                <Grid item xs={12} sm={5} md={4}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    disabled={isView}
-                    label={`Tên cấu kiện #${aIdx + 1}`}
-                    value={assembly.assemblyName}
-                    onChange={(e) =>
-                      updateAssemblyField(aIdx, {
-                        assemblyName: e.target.value,
-                      })
-                    }
-                  />
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} md={4}>
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        fontSize: 13,
+                        fontWeight: 800,
+                        bgcolor: "#2563eb",
+                      }}
+                    >
+                      #{aIdx + 1}
+                    </Avatar>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      disabled={isView}
+                      label="Tên cấu kiện"
+                      value={assembly.assemblyName}
+                      onChange={(e) =>
+                        updateAssemblyField(aIdx, {
+                          assemblyName: e.target.value,
+                        })
+                      }
+                      sx={{ bgcolor: "#ffffff" }}
+                    />
+                  </Stack>
                 </Grid>
-                <Grid item xs={6} sm={3} md={2}>
+
+                <Grid item xs={6} sm={4} md={2}>
                   <TextField
                     fullWidth
                     size="small"
                     type="number"
                     disabled={isView}
-                    label="SL cấu kiện giống nhau"
+                    label="SL cấu kiện"
                     value={assembly.sameQuantity}
                     inputProps={{ min: 1 }}
                     onChange={(e) =>
@@ -299,9 +319,11 @@ export default function Step2({
                         sameQuantity: Math.max(1, Number(e.target.value || 1)),
                       })
                     }
+                    sx={{ bgcolor: "#ffffff" }}
                   />
                 </Grid>
-                <Grid item xs={6} sm={4} md={3}>
+
+                <Grid item xs={6} sm={8} md={3}>
                   <TextField
                     fullWidth
                     size="small"
@@ -311,8 +333,10 @@ export default function Step2({
                     onChange={(e) =>
                       updateAssemblyField(aIdx, { note: e.target.value })
                     }
+                    sx={{ bgcolor: "#ffffff" }}
                   />
                 </Grid>
+
                 <Grid
                   item
                   xs={12}
@@ -321,87 +345,78 @@ export default function Step2({
                     display: "flex",
                     justifyContent: "flex-end",
                     alignItems: "center",
-                    gap: 1,
+                    gap: 0.8,
+                    flexWrap: "wrap",
                   }}
                 >
                   <Chip
-                    label={`Tổng CK: ${aTotal.totalWeight.toLocaleString(
-                      "vi-VN",
-                      { maximumFractionDigits: 2 }
-                    )} kg`}
+                    size="small"
                     color="warning"
-                    variant="outlined"
+                    label={`${aTotal.totalLength.toLocaleString("vi-VN", {
+                      maximumFractionDigits: 1,
+                    })} m • ${aTotal.totalWeight.toLocaleString("vi-VN", {
+                      maximumFractionDigits: 1,
+                    })} kg`}
                     sx={{ fontWeight: 700 }}
                   />
                   {!isView && (
-                    <Tooltip title="Xóa cấu kiện">
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => removeAssembly(aIdx)}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <>
+                      <Tooltip title="Nhân bản cấu kiện">
+                        <IconButton
+                          size="small"
+                          onClick={() => duplicateAssembly(aIdx)}
+                        >
+                          <ContentCopyIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Xóa cấu kiện">
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => removeAssembly(aIdx)}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </>
                   )}
+                  <IconButton size="small" onClick={() => toggleCollapse(aIdx)}>
+                    {isCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                  </IconButton>
                 </Grid>
               </Grid>
+            </Box>
 
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: "#f1f5f9" }}>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 80 }}>
-                        Số hiệu
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 160 }}>
-                        Hình dạng thép
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 95 }}>
-                        Ø (mm)
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 220 }}>
-                        Kích thước các đoạn (mm)
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 95 }}>
-                        Nối chồng (mm)
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 95 }}>
-                        Trừ uốn (mm)
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 90 }} align="right">
-                        L cắt (m)
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 85 }}>
-                        SL/1 CK
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 80 }} align="right">
-                        Tổng thanh
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 100 }} align="right">
-                        Tổng dài (m)
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700, minWidth: 105 }} align="right">
-                        Khối lượng (kg)
-                      </TableCell>
-                      {!isView && <TableCell align="center" width={48} />}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {(assembly.steels ?? []).map((bar, bIdx) => {
-                      const m = computeBarMetrics(bar, sameQty);
-                      const shapeImg =
-                        bar.images?.[0]?.url ||
-                        steelCategories.find(
-                          (c) => c.id === bar.steelCategoryId
-                        )?.images?.[0]?.url;
+            {/* Bars List (Airy Card Rows instead of crammed table) */}
+            <Collapse in={!isCollapsed}>
+              <Box sx={{ p: 2 }}>
+                <Stack spacing={1.5}>
+                  {(assembly.steels ?? []).map((bar, bIdx) => {
+                    const m = computeBarMetrics(bar, sameQty);
+                    const shapeImg =
+                      bar.images?.[0]?.url ||
+                      steelCategories.find((c) => c.id === bar.steelCategoryId)
+                        ?.images?.[0]?.url;
 
-                      return (
-                        <TableRow key={bIdx} hover>
-                          <TableCell>
+                    return (
+                      <Paper
+                        key={bIdx}
+                        variant="outlined"
+                        sx={{
+                          p: 1.8,
+                          borderRadius: 2,
+                          borderColor: "#e2e8f0",
+                          bgcolor: "#fcfcfd",
+                          "&:hover": { borderColor: "#93c5fd" },
+                        }}
+                      >
+                        <Grid container spacing={1.5} alignItems="center">
+                          <Grid item xs={4} sm={2} md={1.1}>
                             <TextField
+                              fullWidth
                               size="small"
                               disabled={isView}
+                              label="Số hiệu"
                               value={bar.barLabel ?? ""}
                               onChange={(e) =>
                                 updateBar(aIdx, bIdx, {
@@ -409,48 +424,162 @@ export default function Step2({
                                 })
                               }
                             />
-                          </TableCell>
+                          </Grid>
 
-                          <TableCell>
-                            <Stack spacing={0.5}>
-                              <TextField
-                                select
-                                size="small"
-                                disabled={isView}
-                                value={bar.steelCategoryId ?? ""}
-                                onChange={(e) => {
-                                  const val = e.target.value
-                                    ? Number(e.target.value)
-                                    : null;
-                                  onSelectCategoryForBar(aIdx, bIdx, val);
-                                }}
-                              >
-                                <MenuItem value="">Tùy chỉnh đoạn</MenuItem>
-                                {steelCategories.map((cat) => (
-                                  <MenuItem key={cat.id} value={cat.id}>
-                                    {cat.code} - {cat.name}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                              {shapeImg && (
-                                <img
-                                  src={shapeImg}
-                                  alt="Hình dạng"
-                                  style={{
-                                    maxHeight: 34,
-                                    objectFit: "contain",
-                                    alignSelf: "flex-start",
-                                  }}
-                                />
-                              )}
-                            </Stack>
-                          </TableCell>
-
-                          <TableCell>
+                          <Grid item xs={12} sm={5} md={2.7}>
                             <TextField
+                              fullWidth
                               select
                               size="small"
                               disabled={isView}
+                              label="Hình dạng thép"
+                              value={bar.steelCategoryId ?? ""}
+                              SelectProps={{
+                                MenuProps: {
+                                  PaperProps: {
+                                    sx: { maxHeight: 420, width: 380 },
+                                  },
+                                },
+                                renderValue: (selected) => {
+                                  const cat = steelCategories.find(
+                                    (c) => c.id === Number(selected)
+                                  );
+                                  if (!cat) {
+                                    return (
+                                      <Typography variant="body2" color="text.secondary">
+                                        Tùy chỉnh đoạn
+                                      </Typography>
+                                    );
+                                  }
+                                  const img = cat.images?.[0]?.url || shapeImg;
+                                  return (
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                      {img && (
+                                        <Box
+                                          sx={{
+                                            width: 44,
+                                            height: 24,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            border: "1px solid #e2e8f0",
+                                            borderRadius: 0.8,
+                                            bgcolor: "#ffffff",
+                                            flexShrink: 0,
+                                            overflow: "hidden",
+                                          }}
+                                        >
+                                          <img
+                                            src={img}
+                                            alt={cat.code}
+                                            style={{
+                                              maxWidth: "100%",
+                                              maxHeight: "100%",
+                                              objectFit: "contain",
+                                            }}
+                                          />
+                                        </Box>
+                                      )}
+                                      <Typography variant="body2" fontWeight={600} noWrap>
+                                        {cat.code} - {cat.name}
+                                      </Typography>
+                                    </Stack>
+                                  );
+                                },
+                              }}
+                              onChange={(e) => {
+                                const val = e.target.value
+                                  ? Number(e.target.value)
+                                  : null;
+                                onSelectCategoryForBar(aIdx, bIdx, val);
+                              }}
+                            >
+                              <MenuItem value="">
+                                <Stack direction="row" spacing={1.5} alignItems="center">
+                                  <Box
+                                    sx={{
+                                      width: 72,
+                                      height: 36,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      border: "1px dashed #cbd5e1",
+                                      borderRadius: 1,
+                                      bgcolor: "#f8fafc",
+                                      color: "text.secondary",
+                                      fontSize: 11,
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    Tự nhập
+                                  </Box>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Tùy chỉnh đoạn
+                                  </Typography>
+                                </Stack>
+                              </MenuItem>
+                              {steelCategories.map((cat) => {
+                                const imgUrl = cat.images?.[0]?.url;
+                                return (
+                                  <MenuItem key={cat.id} value={cat.id} sx={{ py: 1 }}>
+                                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ width: "100%" }}>
+                                      <Box
+                                        sx={{
+                                          width: 72,
+                                          height: 36,
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          border: "1px solid #e2e8f0",
+                                          borderRadius: 1,
+                                          bgcolor: "#ffffff",
+                                          p: 0.4,
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        {imgUrl ? (
+                                          <img
+                                            src={imgUrl}
+                                            alt={cat.name}
+                                            style={{
+                                              maxWidth: "100%",
+                                              maxHeight: "100%",
+                                              objectFit: "contain",
+                                            }}
+                                          />
+                                        ) : (
+                                          <Typography variant="caption" color="text.disabled">
+                                            No img
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                                        <Typography variant="body2" fontWeight={700} noWrap>
+                                          {cat.code}
+                                        </Typography>
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                          display="block"
+                                          noWrap
+                                        >
+                                          {cat.name}
+                                        </Typography>
+                                      </Box>
+                                    </Stack>
+                                  </MenuItem>
+                                );
+                              })}
+                            </TextField>
+                          </Grid>
+
+                          <Grid item xs={4} sm={2.5} md={1.2}>
+                            <TextField
+                              fullWidth
+                              select
+                              size="small"
+                              disabled={isView}
+                              label="Đường kính"
                               value={bar.barDiameter ?? 16}
                               onChange={(e) =>
                                 updateBar(aIdx, bIdx, {
@@ -464,39 +593,166 @@ export default function Step2({
                                 </MenuItem>
                               ))}
                             </TextField>
-                          </TableCell>
+                          </Grid>
 
-                          <TableCell>
-                            <Stack spacing={0.5}>
+                          <Grid item xs={4} sm={2.5} md={1.2}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              type="number"
+                              disabled={isView}
+                              label="SL / 1 CK"
+                              value={bar.barQuantity ?? 0}
+                              inputProps={{ min: 0 }}
+                              onChange={(e) =>
+                                updateBar(aIdx, bIdx, {
+                                  barQuantity: Math.max(
+                                    0,
+                                    Number(e.target.value || 0)
+                                  ),
+                                })
+                              }
+                            />
+                          </Grid>
+
+                          <Grid item xs={6} sm={3} md={1.3}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              type="number"
+                              disabled={isView}
+                              label="Nối chồng (mm)"
+                              value={bar.spliceLength ?? 0}
+                              onChange={(e) =>
+                                updateBar(aIdx, bIdx, {
+                                  spliceLength: Number(e.target.value || 0),
+                                })
+                              }
+                            />
+                          </Grid>
+
+                          <Grid item xs={6} sm={3} md={1.2}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              type="number"
+                              disabled={isView}
+                              label="Trừ uốn (mm)"
+                              value={bar.bendDeduction ?? 0}
+                              onChange={(e) =>
+                                updateBar(aIdx, bIdx, {
+                                  bendDeduction: Number(e.target.value || 0),
+                                })
+                              }
+                            />
+                          </Grid>
+
+                          {/* Live Computed Result Pill */}
+                          <Grid item xs={12} sm={6} md={3.3}>
+                            <Stack
+                              direction="row"
+                              justifyContent="space-between"
+                              alignItems="center"
+                              sx={{
+                                px: 1.5,
+                                py: 0.8,
+                                borderRadius: 1.5,
+                                bgcolor: "#eff6ff",
+                                border: "1px solid #bfdbfe",
+                              }}
+                            >
+                              <Box>
+                                <Typography variant="caption" color="text.secondary">
+                                  L cắt:{" "}
+                                  <b>
+                                    {m.cutLengthMeter.toLocaleString("vi-VN", {
+                                      maximumFractionDigits: 3,
+                                    })}{" "}
+                                    m
+                                  </b>{" "}
+                                  • {m.totalBars} thanh
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={800}
+                                  color="primary.dark"
+                                >
+                                  {m.totalLength.toLocaleString("vi-VN", {
+                                    maximumFractionDigits: 2,
+                                  })}{" "}
+                                  m •{" "}
+                                  <span style={{ color: "#b45309" }}>
+                                    {m.totalWeight.toLocaleString("vi-VN", {
+                                      maximumFractionDigits: 2,
+                                    })}{" "}
+                                    kg
+                                  </span>
+                                </Typography>
+                              </Box>
+                              {!isView && (
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => removeBar(aIdx, bIdx)}
+                                >
+                                  <DeleteOutlineIcon fontSize="small" />
+                                </IconButton>
+                              )}
+                            </Stack>
+                          </Grid>
+
+                          {/* Segments Row */}
+                          <Grid item xs={12}>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                              flexWrap="wrap"
+                              gap={1}
+                              sx={{ pt: 0.5 }}
+                            >
+                              <Typography
+                                variant="caption"
+                                fontWeight={700}
+                                color="text.secondary"
+                              >
+                                Kích thước đoạn (mm):
+                              </Typography>
                               {(bar.steelLines ?? []).map((line, lIdx) => (
                                 <Stack
                                   key={lIdx}
                                   direction="row"
                                   spacing={0.5}
                                   alignItems="center"
+                                  sx={{
+                                    p: 0.5,
+                                    borderRadius: 1.5,
+                                    bgcolor: "#ffffff",
+                                    border: "1px solid #e2e8f0",
+                                  }}
                                 >
                                   <TextField
                                     size="small"
                                     disabled={isView}
-                                    sx={{ width: 62 }}
                                     value={line.paramName}
                                     onChange={(e) =>
                                       updateLineValue(aIdx, bIdx, lIdx, {
                                         paramName: e.target.value,
                                       })
                                     }
+                                    sx={{ width: 58 }}
                                   />
                                   <TextField
                                     size="small"
                                     type="number"
                                     disabled={isView}
-                                    sx={{ width: 105 }}
                                     value={line.value}
                                     onChange={(e) =>
                                       updateLineValue(aIdx, bIdx, lIdx, {
                                         value: Number(e.target.value || 0),
                                       })
                                     }
+                                    sx={{ width: 92 }}
                                   />
                                   {!isView &&
                                     (bar.steelLines ?? []).length > 1 && (
@@ -515,136 +771,48 @@ export default function Step2({
                               {!isView && (
                                 <Button
                                   size="small"
-                                  sx={{
-                                    alignSelf: "flex-start",
-                                    textTransform: "none",
-                                    p: 0,
-                                    minWidth: 0,
-                                  }}
+                                  variant="text"
+                                  startIcon={<AddIcon />}
                                   onClick={() => addLineSegment(aIdx, bIdx)}
+                                  sx={{ textTransform: "none", fontWeight: 600 }}
                                 >
-                                  + Thêm đoạn
+                                  Thêm đoạn
                                 </Button>
                               )}
                             </Stack>
-                          </TableCell>
+                          </Grid>
+                        </Grid>
+                      </Paper>
+                    );
+                  })}
+                </Stack>
 
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              type="number"
-                              disabled={isView}
-                              value={bar.spliceLength ?? 0}
-                              onChange={(e) =>
-                                updateBar(aIdx, bIdx, {
-                                  spliceLength: Number(e.target.value || 0),
-                                })
-                              }
-                            />
-                          </TableCell>
-
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              type="number"
-                              disabled={isView}
-                              value={bar.bendDeduction ?? 0}
-                              onChange={(e) =>
-                                updateBar(aIdx, bIdx, {
-                                  bendDeduction: Number(e.target.value || 0),
-                                })
-                              }
-                            />
-                          </TableCell>
-
-                          <TableCell align="right" sx={{ fontWeight: 600 }}>
-                            {m.cutLengthMeter.toLocaleString("vi-VN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 3,
-                            })}
-                          </TableCell>
-
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              type="number"
-                              disabled={isView}
-                              value={bar.barQuantity ?? 0}
-                              inputProps={{ min: 0 }}
-                              onChange={(e) =>
-                                updateBar(aIdx, bIdx, {
-                                  barQuantity: Math.max(
-                                    0,
-                                    Number(e.target.value || 0)
-                                  ),
-                                })
-                              }
-                            />
-                          </TableCell>
-
-                          <TableCell align="right" sx={{ fontWeight: 600 }}>
-                            {m.totalBars}
-                          </TableCell>
-
-                          <TableCell align="right" sx={{ fontWeight: 600 }}>
-                            {m.totalLength.toLocaleString("vi-VN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </TableCell>
-
-                          <TableCell
-                            align="right"
-                            sx={{ fontWeight: 700, color: "warning.dark" }}
-                          >
-                            {m.totalWeight.toLocaleString("vi-VN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </TableCell>
-
-                          {!isView && (
-                            <TableCell align="center">
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => removeBar(aIdx, bIdx)}
-                              >
-                                <DeleteOutlineIcon fontSize="small" />
-                              </IconButton>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              {!isView && (
-                <Box sx={{ mt: 1.5 }}>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    startIcon={<AddIcon />}
-                    onClick={() => addBar(aIdx)}
-                  >
-                    Thêm thanh thép
-                  </Button>
-                </Box>
-              )}
-            </Paper>
-          );
-        })}
-      </Stack>
+                {!isView && (
+                  <Box sx={{ mt: 1.5 }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={() => addBar(aIdx)}
+                      sx={{ textTransform: "none", fontWeight: 600 }}
+                    >
+                      Thêm thanh thép vào cấu kiện
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            </Collapse>
+          </Paper>
+        );
+      })}
 
       {!isView && (
-        <Box sx={{ mt: 2 }}>
+        <Box>
           <Button
             variant="contained"
-            color="primary"
             startIcon={<AddIcon />}
             onClick={addAssembly}
+            sx={{ textTransform: "none", fontWeight: 700, borderRadius: 2 }}
           >
             Thêm cấu kiện mới
           </Button>
@@ -652,7 +820,10 @@ export default function Step2({
       )}
 
       {/* Bảng tổng hợp theo Đường kính (Ø) */}
-      <Paper variant="outlined" sx={{ p: 2.5, mt: 3, borderRadius: 2 }}>
+      <Paper
+        elevation={0}
+        sx={{ p: 2.5, borderRadius: 2.5, border: "1px solid #e2e8f0" }}
+      >
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1.5 }}>
           Bảng tổng hợp thép theo đường kính (Ø)
         </Typography>
@@ -674,45 +845,79 @@ export default function Step2({
                 <TableCell sx={{ fontWeight: 700 }} align="right">
                   Quy đổi (tấn)
                 </TableCell>
+                <TableCell sx={{ fontWeight: 700, minWidth: 160 }}>
+                  Tỷ trọng khối lượng
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {summary.diameterSummaries.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 2 }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
                     Chưa có dữ liệu thanh thép
                   </TableCell>
                 </TableRow>
               ) : (
                 <>
-                  {summary.diameterSummaries.map((row) => (
-                    <TableRow key={row.barDiameter} hover>
-                      <TableCell sx={{ fontWeight: 700 }}>
-                        Ø{row.barDiameter}
-                      </TableCell>
-                      <TableCell align="right">
-                        {row.totalBars.toLocaleString("vi-VN")}
-                      </TableCell>
-                      <TableCell align="right">
-                        {row.totalLengthMeter.toLocaleString("vi-VN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
-                        {row.totalWeightKg.toLocaleString("vi-VN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </TableCell>
-                      <TableCell align="right">
-                        {(row.totalWeightKg / 1000).toLocaleString("vi-VN", {
-                          minimumFractionDigits: 3,
-                          maximumFractionDigits: 3,
-                        })}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {summary.diameterSummaries.map((row) => {
+                    const share =
+                      summary.totalWeight > 0
+                        ? Math.round(
+                            (row.totalWeightKg / summary.totalWeight) * 100
+                          )
+                        : 0;
+                    return (
+                      <TableRow key={row.barDiameter} hover>
+                        <TableCell>
+                          <Chip
+                            size="small"
+                            label={`Ø${row.barDiameter}`}
+                            color="primary"
+                            variant="outlined"
+                            sx={{ fontWeight: 800 }}
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          {row.totalBars.toLocaleString("vi-VN")}
+                        </TableCell>
+                        <TableCell align="right">
+                          {row.totalLengthMeter.toLocaleString("vi-VN", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700 }}>
+                          {row.totalWeightKg.toLocaleString("vi-VN", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </TableCell>
+                        <TableCell align="right">
+                          {(row.totalWeightKg / 1000).toLocaleString("vi-VN", {
+                            minimumFractionDigits: 3,
+                            maximumFractionDigits: 3,
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                          >
+                            <LinearProgress
+                              variant="determinate"
+                              color="warning"
+                              value={share}
+                              sx={{ flex: 1, height: 6, borderRadius: 3 }}
+                            />
+                            <Typography variant="caption" fontWeight={700}>
+                              {share}%
+                            </Typography>
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                   <TableRow sx={{ bgcolor: "#fffbeb" }}>
                     <TableCell colSpan={2} sx={{ fontWeight: 800 }}>
                       TỔNG CỘNG
@@ -741,6 +946,7 @@ export default function Step2({
                         maximumFractionDigits: 3,
                       })}
                     </TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>100%</TableCell>
                   </TableRow>
                 </>
               )}
@@ -748,6 +954,6 @@ export default function Step2({
           </Table>
         </TableContainer>
       </Paper>
-    </Box>
+    </Stack>
   );
 }

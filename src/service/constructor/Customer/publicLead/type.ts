@@ -23,6 +23,25 @@ export type PublicCustomerLeadResult = {
   existingCustomer: boolean;
 };
 
+export type AiHouseDesignRequest = {
+  style: string;
+  floors: string;
+  paintColor: string;
+  ownerAgeGroup: string;
+  functions: string[];
+  landSize: string;
+  budget: string;
+  extraNotes?: string;
+};
+
+export type AiHouseDesignResponse = {
+  generatedByAi: boolean;
+  imageDataUrl?: string;
+  summaryText: string;
+  promptUsed: string;
+  warningMessage?: string;
+};
+
 export type Response = {
   POST: BaseResponse<PublicCustomerLeadResult>;
 };

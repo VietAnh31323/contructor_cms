@@ -1,0 +1,17 @@
+{
+  "name": "Constructor ERP - Quản lý Thi công",
+  "short_name": "Constructor",
+  "description": "Ứng dụng quản lý dự án xây dựng, tiến độ hiện trường và thống kê thép",
+  "start_url": "/Dashboard",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

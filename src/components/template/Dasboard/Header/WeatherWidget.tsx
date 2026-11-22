@@ -100,7 +100,7 @@ const VN_DAYS = [
 ];
 
 export default function WeatherWidget() {
-  const [now, setNow] = useState<Date>(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [cityName, setCityName] = useState<string>("Hà Nội");
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [weather, setWeather] = useState<WeatherState>({
@@ -116,6 +116,7 @@ export default function WeatherWidget() {
   });
 
   useEffect(() => {
+    setNow(new Date());
     const saved = localStorage.getItem("cms_weather_city");
     if (saved && CITIES.some((c) => c.name === saved)) {
       setCityName(saved);
@@ -215,13 +216,15 @@ export default function WeatherWidget() {
     }
   };
 
-  const dayStr = VN_DAYS[now.getDay()];
-  const dateStr = now.toLocaleDateString("vi-VN");
-  const timeStr = now.toLocaleTimeString("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+  const dayStr = now ? VN_DAYS[now.getDay()] : "";
+  const dateStr = now ? now.toLocaleDateString("vi-VN") : "";
+  const timeStr = now
+    ? now.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+    : "--:--:--";
 
   return (
     <>

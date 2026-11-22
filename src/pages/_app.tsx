@@ -1,6 +1,8 @@
 import "@/styles/global.css";
 import type { AppProps } from "next/app";
+import Head from "next/head";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import { Provider } from "react-redux";
@@ -29,8 +31,19 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   const Layout = isAuthPage ? AuthLayout : AdminLayout;
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta name="theme-color" content="#2563eb" />
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
       <Provider store={store}>
         <RecoilRoot>
           <ThemeProvider theme={theme}>

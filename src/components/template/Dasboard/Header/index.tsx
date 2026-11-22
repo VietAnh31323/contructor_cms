@@ -82,11 +82,15 @@ export default function Header({
   const open = Boolean(anchorEl);
   const queryClient = useQueryClient();
 
-  const displayName = useMemo(() => {
-    if (typeof window === "undefined") return "Admin";
+  const [displayName, setDisplayName] = useState<string>("Admin");
+
+  useEffect(() => {
     const info = extractAuthFromToken() as { username?: string };
-    return info.username || localStorage.getItem("username") || "Người dùng";
+    const resolved =
+      info.username || localStorage.getItem("username") || "Người dùng";
+    setDisplayName(resolved);
   }, []);
+
   const initials = displayName.slice(0, 2).toUpperCase();
 
   useEffect(() => {

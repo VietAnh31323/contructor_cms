@@ -34,6 +34,7 @@ import { PublicCustomerLeadResult } from "@/service/constructor/Customer/publicL
 import { toastError, toastSuccess } from "@/toast";
 import router from "next/router";
 import { FormEvent, useState } from "react";
+import AiHouseDesignerSection from "./AiHouseDesignerSection";
 
 const SERVICE_OPTIONS = [
   "Thiết kế kiến trúc & kết cấu",
@@ -252,6 +253,19 @@ export default function CustomerLeadLanding() {
         }}
       >
         <Container maxWidth="lg">
+          <AiHouseDesignerSection
+            onApplyToLeadForm={(payload) => {
+              setSubmittedResult(null);
+              setForm((prev) => ({
+                ...prev,
+                projectScale: payload.projectScale,
+                estimatedBudget: payload.estimatedBudget,
+                serviceInterest: payload.serviceInterest,
+                message: payload.message,
+              }));
+            }}
+          />
+
           <Grid container spacing={5} alignItems="flex-start">
             {/* LEFT HERO CONTENT */}
             <Grid item xs={12} md={6}>

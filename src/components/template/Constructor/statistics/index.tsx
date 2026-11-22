@@ -431,6 +431,10 @@ export default function StatisticsPage() {
                         elevation={0}
                         sx={{
                           p: 2.5,
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #e2e8f0",
                           bgcolor: "#ffffff",
@@ -510,6 +514,10 @@ export default function StatisticsPage() {
                         elevation={0}
                         sx={{
                           p: 2.5,
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #fee2e2",
                           bgcolor: "#ffffff",
@@ -577,6 +585,10 @@ export default function StatisticsPage() {
                         elevation={0}
                         sx={{
                           p: 2.5,
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #fef3c7",
                           bgcolor: "#ffffff",
@@ -601,7 +613,7 @@ export default function StatisticsPage() {
                               CÔNG NỢ PHẢI THU
                             </Typography>
                             <Typography
-                              variant="h5"
+                              variant="h4"
                               fontWeight={800}
                               color="warning.dark"
                               sx={{ mt: 0.8 }}
@@ -641,6 +653,10 @@ export default function StatisticsPage() {
                         elevation={0}
                         sx={{
                           p: 2.5,
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #dcfce7",
                           bgcolor: "#ffffff",
