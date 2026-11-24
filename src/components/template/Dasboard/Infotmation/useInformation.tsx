@@ -1,7 +1,6 @@
 import { useFormCustom } from "@/lib/form";
 import { ROUTES } from "@/routes";
 import { useAccountDetailQuery } from "@/service/constructor/Account/getDetail";
-import { RequestBody as RequestDetail } from "@/service/constructor/Account/getDetail/type";
 import { putAccount } from "@/service/constructor/Account/save";
 import { RequestBody } from "@/service/constructor/Account/save/type";
 import { toastError, toastSuccess } from "@/toast";
@@ -11,6 +10,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 const defaultValues = {};
+
 export default function useInformation() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,43 +25,50 @@ export default function useInformation() {
   const id = Number(params?.id);
   const isUpdate = !!id;
 
-  const methodForm = useFormCustom<RequestDetail["GET"]>({
-    defaultValues,
-  });
   const methodForms = useFormCustom<RequestBody["SAVE"]>({
     defaultValues,
   });
-  const { reset } = methodForm;
-  const { handleSubmit, control } = methodForms;
+  const { handleSubmit, control, reset, setValue, watch } = methodForms;
   const { data, isLoading, refetch } = useAccountDetailQuery();
+  const watchedAvatar = watch("avatar");
 
   useEffect(() => {
-    if (id && data?.data) {
-      reset(data.data);
+    if (data?.data) {
+      reset(data.data as any);
     }
-  }, [id, data, reset]);
+  }, [data, reset]);
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (body: RequestBody["SAVE"]) => putAccount(body),
-
     onSuccess: (res: any) => {
-      toastSuccess("Thành công");
+      toastSuccess("Cập nhật thông tin thành công");
       if (res?.data?.id) {
         router.push(ROUTES.INFORMATION);
       }
       refetch();
     },
-
     onError: (error: any) => {
       toastError(error?.message || "Có lỗi xảy ra");
     },
   });
 
-  const onSubmit = handleSubmit((data) => {
-    mutate(data);
+  const onSubmit = handleSubmit((formData) => {
+    mutate(formData);
   });
+
   return [
-    { isView, page, rowsPerPage, control, isUpdate, isLoading, id, data },
-    { setPage, setRowsPerPage, onSubmit },
-  ];
+    {
+      isView,
+      page,
+      rowsPerPage,
+      control,
+      watchedAvatar,
+      isUpdate,
+      isLoading,
+      isPending,
+      id,
+      data,
+    },
+    { setPage, setRowsPerPage, setValue, onSubmit },
+  ] as const;
 }

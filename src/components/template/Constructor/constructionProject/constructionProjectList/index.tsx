@@ -46,6 +46,7 @@ import {
   PROJECT_STATE_META,
 } from "../constants";
 import ProjectTransitionDialog from "../ProjectTransitionDialog";
+import { ProjectLifecycleSummary } from "./ProjectLifecycleSummary";
 import useConstructionProjectList, {
   ProjectViewMode,
 } from "./useConstructionProjectList";
@@ -96,96 +97,11 @@ export default function ConstructionProjectList() {
     >
       {/* ================= BẢNG TỔNG QUAN VÒNG ĐỜI DỰ ÁN (2.09) ================= */}
       {lifecycleSummary && (
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1.5,
-            overflowX: "auto",
-            pb: 1.5,
-            pt: 1,
-          }}
-        >
-          <Paper
-            variant="outlined"
-            onClick={() => handleSelectStageCard("")}
-            sx={{
-              minWidth: 165,
-              p: 1.5,
-              borderRadius: 2,
-              cursor: "pointer",
-              borderColor:
-                activeStateFilter === "" ? "primary.main" : "#e2e8f0",
-              borderWidth: activeStateFilter === "" ? 2 : 1,
-              bgcolor: activeStateFilter === "" ? "#eff6ff" : "#ffffff",
-              flexShrink: 0,
-            }}
-          >
-            <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              TẤT CẢ DỰ ÁN
-            </Typography>
-            <Typography variant="h6" fontWeight={800} sx={{ mt: 0.25 }}>
-              {lifecycleSummary.totalProjects}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" noWrap>
-              Đang chạy: {lifecycleSummary.activeProjects} •{" "}
-              {formatVnd(lifecycleSummary.totalContractValue)}
-            </Typography>
-          </Paper>
-
-          {PROJECT_KANBAN_STATES.map((st) => {
-            const meta = PROJECT_STATE_META[st];
-            const stageSummary = lifecycleSummary.stages?.find(
-              (s) => s.state === st
-            );
-            const count = stageSummary?.projectCount ?? 0;
-            const totalVal = stageSummary?.totalContractValue ?? 0;
-            const isSelected = activeStateFilter === st;
-
-            return (
-              <Paper
-                key={st}
-                variant="outlined"
-                onClick={() =>
-                  handleSelectStageCard(isSelected ? "" : st)
-                }
-                sx={{
-                  minWidth: 150,
-                  p: 1.5,
-                  borderRadius: 2,
-                  cursor: "pointer",
-                  borderTop: `3px solid ${meta.accent}`,
-                  borderColor: isSelected ? meta.accent : undefined,
-                  bgcolor: isSelected ? meta.bg : "#ffffff",
-                  flexShrink: 0,
-                  transition: "all 0.15s ease",
-                  "&:hover": {
-                    bgcolor: meta.bg,
-                  },
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  fontWeight={700}
-                  sx={{ color: meta.accent }}
-                  noWrap
-                >
-                  {meta.shortLabel}
-                </Typography>
-                <Typography variant="h6" fontWeight={800} sx={{ mt: 0.25 }}>
-                  {count} DA
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block" }}
-                  noWrap
-                >
-                  {formatVnd(totalVal)}
-                </Typography>
-              </Paper>
-            );
-          })}
-        </Box>
+        <ProjectLifecycleSummary
+          lifecycleSummary={lifecycleSummary}
+          activeStateFilter={activeStateFilter}
+          onSelectStage={handleSelectStageCard}
+        />
       )}
 
       {/* ================= BỘ LỌC TÌM KIẾM ================= */}

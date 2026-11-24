@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+import { PaletteMode } from "@mui/material";
 
 export const APP_FONT_FAMILY =
   '"Be Vietnam Pro", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -6,8 +7,37 @@ export const APP_FONT_FAMILY =
 export const APP_MONO_FONT_FAMILY =
   '"JetBrains Mono", "Cascadia Mono", Consolas, "Courier New", monospace';
 
-export const theme = createTheme({
-  typography: {
+export function createAppTheme(mode: PaletteMode = "light") {
+  const isDark = mode === "dark";
+
+  return createTheme({
+    palette: {
+      mode,
+      ...(isDark
+        ? {
+            background: {
+              default: "#090d16",
+              paper: "#0f172a",
+            },
+            text: {
+              primary: "#f1f5f9",
+              secondary: "#94a3b8",
+            },
+            divider: "#1e293b",
+          }
+        : {
+            background: {
+              default: "#f8fafc",
+              paper: "#ffffff",
+            },
+            text: {
+              primary: "#0f172a",
+              secondary: "#64748b",
+            },
+            divider: "#e2e8f0",
+          }),
+    },
+    typography: {
     fontFamily: APP_FONT_FAMILY,
     fontWeightLight: 300,
     fontWeightRegular: 400,
@@ -127,6 +157,26 @@ export const theme = createTheme({
         root: {
           fontFamily: APP_FONT_FAMILY,
           lineHeight: 1.5,
+          ...(isDark && {
+            borderBottomColor: "#1e293b",
+            color: "#e2e8f0",
+          }),
+        },
+        head: {
+          ...(isDark && {
+            backgroundColor: "#1e293b",
+            color: "#cbd5e1",
+          }),
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          ...(isDark && {
+            backgroundImage: "none",
+            borderColor: "#1e293b",
+          }),
         },
       },
     },
@@ -154,4 +204,7 @@ export const theme = createTheme({
       },
     },
   },
-});
+  });
+}
+
+export const theme = createAppTheme("light");

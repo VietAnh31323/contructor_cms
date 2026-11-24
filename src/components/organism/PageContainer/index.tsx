@@ -14,10 +14,14 @@ const PageContainer = ({
 
       <Box
         sx={{
-          backgroundColor: "#ffffff",
+          backgroundColor: "background.paper",
           borderRadius: 3,
-          border: "1px solid #e2e8f0",
-          boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
+          border: "1px solid",
+          borderColor: "divider",
+          boxShadow: (theme) =>
+            theme.palette.mode === "dark"
+              ? "0 1px 3px rgba(0, 0, 0, 0.35)"
+              : "0 1px 3px rgba(15, 23, 42, 0.04)",
           p: { xs: 2, md: 3 },
           minHeight: title ? "calc(100vh - 140px)" : "calc(100vh - 110px)",
         }}

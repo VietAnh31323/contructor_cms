@@ -26,7 +26,7 @@ export const CoreBreadcrumbs = (props: CoreBreadcrumbsProps) => {
       className={className}
       separator={<KeyboardArrowRightIcon fontSize="small" />}
       classes={{
-        root: "bg-white h-30 flex item-center mb-0",
+        root: "bg-white dark:bg-slate-900 dark:text-slate-100 rounded-xl px-2 h-30 flex items-center mb-0",
         separator: "m-0",
       }}
     >

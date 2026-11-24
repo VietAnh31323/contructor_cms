@@ -1,7 +1,18 @@
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { toast } from "react-toastify";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { CloseButtonProps, toast } from "react-toastify";
 import { ErrorMessage } from "@/toast/componets/error";
 import { SuccessMessage } from "@/toast/componets/success";
+
+const ToastCloseButton = ({ closeToast }: CloseButtonProps) => (
+  <button
+    type="button"
+    onClick={closeToast}
+    aria-label="Đóng thông báo"
+    className="ml-1 flex h-6 w-6 flex-shrink-0 items-center justify-center self-start rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 cursor-pointer"
+  >
+    <CloseRoundedIcon sx={{ fontSize: 16 }} />
+  </button>
+);
 
 export const toastSuccess = (
   msg: string,
@@ -10,31 +21,12 @@ export const toastSuccess = (
 ) => {
   if (msg)
     toast(<SuccessMessage message={msg} title={title} />, {
-      closeButton: () => (
-        <div className="px-6 my-auto border-l">
-          <CloseOutlinedIcon fontSize="small" />
-        </div>
-      ),
-      className: "vds-toast__success",
-      autoClose: onClick ? 99999 : 5000,
+      closeButton: ToastCloseButton,
+      className: "vds-toast vds-toast__success",
+      progressClassName: "vds-toast__progress--success",
+      autoClose: onClick ? 99999 : 3500,
     });
 };
-
-// export const errorMsgWithClick = (
-//   message: any,
-//   title?: any,
-//   onClick?: () => void,
-// ) => {
-//   toast(<ErrorMessage title={title} message={message} />, {
-//     closeButton: () => (
-//       <div className="px-12 my-auto border-l">
-//         <CloseOutlinedIcon fontSize="small" />
-//       </div>
-//     ),
-//     className: 'vds-toast__error',
-//     autoClose: 99999,
-//   })
-// }
 
 export const toastError = (error: any, setError?: any) => {
   if (Array.isArray(error) && error.length > 0) {
@@ -51,20 +43,19 @@ export const toastError = (error: any, setError?: any) => {
     });
   } else if (typeof error === "string") {
     toast(<ErrorMessage message={error} />, {
-      closeButton: () => (
-        <div className="px-2 my-auto border-l">
-          <CloseOutlinedIcon fontSize="small" color={"error"} />
-        </div>
-      ),
-      className: "vds-toast__error",
+      closeButton: ToastCloseButton,
+      className: "vds-toast vds-toast__error",
+      progressClassName: "vds-toast__progress--error",
     });
-  } else
-    toast(<ErrorMessage message="Có lỗi xảy ra" />, {
-      closeButton: () => (
-        <div className="px-2 my-auto border-l">
-          <CloseOutlinedIcon fontSize="small" color={"error"} />
-        </div>
-      ),
-      className: "vds-toast__error",
+  } else {
+    const resolvedMsg =
+      typeof error?.message === "string" && error.message.trim()
+        ? error.message
+        : "Có lỗi xảy ra";
+    toast(<ErrorMessage message={resolvedMsg} />, {
+      closeButton: ToastCloseButton,
+      className: "vds-toast vds-toast__error",
+      progressClassName: "vds-toast__progress--error",
     });
+  }
 };

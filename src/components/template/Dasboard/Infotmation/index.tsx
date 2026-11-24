@@ -1,260 +1,375 @@
-import {
-  Autocomplete,
-  Avatar,
-  Button,
-  Grid,
-  InputAdornment,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Image from "next/image";
-import statistics from "@/assets/svg/statistics.svg";
-import { CoreTableCustom } from "@/components/organism/CoreTableCustom";
-import PageContainer from "@/components/organism/PageContainer";
 import { CoreBreadcrumbs } from "@/components/atoms/CoreBreadcrumbs";
-import { CoreButton } from "@/components/atoms/CoreButton";
-import useInformation from "@/components/template/Dasboard/Infotmation/useInformation";
-import CoreNavbar from "@/components/organism/CoreNavbar";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import CoreInputCustom from "@/components/atoms/CoreInputCustom";
-import { useForm, useFormContext } from "react-hook-form";
 import CoreAutocomplete from "@/components/atoms/CoreAutocomplete";
-import avatar from "@/assets/png/Avatar.png";
-import edit from "@/assets/svg/edit.svg";
-import { RowBoxCommon } from "@/components/atoms/RowBoxCommon";
+import { CoreButton } from "@/components/atoms/CoreButton";
 import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
+import CoreInputCustom from "@/components/atoms/CoreInputCustom";
 import { getEnum } from "@/components/atoms/TextColor";
-import router from "next/router";
-import { ROUTES } from "@/routes";
+import { AvatarUploadField } from "@/components/molecules/AvatarUploadField";
 import CoreLoading from "@/components/molecules/CoreLoading";
+import PageContainer from "@/components/organism/PageContainer";
+import useInformation from "@/components/template/Dasboard/Infotmation/useInformation";
+import { ROUTES } from "@/routes";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
+import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined";
+import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
+import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import { useRouter } from "next/router";
+
+const POSITION_OPTIONS = [
+  { label: "Kiến trúc sư", value: "ARCHITECT" },
+  { label: "Kỹ sư điện nước", value: "MEP_ENGINEER" },
+  { label: "Kỹ sư kết cấu", value: "STRUCTURAL_ENGINEER" },
+  { label: "Kỹ sư giám sát", value: "ESTIMATOR" },
+  { label: "Dự toán viên", value: "SUPERVISOR" },
+];
+
+const GENDER_OPTIONS = [
+  { label: "Nam", value: "MALE" },
+  { label: "Nữ", value: "FEMALE" },
+];
+
 export default function Information() {
+  const router = useRouter();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const [value, handle] = useInformation();
-  const { onSubmit } = handle;
-  const { control, data, isLoading } = value;
-  const [date, setDate] = useState<Date | null>(null);
-  console.log("data", data);
+  const { onSubmit, setValue } = handle;
+  const { control, data, isLoading, isPending, watchedAvatar } = value;
+
+  const profile = data?.data;
+  const fullName =
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
+    profile?.code ||
+    profile?.email ||
+    "Người dùng";
+  const initials = fullName.slice(0, 2).toUpperCase();
+  const positionLabel =
+    getEnum(profile?.position, POSITION_OPTIONS) ?? "Chưa cập nhật";
+
+  const cardBg = isDark ? "#0f172a" : "#ffffff";
+  const subtleBg = isDark ? "#1e293b" : "#f8fafc";
+  const borderColor = isDark ? "#1e293b" : "#e2e8f0";
+
   return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      sx={{
-        overflowY: "auto",
-        overflowX: "hidden",
-      }}
+    <PageContainer
+      title={
+        <CoreBreadcrumbs breadcrumbs={[{ title: "Thông tin cá nhân" }]} />
+      }
     >
-      <PageContainer
-        title={
-          <CoreBreadcrumbs breadcrumbs={[{ title: "Thông tin cá nhân" }]} />
-        }
-      >
-        <br />
-        <CoreNavbar
-          breadcrumbs={[
-            {
-              title: "Thông tin ",
-              content: isLoading ? (
-                <CoreLoading />
-              ) : (
-                <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                  <Grid item xs={12} sm={12} md={3} lg={3}>
-                    <Avatar
-                      src={data?.data?.avatar}
-                      alt="statistics"
-                      sx={{
-                        width: 220,
-                        height: 220,
-                        margin: "0 auto",
-                      }}
-                    />
+      {isLoading ? (
+        <CoreLoading />
+      ) : (
+        <Grid container spacing={3}>
+          {/* Left: Profile Overview Card */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              variant="outlined"
+              sx={{
+                borderRadius: 3,
+                overflow: "hidden",
+                borderColor,
+                bgcolor: cardBg,
+              }}
+            >
+              {/* Subtle top accent band */}
+              <Box
+                sx={{
+                  height: 84,
+                  background: isDark
+                    ? "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"
+                    : "linear-gradient(135deg, #e0f2fe 0%, #f1f5f9 100%)",
+                  borderBottom: `1px solid ${borderColor}`,
+                }}
+              />
 
+              <Box sx={{ px: 3, pb: 3, mt: -6 }}>
+                <Stack alignItems="center" spacing={1.25} textAlign="center">
+                  <Avatar
+                    src={watchedAvatar ?? profile?.avatar}
+                    alt={fullName}
+                    sx={{
+                      width: 96,
+                      height: 96,
+                      fontSize: 28,
+                      fontWeight: 800,
+                      bgcolor: "#2563eb",
+                      color: "#ffffff",
+                      border: `4px solid ${cardBg}`,
+                      boxShadow: "0 4px 14px rgba(15, 23, 42, 0.14)",
+                    }}
+                  >
+                    {initials}
+                  </Avatar>
+
+                  <Box>
                     <Typography
-                      align="center"
-                      color={"#0078D4"}
-                      display={"flex"}
-                      justifyContent={"center"}
-                      marginTop={"10px"}
+                      variant="h6"
+                      fontWeight={800}
+                      sx={{ color: "text.primary" }}
                     >
-                      Cập nhật hình ảnh
-                      <Image
-                        src={edit}
-                        alt="statistics"
-                        width={20}
-                        height={20}
-                        style={{
-                          margin: " 0 5px",
-                        }}
-                      />
+                      {fullName}
                     </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={12} md={9} lg={9}>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                      <RowBoxCommon
-                        title=" "
-                        data={
-                          data?.data?.code +
-                          " - " +
-                          data?.data?.firstName +
-                          " " +
-                          data?.data?.lastName
-                        }
-                        dataStyle={{ fontSize: "1.5rem", color: "#0078D4" }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon
-                        title="Vị trí"
-                        data={
-                          getEnum(data?.data?.position, [
-                            { label: "Kiến trúc sư", value: "ARCHITECT" },
-                            { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
-                            {
-                              label: "Kĩ sư kết cấu",
-                              value: "STRUCTURAL_ENGINEER",
-                            },
-                            { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
-                            { label: "Dự toán viên", value: "SUPERVISOR" },
-                          ]) ?? "N/A"
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon
-                        title="Ngày sinh"
-                        data={data?.data?.birthDate ?? "N/A"}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon
-                        title="Email"
-                        data={data?.data?.email ?? "N/A"}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon
-                        title="Địa chỉ"
-                        data={data?.data?.address ?? "N/A"}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <RowBoxCommon
-                        title="Số điện thoại"
-                        data={data?.data?.phone ?? "N/A"}
-                      />
-                    </Grid>
-                  </Grid>
-                  <form className="flex flex-col p-6 " onSubmit={onSubmit}>
-                    <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="firstName"
-                          label="First Name"
-                          placeholder="Nhập họ và tên"
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="center"
+                      alignItems="center"
+                      sx={{ mt: 0.75 }}
+                    >
+                      {profile?.code && (
+                        <Chip
+                          size="small"
+                          label={profile.code}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: 11,
+                            bgcolor: subtleBg,
+                            color: "text.primary",
+                          }}
                         />
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="lastName"
-                          label="Last Name"
-                          placeholder="Nhập họ và tên"
-                        />
-                      </Grid>
+                      )}
+                      <Chip
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        label={positionLabel}
+                        sx={{ fontWeight: 600, fontSize: 11 }}
+                      />
+                    </Stack>
+                  </Box>
+                </Stack>
 
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="phone"
-                          label="Số điện thoại"
-                          placeholder="Nhập số điện thoại"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreAutocomplete
-                          options={[
-                            { label: "Nam", value: "MALE" },
-                            { label: "Nữ", value: "FEMALE" },
-                          ]}
-                          control={control}
-                          name="gender"
-                          label="Giới tính"
-                          placeholder="Chọn giới tính"
-                          valuePath="value"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="email"
-                          label="Email"
-                          placeholder="Nhập email"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreAutocomplete
-                          options={[
-                            { label: "Kiến trúc sư", value: "ARCHITECT" },
-                            { label: "Kĩ sư điện nước", value: "MEP_ENGINEER" },
-                            {
-                              label: "Kĩ sư kết cấu",
-                              value: "STRUCTURAL_ENGINEER",
-                            },
-                            { label: "Kĩ sư giám sát", value: "ESTIMATOR" },
-                            { label: "Dự toán viên", value: "SUPERVISOR" },
-                          ]}
-                          control={control}
-                          name="position"
-                          label="Chức vụ"
-                          placeholder="Chọn chức vụ"
-                          valuePath="value"
-                        />
-                      </Grid>
+                <Divider sx={{ my: 2.5 }} />
 
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreDatePicker
-                          name="birthDate"
-                          control={control!}
-                          label={"Ngày sinh"}
-                          placeholder="Chọn ngày sinh"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={12} md={6} lg={6}>
-                        <CoreInputCustom
-                          control={control}
-                          name="address"
-                          label="Địa chỉ"
-                          placeholder="Nhập địa chỉ"
-                        />
-                      </Grid>
-                    </Grid>
-                    <div className="py-4 flex justify-center gap-4 items-center">
-                      <CoreButton
-                        onClick={() => {
-                          router.push(ROUTES.DASHBOARD);
-                        }}
-                        theme="cancel"
-                      >
-                        {"Hủy bỏ"}
-                      </CoreButton>
-                      <CoreButton
-                        // onClick={() => {}}
-                        theme="submit"
-                        type="submit"
-                      >
-                        {"Lưu"}
-                      </CoreButton>
-                    </div>
-                  </form>
+                <Stack spacing={1.6}>
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <EmailOutlinedIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
+                    />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Email
+                      </Typography>
+                      <Typography variant="body2" fontWeight={600} noWrap>
+                        {profile?.email || "Chưa cập nhật"}
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <PhoneOutlinedIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
+                    />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Số điện thoại
+                      </Typography>
+                      <Typography variant="body2" fontWeight={600} noWrap>
+                        {profile?.phone || "Chưa cập nhật"}
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <CakeOutlinedIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
+                    />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Ngày sinh
+                      </Typography>
+                      <Typography variant="body2" fontWeight={600} noWrap>
+                        {profile?.birthDate || "Chưa cập nhật"}
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <HomeOutlinedIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
+                    />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Địa chỉ
+                      </Typography>
+                      <Typography variant="body2" fontWeight={600} noWrap>
+                        {profile?.address || "Chưa cập nhật"}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Stack>
+
+                <Divider sx={{ my: 2.5 }} />
+
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<LockResetOutlinedIcon />}
+                  onClick={() => router.push(ROUTES.FORGOTPASS)}
+                  sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
+                >
+                  Đổi mật khẩu tài khoản
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+
+          {/* Right: Edit Form Card */}
+          <Grid item xs={12} md={8}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: { xs: 2.5, sm: 3.5 },
+                borderRadius: 3,
+                borderColor,
+                bgcolor: cardBg,
+              }}
+            >
+              <Box sx={{ mb: 3 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight={800}
+                  sx={{ color: "text.primary" }}
+                >
+                  Chỉnh sửa thông tin cá nhân
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  Cập nhật thông tin liên hệ và chức vụ hiển thị trong hệ thống.
+                </Typography>
+              </Box>
+
+              <form onSubmit={onSubmit}>
+                <Box sx={{ mb: 3 }}>
+                  <AvatarUploadField
+                    value={watchedAvatar ?? profile?.avatar}
+                    onChange={(url) =>
+                      setValue("avatar", url, { shouldDirty: true })
+                    }
+                    fallbackText={initials}
+                    label="Hình ảnh cá nhân"
+                    helperText="Ảnh đại diện sẽ hiển thị trong hồ sơ nhân sự và tài khoản của bạn (PNG, JPG, tối đa 5MB)."
+                  />
+                </Box>
+
+                <Grid container spacing={2.5}>
+                  <Grid item xs={12} sm={6}>
+                    <CoreInputCustom
+                      control={control}
+                      name="firstName"
+                      label="Họ"
+                      placeholder="Nhập họ"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <CoreInputCustom
+                      control={control}
+                      name="lastName"
+                      label="Tên"
+                      placeholder="Nhập tên"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <CoreInputCustom
+                      control={control}
+                      name="phone"
+                      label="Số điện thoại"
+                      placeholder="Nhập số điện thoại"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <CoreAutocomplete
+                      options={GENDER_OPTIONS}
+                      control={control}
+                      name="gender"
+                      label="Giới tính"
+                      placeholder="Chọn giới tính"
+                      valuePath="value"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <CoreInputCustom
+                      control={control}
+                      name="email"
+                      label="Email"
+                      placeholder="Nhập email"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <CoreAutocomplete
+                      options={POSITION_OPTIONS}
+                      control={control}
+                      name="position"
+                      label="Chức vụ"
+                      placeholder="Chọn chức vụ"
+                      valuePath="value"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <CoreDatePicker
+                      name="birthDate"
+                      control={control!}
+                      label="Ngày sinh"
+                      placeholder="Chọn ngày sinh"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <CoreInputCustom
+                      control={control}
+                      name="address"
+                      label="Địa chỉ"
+                      placeholder="Nhập địa chỉ"
+                    />
+                  </Grid>
                 </Grid>
-              ),
-            },
-          ]}
-        />
-      </PageContainer>
-    </Grid>
+
+                <Divider sx={{ my: 3 }} />
+
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  justifyContent="flex-end"
+                  alignItems="center"
+                >
+                  <CoreButton
+                    onClick={() => router.push(ROUTES.DASHBOARD)}
+                    theme="cancel"
+                  >
+                    Hủy bỏ
+                  </CoreButton>
+                  <CoreButton
+                    theme="submit"
+                    type="submit"
+                    disabled={isPending}
+                  >
+                    {isPending ? "Đang lưu..." : "Lưu thay đổi"}
+                  </CoreButton>
+                </Stack>
+              </form>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
+    </PageContainer>
   );
 }

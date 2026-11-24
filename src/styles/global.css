@@ -44,10 +44,54 @@
   }
 }
 
-/* Đồng bộ font cho Toastify, Rich Text (Quill), Datepicker và Sidebar */
+/* Đồng bộ font và giao diện hiện đại cho Toastify, Rich Text (Quill), Datepicker và Sidebar */
+.Toastify__toast-container {
+  width: auto !important;
+  min-width: 320px;
+  max-width: 420px !important;
+  padding: 0 12px !important;
+}
+
 .Toastify__toast,
 .Toastify__toast-body {
   font-family: var(--font-sans) !important;
+}
+
+.Toastify__toast.vds-toast {
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  min-height: 0 !important;
+  margin-bottom: 10px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 12px 28px -10px rgba(15, 23, 42, 0.16),
+    0 4px 10px -4px rgba(15, 23, 42, 0.06) !important;
+  color: #0f172a !important;
+}
+
+html.dark .Toastify__toast.vds-toast {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 14px 32px -10px rgba(0, 0, 0, 0.55) !important;
+  color: #f1f5f9 !important;
+}
+
+.Toastify__toast.vds-toast .Toastify__toast-body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.Toastify__progress-bar--wrp {
+  height: 2.5px !important;
+}
+
+.vds-toast__progress--success {
+  background: linear-gradient(90deg, #10b981, #34d399) !important;
+}
+
+.vds-toast__progress--error {
+  background: linear-gradient(90deg, #ef4444, #fb7185) !important;
 }
 
 .ql-container,

@@ -38,7 +38,9 @@ import { toastError, toastSuccess } from "@/toast";
 import router from "next/router";
 import { ROUTES } from "@/routes";
 import { TopAction } from "@/components/molecules/TopAction";
+import { AvatarUploadField } from "@/components/molecules/AvatarUploadField";
 import CoreLoading from "@/components/molecules/CoreLoading";
+import { Controller } from "react-hook-form";
 import CoreInput from "@/components/atoms/CoreInput";
 import { CoreDatePicker } from "@/components/atoms/CoreDatePicker";
 import { usePermission } from "@/components/hooks/permission/usePermission";
@@ -179,6 +181,26 @@ export default function EmployeeSave() {
       </Stack>
 
       <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Grid item xs={12}>
+          <Controller
+            control={control}
+            name="avatar"
+            render={({ field }) => (
+              <AvatarUploadField
+                value={field.value}
+                onChange={(url) => field.onChange(url)}
+                disabled={isView}
+                fallbackText={
+                  [employeeDetail?.firstName, employeeDetail?.lastName]
+                    .filter(Boolean)
+                    .join(" ") || "NV"
+                }
+                label="Hình ảnh nhân sự"
+                helperText="Tải lên ảnh đại diện của nhân viên (PNG, JPG, JPEG, tối đa 5MB)."
+              />
+            )}
+          />
+        </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <CoreInputCustom
             control={control}

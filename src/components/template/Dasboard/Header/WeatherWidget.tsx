@@ -261,6 +261,9 @@ export default function WeatherWidget() {
           display: { xs: "none", lg: "flex" },
           alignItems: "center",
           gap: 1.5,
+          width: 256,
+          minWidth: 256,
+          flexShrink: 0,
           px: 1.8,
           py: 0.75,
           borderRadius: "12px",
@@ -322,7 +325,13 @@ export default function WeatherWidget() {
           </Stack>
           <Typography
             variant="caption"
-            sx={{ color: "rgba(255,255,255,0.9)", fontSize: 11 }}
+            sx={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: 11,
+              display: "block",
+              whiteSpace: "nowrap",
+              fontVariantNumeric: "tabular-nums",
+            }}
           >
             {dayStr}, {dateStr} • {timeStr}
           </Typography>

@@ -50,6 +50,8 @@ import {
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import { ProjectStatus3DDonut } from "./ProjectStatus3DDonut";
+import { Cashflow3DChart } from "./Cashflow3DChart";
 
 const STATE_COLORS = [
   "#3b82f6",
@@ -218,7 +220,7 @@ export default function StatisticsPage() {
       container
       justifyContent="center"
       alignItems="flex-start"
-      sx={{ minHeight: "100vh", overflowY: "auto", bgcolor: "#f1f5f9" }}
+      sx={{ minHeight: "100vh", overflowY: "auto", bgcolor: "background.default" }}
     >
       <PageContainer
         title={
@@ -273,7 +275,7 @@ export default function StatisticsPage() {
                     startIcon={<AddIcon />}
                     onClick={() => router.push(`${ROUTES.PROJECT}/addNew`)}
                     sx={{
-                      bgcolor: "#ffffff",
+                      bgcolor: "background.paper",
                       color: "#0f172a",
                       fontWeight: 700,
                       textTransform: "none",
@@ -398,8 +400,8 @@ export default function StatisticsPage() {
               px: 2,
               mb: 3,
               borderRadius: 2,
-              border: "1px solid #e2e8f0",
-              bgcolor: "#ffffff",
+              border: "1px solid", borderColor: "divider",
+              bgcolor: "background.paper",
             }}
           >
             <Tabs value={tab} onChange={(_, v) => setTab(v)}>
@@ -436,8 +438,8 @@ export default function StatisticsPage() {
                           flexDirection: "column",
                           justifyContent: "space-between",
                           borderRadius: 2.5,
-                          border: "1px solid #e2e8f0",
-                          bgcolor: "#ffffff",
+                          border: "1px solid", borderColor: "divider",
+                          bgcolor: "background.paper",
                           transition: "all 0.2s",
                           "&:hover": {
                             transform: "translateY(-3px)",
@@ -520,7 +522,7 @@ export default function StatisticsPage() {
                           justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #fee2e2",
-                          bgcolor: "#ffffff",
+                          bgcolor: "background.paper",
                           transition: "all 0.2s",
                           "&:hover": {
                             transform: "translateY(-3px)",
@@ -591,7 +593,7 @@ export default function StatisticsPage() {
                           justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #fef3c7",
-                          bgcolor: "#ffffff",
+                          bgcolor: "background.paper",
                           transition: "all 0.2s",
                           "&:hover": {
                             transform: "translateY(-3px)",
@@ -659,7 +661,7 @@ export default function StatisticsPage() {
                           justifyContent: "space-between",
                           borderRadius: 2.5,
                           border: "1px solid #dcfce7",
-                          bgcolor: "#ffffff",
+                          bgcolor: "background.paper",
                           transition: "all 0.2s",
                           "&:hover": {
                             transform: "translateY(-3px)",
@@ -730,8 +732,8 @@ export default function StatisticsPage() {
                         sx={{
                           p: 2.5,
                           borderRadius: 2.5,
-                          border: "1px solid #e2e8f0",
-                          bgcolor: "#ffffff",
+                          border: "1px solid", borderColor: "divider",
+                          bgcolor: "background.paper",
                           height: "100%",
                         }}
                       >
@@ -742,126 +744,10 @@ export default function StatisticsPage() {
                         >
                           Phân bổ dự án theo trạng thái
                         </Typography>
-                        <Grid container spacing={2} alignItems="center">
-                          <Grid
-                            item
-                            xs={12}
-                            sm={5}
-                            className="flex justify-center"
-                          >
-                            <svg width={180} height={180} viewBox="0 0 180 180">
-                              <circle
-                                cx="90"
-                                cy="90"
-                                r="68"
-                                fill="transparent"
-                                stroke="#f1f5f9"
-                                strokeWidth="22"
-                              />
-                              {donutSegments.map((seg) => (
-                                <circle
-                                  key={seg.state}
-                                  cx="90"
-                                  cy="90"
-                                  r="68"
-                                  fill="transparent"
-                                  stroke={seg.color}
-                                  strokeWidth={
-                                    hoveredState === seg.state ? 26 : 21
-                                  }
-                                  strokeDasharray={seg.dashArray}
-                                  strokeDashoffset={seg.dashOffset}
-                                  transform="rotate(-90 90 90)"
-                                  style={{
-                                    cursor: "pointer",
-                                    transition: "stroke-width 0.18s ease",
-                                  }}
-                                  onMouseEnter={() =>
-                                    setHoveredState(seg.state)
-                                  }
-                                  onMouseLeave={() => setHoveredState(null)}
-                                />
-                              ))}
-                              <text
-                                x="90"
-                                y="84"
-                                textAnchor="middle"
-                                fontSize="24"
-                                fontWeight="800"
-                                fill="#0f172a"
-                              >
-                                {activeHoveredSegment
-                                  ? activeHoveredSegment.count
-                                  : overview?.totalProjects ?? 0}
-                              </text>
-                              <text
-                                x="90"
-                                y="104"
-                                textAnchor="middle"
-                                fontSize="11"
-                                fill="#64748b"
-                              >
-                                {activeHoveredSegment
-                                  ? `${activeHoveredSegment.label} (${activeHoveredSegment.pct}%)`
-                                  : "Tổng dự án"}
-                              </text>
-                            </svg>
-                          </Grid>
-                          <Grid item xs={12} sm={7}>
-                            <Stack spacing={0.8}>
-                              {donutSegments.map((seg) => (
-                                <Stack
-                                  key={seg.state}
-                                  direction="row"
-                                  justifyContent="space-between"
-                                  alignItems="center"
-                                  onMouseEnter={() =>
-                                    setHoveredState(seg.state)
-                                  }
-                                  onMouseLeave={() => setHoveredState(null)}
-                                  sx={{
-                                    px: 1.2,
-                                    py: 0.5,
-                                    borderRadius: 1.5,
-                                    cursor: "pointer",
-                                    bgcolor:
-                                      hoveredState === seg.state
-                                        ? "#f1f5f9"
-                                        : "transparent",
-                                  }}
-                                >
-                                  <Stack
-                                    direction="row"
-                                    spacing={1}
-                                    alignItems="center"
-                                  >
-                                    <Box
-                                      sx={{
-                                        width: 10,
-                                        height: 10,
-                                        borderRadius: "50%",
-                                        bgcolor: seg.color,
-                                      }}
-                                    />
-                                    <Typography variant="body2">
-                                      {seg.label}
-                                    </Typography>
-                                  </Stack>
-                                  <Typography variant="body2" fontWeight={700}>
-                                    {seg.count}{" "}
-                                    <Typography
-                                      component="span"
-                                      variant="caption"
-                                      color="text.secondary"
-                                    >
-                                      ({seg.pct}%)
-                                    </Typography>
-                                  </Typography>
-                                </Stack>
-                              ))}
-                            </Stack>
-                          </Grid>
-                        </Grid>
+                        <ProjectStatus3DDonut
+                          states={states}
+                          totalProjects={overview?.totalProjects ?? 0}
+                        />
                       </Paper>
                     </Grid>
 
@@ -872,8 +758,8 @@ export default function StatisticsPage() {
                         sx={{
                           p: 2.5,
                           borderRadius: 2.5,
-                          border: "1px solid #e2e8f0",
-                          bgcolor: "#ffffff",
+                          border: "1px solid", borderColor: "divider",
+                          bgcolor: "background.paper",
                           height: "100%",
                         }}
                       >
@@ -923,180 +809,7 @@ export default function StatisticsPage() {
                           </Stack>
                         </Stack>
 
-                        <Box sx={{ width: "100%", overflowX: "auto" }}>
-                          <svg width="100%" height={210} viewBox="0 0 580 210">
-                            <defs>
-                              <linearGradient
-                                id="colGrad"
-                                x1="0"
-                                y1="0"
-                                x2="0"
-                                y2="1"
-                              >
-                                <stop offset="0%" stopColor="#10b981" />
-                                <stop offset="100%" stopColor="#059669" />
-                              </linearGradient>
-                              <linearGradient
-                                id="planGrad"
-                                x1="0"
-                                y1="0"
-                                x2="0"
-                                y2="1"
-                              >
-                                <stop offset="0%" stopColor="#fbbf24" />
-                                <stop offset="100%" stopColor="#d97706" />
-                              </linearGradient>
-                            </defs>
-                            {[0, 0.25, 0.5, 0.75, 1].map((g) => {
-                              const y = 175 - g * 140;
-                              return (
-                                <g key={g}>
-                                  <line
-                                    x1="56"
-                                    y1={y}
-                                    x2="565"
-                                    y2={y}
-                                    stroke="#e2e8f0"
-                                    strokeDasharray={g === 0 ? undefined : "3 3"}
-                                  />
-                                  <text
-                                    x="48"
-                                    y={y + 4}
-                                    textAnchor="end"
-                                    fontSize="10"
-                                    fill="#64748b"
-                                  >
-                                    {formatCompactMoney(maxCashflow * g)}
-                                  </text>
-                                </g>
-                              );
-                            })}
-                            {cashflow.map((m, idx) => {
-                              const xBase = 76 + idx * 82;
-                              const colH = Math.max(
-                                3,
-                                (Number(m.collectedAmount || 0) / maxCashflow) *
-                                  140
-                              );
-                              const planH = Math.max(
-                                3,
-                                (Number(m.plannedAmount || 0) / maxCashflow) *
-                                  140
-                              );
-                              return (
-                                <g
-                                  key={m.month}
-                                  onMouseEnter={() => setHoveredMonth(idx)}
-                                  onMouseLeave={() => setHoveredMonth(null)}
-                                  style={{ cursor: "pointer" }}
-                                >
-                                  <rect
-                                    x={xBase}
-                                    y={175 - colH}
-                                    width={22}
-                                    height={colH}
-                                    rx={4}
-                                    fill="url(#colGrad)"
-                                    opacity={
-                                      hoveredMonth === null ||
-                                      hoveredMonth === idx
-                                        ? 1
-                                        : 0.45
-                                    }
-                                  />
-                                  <rect
-                                    x={xBase + 26}
-                                    y={175 - planH}
-                                    width={22}
-                                    height={planH}
-                                    rx={4}
-                                    fill="url(#planGrad)"
-                                    opacity={
-                                      hoveredMonth === null ||
-                                      hoveredMonth === idx
-                                        ? 1
-                                        : 0.45
-                                    }
-                                  />
-                                  <text
-                                    x={xBase + 24}
-                                    y={196}
-                                    textAnchor="middle"
-                                    fontSize="11"
-                                    fontWeight={
-                                      hoveredMonth === idx ? "700" : "500"
-                                    }
-                                    fill="#334155"
-                                  >
-                                    {m.month}
-                                  </text>
-                                </g>
-                              );
-                            })}
-                            {trendPath && (
-                              <path
-                                d={trendPath}
-                                fill="none"
-                                stroke="#0284c7"
-                                strokeWidth={2.2}
-                              />
-                            )}
-                            {cashflow.map((m, idx) => {
-                              const cx = 76 + idx * 82 + 12;
-                              const cy =
-                                175 -
-                                (Number(m.collectedAmount || 0) / maxCashflow) *
-                                  140;
-                              return (
-                                <circle
-                                  key={`pt-${m.month}`}
-                                  cx={cx}
-                                  cy={cy}
-                                  r={hoveredMonth === idx ? 5 : 3.5}
-                                  fill="#ffffff"
-                                  stroke="#0284c7"
-                                  strokeWidth={2}
-                                />
-                              );
-                            })}
-                          </svg>
-                        </Box>
-
-                        <Box
-                          sx={{
-                            mt: 1,
-                            px: 1.5,
-                            py: 0.8,
-                            borderRadius: 1.5,
-                            bgcolor:
-                              hoveredMonth !== null ? "#0f172a" : "#f8fafc",
-                            color:
-                              hoveredMonth !== null ? "#ffffff" : "#64748b",
-                          }}
-                        >
-                          {hoveredMonth !== null && cashflow[hoveredMonth] ? (
-                            <Typography variant="caption">
-                              <b>Tháng {cashflow[hoveredMonth].month}</b> — Thực
-                              thu:{" "}
-                              <b style={{ color: "#34d399" }}>
-                                {formatVnd(
-                                  cashflow[hoveredMonth].collectedAmount
-                                )}
-                              </b>{" "}
-                              • Kế hoạch:{" "}
-                              <b style={{ color: "#fbbf24" }}>
-                                {formatVnd(
-                                  cashflow[hoveredMonth].plannedAmount
-                                )}
-                              </b>
-                            </Typography>
-                          ) : (
-                            <Typography variant="caption">
-                              Di chuột lên từng tháng trên biểu đồ để xem đối
-                              chiếu Thực thu và Kế hoạch.
-                            </Typography>
-                          )}
-                        </Box>
+                        <Cashflow3DChart cashflow={cashflow} />
                       </Paper>
                     </Grid>
                   </Grid>
@@ -1107,8 +820,8 @@ export default function StatisticsPage() {
                     sx={{
                       p: 2.5,
                       borderRadius: 2.5,
-                      border: "1px solid #e2e8f0",
-                      bgcolor: "#ffffff",
+                      border: "1px solid", borderColor: "divider",
+                      bgcolor: "background.paper",
                     }}
                   >
                     <Stack
@@ -1157,7 +870,7 @@ export default function StatisticsPage() {
                               transition: "all 0.15s",
                               "&:hover": {
                                 borderColor: "primary.main",
-                                bgcolor: "#f8fafc",
+                                bgcolor: "action.hover",
                               },
                             }}
                           >
@@ -1293,8 +1006,8 @@ export default function StatisticsPage() {
                         sx={{
                           p: 2.5,
                           borderRadius: 2.5,
-                          border: "1px solid #e2e8f0",
-                          bgcolor: "#ffffff",
+                          border: "1px solid", borderColor: "divider",
+                          bgcolor: "background.paper",
                         }}
                       >
                         <Stack
@@ -1391,8 +1104,8 @@ export default function StatisticsPage() {
                         sx={{
                           p: 2.5,
                           borderRadius: 2.5,
-                          border: "1px solid #e2e8f0",
-                          bgcolor: "#ffffff",
+                          border: "1px solid", borderColor: "divider",
+                          bgcolor: "background.paper",
                         }}
                       >
                         <Typography
@@ -1429,7 +1142,7 @@ export default function StatisticsPage() {
                                   cursor: "pointer",
                                   "&:hover": {
                                     borderColor: "primary.main",
-                                    bgcolor: "#f8fafc",
+                                    bgcolor: "action.hover",
                                   },
                                 }}
                               >
@@ -1529,7 +1242,7 @@ export default function StatisticsPage() {
               >
                 <Autocomplete
                   size="small"
-                  sx={{ minWidth: 320, bgcolor: "#ffffff" }}
+                  sx={{ minWidth: 320, bgcolor: "background.paper" }}
                   options={projects}
                   value={selectedProject}
                   getOptionLabel={(opt) =>
@@ -1565,7 +1278,7 @@ export default function StatisticsPage() {
                 <>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={2.4}>
-                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid #e2e8f0" }}>
+                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
                         <Typography variant="caption" color="text.secondary">
                           Tổng giá trị HĐ
                         </Typography>
@@ -1575,7 +1288,7 @@ export default function StatisticsPage() {
                       </Paper>
                     </Grid>
                     <Grid item xs={12} sm={6} md={2.4}>
-                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid #e2e8f0" }}>
+                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
                         <Typography variant="caption" color="text.secondary">
                           Đã thu
                         </Typography>
@@ -1589,7 +1302,7 @@ export default function StatisticsPage() {
                       </Paper>
                     </Grid>
                     <Grid item xs={12} sm={6} md={2.4}>
-                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid #e2e8f0" }}>
+                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
                         <Typography variant="caption" color="text.secondary">
                           Còn phải thu
                         </Typography>
@@ -1603,7 +1316,7 @@ export default function StatisticsPage() {
                       </Paper>
                     </Grid>
                     <Grid item xs={12} sm={6} md={2.4}>
-                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid #e2e8f0" }}>
+                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
                         <Typography variant="caption" color="text.secondary">
                           Chi phí dự toán
                         </Typography>
@@ -1613,7 +1326,7 @@ export default function StatisticsPage() {
                       </Paper>
                     </Grid>
                     <Grid item xs={12} sm={6} md={2.4}>
-                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid #e2e8f0" }}>
+                      <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
                         <Typography variant="caption" color="text.secondary">
                           Lợi nhuận tạm tính
                         </Typography>
@@ -1631,11 +1344,11 @@ export default function StatisticsPage() {
                   <TableContainer
                     component={Paper}
                     elevation={0}
-                    sx={{ borderRadius: 2.5, border: "1px solid #e2e8f0" }}
+                    sx={{ borderRadius: 2.5, border: "1px solid", borderColor: "divider" }}
                   >
                     <Table size="small">
                       <TableHead>
-                        <TableRow sx={{ bgcolor: "#f8fafc" }}>
+                        <TableRow sx={{ bgcolor: "action.hover" }}>
                           <TableCell sx={{ fontWeight: 700 }}>Dự án</TableCell>
                           <TableCell sx={{ fontWeight: 700 }}>
                             Trạng thái

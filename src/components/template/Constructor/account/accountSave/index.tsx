@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Checkbox,
   Chip,
@@ -121,6 +122,24 @@ export default function AccountSave() {
                     }}
                   >
                     <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
+                      <Avatar
+                        src={accountDetail?.staff?.avatar || undefined}
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          fontSize: 14,
+                          fontWeight: 700,
+                          bgcolor: "#2563eb",
+                        }}
+                      >
+                        {(
+                          accountDetail?.firstName ||
+                          accountDetail?.username ||
+                          "U"
+                        )
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </Avatar>
                       <Typography variant="body2">
                         Tài khoản:{" "}
                         <strong>{accountDetail?.username || "—"}</strong>

@@ -54,6 +54,7 @@ const defaultValues: RequestBody["SAVE"] = {
   address: "",
   phone: "",
   gender: null,
+  avatar: "",
   description: "",
   genPassword: "",
   certificates: [],

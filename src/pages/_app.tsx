@@ -59,11 +59,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </DialogProvider>
 
             <ToastContainer
-              position="top-center"
-              autoClose={3000}
+              position="top-right"
+              autoClose={3500}
               hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
+              newestOnTop
+              closeOnClick={false}
               rtl={false}
               pauseOnFocusLoss
               draggable
